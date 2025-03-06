@@ -107,7 +107,8 @@ class PipelineHandler(PluginHandler):
                 model_name = ModelName.from_string(model_name_str)
                 config_copy = instance._chatbot_configs[chatbot_id].config.copy()
                 config_copy["model_name"] = model_name
-                plugin.catalog = instance._chatbot_configs[chatbot_id].catalog
+                plugin.prompt_builder_catalogs = instance._chatbot_configs[chatbot_id].prompt_builder_catalogs
+                plugin.lmrp_catalogs = instance._chatbot_configs[chatbot_id].lmrp_catalogs
                 pipeline = plugin.build(config_copy)
                 instance._builders[chatbot_id] = plugin
                 instance._pipeline_cache[(chatbot_id, str(model_name))] = pipeline

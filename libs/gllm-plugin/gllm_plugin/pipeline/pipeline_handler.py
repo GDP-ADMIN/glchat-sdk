@@ -16,7 +16,6 @@ from gllm_pipeline.pipeline.pipeline import Pipeline
 from pydantic import BaseModel, ConfigDict
 
 from gllm_plugin.config.app_config import AppConfig
-from gllm_plugin.pipeline.pipeline_plugin import PipelineBuilderPlugin
 from gllm_plugin.supported_models import ModelName
 
 
@@ -111,14 +110,14 @@ class PipelineHandler(PluginHandler):
                 instance._builders[chatbot_id] = plugin
                 instance._pipeline_cache[(chatbot_id, str(model_name))] = pipeline
 
-    def get_pipeline_builder(self, chatbot_id: str) -> PipelineBuilderPlugin:
+    def get_pipeline_builder(self, chatbot_id: str) -> Plugin:
         """Get a pipeline builder instance for the given chatbot.
 
         Args:
             chatbot_id (str): The chatbot ID.
 
         Returns:
-            PipelineBuilderPlugin: The pipeline builder instance.
+            Plugin: The pipeline builder instance.
 
         Raises:
             ValueError: If the chatbot ID is invalid.

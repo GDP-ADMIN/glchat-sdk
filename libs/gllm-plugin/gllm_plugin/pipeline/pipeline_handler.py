@@ -16,6 +16,7 @@ from gllm_pipeline.pipeline.pipeline import Pipeline
 from pydantic import BaseModel, ConfigDict
 
 from gllm_plugin.config.app_config import AppConfig
+from gllm_plugin.pipeline.pipeline_plugin import PipelineBuilderPlugin
 from gllm_plugin.supported_models import ModelName
 
 
@@ -110,15 +111,89 @@ class PipelineHandler(PluginHandler):
                 instance._builders[chatbot_id] = plugin
                 instance._pipeline_cache[(chatbot_id, str(model_name))] = pipeline
 
-    def _prepare_pipelines(self):
-        """Build pipeline configurations from the chatbots configuration.
+    def get_pipeline_builder(self, chatbot_id: str) -> PipelineBuilderPlugin:
+        """Get a pipeline builder instance for the given chatbot.
 
         Args:
-            app_config (AppConfig): The application configuration.
+            chatbot_id (str): The chatbot ID.
 
         Returns:
-            PipelineRouter: The pipeline router object.
+            PipelineBuilderPlugin: The pipeline builder instance.
+
+        Raises:
+            ValueError: If the chatbot ID is invalid.
         """
+        return self._builders[chatbot_id]
+
+    def get_pipeline(self, chatbot_id: str, model_name: ModelName) -> Pipeline:
+        """Get a pipeline instance for the given chatbot and model name.
+
+        Args:
+            chatbot_id (str): The chatbot ID.
+            model_name (ModelName): The model to use for inference.
+
+        Returns:
+            Pipeline: The pipeline instance.
+
+        Raises:
+            ValueError: If the chatbot ID is invalid.
+        """
+        return self._pipeline_cache[(chatbot_id, str(model_name))]
+
+    def get_pipeline_config(self, chatbot_id: str) -> dict[str, Any]:
+        """Get the pipeline configuration by chatbot ID.
+
+        Args:
+            chatbot_id (str): The chatbot ID.
+
+        Returns:
+            dict[str, Any]: The pipeline configuration.
+
+        Raises:
+            ValueError: If the chatbot or pipeline is not found.
+        """
+        self._validate_pipeline(chatbot_id)
+        return self._chatbot_configs[chatbot_id].config
+
+    def get_pipeline_type(self, chatbot_id: str) -> str:
+        """Get the pipeline type for the given chatbot and pipeline.
+
+        Args:
+            chatbot_id (str): The chatbot ID.
+        """
+        return self._chatbot_configs[chatbot_id].pipeline_type
+
+    def get_use_docproc(self, chatbot_id: str) -> bool:
+        """Get whether DocProc should be used for this pipeline.
+
+        Args:
+            chatbot_id (str): The chatbot ID.
+
+        Returns:
+            bool: Whether DocProc should be used.
+
+        Raises:
+            ValueError: If the chatbot or pipeline is not found.
+        """
+        self._validate_pipeline(chatbot_id)
+        config = self._chatbot_configs[chatbot_id].config.copy()
+        return config["use_docproc"]
+
+    def get_max_file_size(self, chatbot_id: str) -> int | None:
+        """Get maximum file size for the given chatbot and pipeline.
+
+        Args:
+            chatbot_id (str): The chatbot ID.
+
+        Returns:
+            int | None: The maximum file size if provided.
+        """
+        self._validate_pipeline(chatbot_id)
+        config = self._chatbot_configs[chatbot_id].config.copy()
+        return config.get("max_file_size")
+
+    def _prepare_pipelines(self):
+        """Build pipeline configurations from the chatbots configuration."""
         self._chatbot_configs = {}
         self._pipeline_cache = {}
 

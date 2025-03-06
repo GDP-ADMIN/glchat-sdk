@@ -14,7 +14,7 @@ from typing import Any
 
 from typing_extensions import TypeVar
 
-from gllm_plugin.storage.anonymizer_storage import AnonymizerMapping
+from gllm_plugin.storage.base_anonymizer_storage import AnonymizerMapping
 
 Conversation = TypeVar("Conversation")
 Message = TypeVar("Message")
@@ -36,7 +36,7 @@ class DocumentStatus(Enum):
     FAILED = "failed"
 
 
-class ChatHistoryStorage(ABC):
+class BaseChatHistoryStorage(ABC):
     """Interface for chat history storage that defines methods for managing chat conversations and messages."""
 
     @abstractmethod

@@ -14,7 +14,7 @@ AnonymizerMapping = TypeVar("AnonymizerMapping")
 MappingDataType = TypeVar("MappingDataType")
 
 
-class AnonymizerStorage(ABC):
+class BaseAnonymizerStorage(ABC):
     """Interface for anonymizer storage that defines methods for managing anonymizer mappings."""
 
     @abstractmethod

@@ -1,0 +1,112 @@
+"""Base Pipeline Builder Plugin.
+
+This module defines the base class for Pipeline Builder plugins.
+
+Authors:
+    Samuel Lusandi (samuel.lusandi@gdplabs.id)
+    Hermes Vincentius Gani (hermes.v.gani@gdplabs.id)
+"""
+
+from abc import ABC, abstractmethod
+from typing import Any, Generic, Type, TypeVar
+
+from bosa_core.plugin.plugin import Plugin
+from gllm_inference.catalog.catalog import BaseCatalog
+from gllm_pipeline.pipeline.pipeline import Pipeline
+
+from gllm_plugin.pipeline.pipeline_handler import PipelineHandler
+
+PipelineState = TypeVar("PipelineState")
+PipelinePresetConfig = TypeVar("PipelinePresetConfig", bound="BasePipelinePresetConfig")
+PipelineRuntimeConfig = TypeVar("PipelineRuntimeConfig", bound="BaseModel")
+
+
+@Plugin.for_handler(PipelineHandler)
+class PipelineBuilderPlugin(Plugin, Generic[PipelineState, PipelinePresetConfig], ABC):
+    """Base class for Pipeline Builder plugins.
+
+    This class combines the Plugin architecture with the Pipeline Builder functionality.
+    """
+
+    name: str
+    description: str = "Pipeline builder plugin"
+    version: str = "0.0.0"
+
+    catalog: BaseCatalog[Any]
+
+    additional_config_class: Type[PipelineRuntimeConfig] | None = None
+    preset_config_class: Type[PipelinePresetConfig] | None = None
+
+    @classmethod
+    def get_preset_config_class(cls) -> Type[PipelinePresetConfig]:
+        """Get the preset_config_class.
+
+        Returns:
+            Type[PipelinePresetConfig]: The pipeline preset config class.
+
+        Raises:
+            NotImplementedError: If the preset_config_class is not defined.
+        """
+        if cls.preset_config_class is None:
+            raise NotImplementedError(f"{cls.__name__} must define a `preset_config_class` attribute.")
+        return cls.preset_config_class
+
+    @abstractmethod
+    def build_initial_state(
+        self,
+        request_config: dict[str, Any],
+        pipeline_config: dict[str, Any],
+        **kwargs: Any,
+    ) -> PipelineState:
+        """Build the initial pipeline state.
+
+        Args:
+            request_config: Request configuration
+            pipeline_config: Pipeline configuration
+            **kwargs: Additional state arguments
+
+        Returns:
+            Initial pipeline state
+        """
+
+    @abstractmethod
+    def build(
+        self,
+        pipeline_config: dict[str, Any],
+    ) -> Pipeline:
+        """Build a pipeline instance.
+
+        Args:
+            pipeline_config: Pipeline configuration including model name and other settings
+
+        Returns:
+            Built pipeline instance
+        """
+
+    def build_additional_runtime_config(
+        self,
+        pipeline_config: dict[str, Any],
+    ) -> dict[str, Any]:
+        """Build additional runtime configuration.
+
+        Args:
+            pipeline_config: Pipeline configuration
+
+        Returns:
+            Additional runtime configuration
+        """
+        if not self.additional_config_class:
+            return {}
+
+        config = self.additional_config_class(**pipeline_config)
+        return config.model_dump(exclude_none=True)
+
+    def get_config(self) -> dict[str, Any]:
+        """Get the pipeline configuration.
+
+        Returns:
+            Pipeline configuration
+        """
+        if self.preset_config_class:
+            return self.preset_config_class().model_dump()
+        return {}

@@ -1,0 +1,61 @@
+[tool.poetry]
+name = "gllm-plugin"
+version = "0.0.1"
+description = ""
+authors = ["GenAI SDK Team <gat-sdk@gdplabs.id>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+gllm-core = {git = "ssh://git@github.com/GDP-ADMIN/gen-ai-internal.git", subdirectory = "libs/gllm-core"}
+gllm-inference = {git = "ssh://git@github.com/GDP-ADMIN/gen-ai-internal.git", subdirectory = "libs/gllm-inference"}
+gllm-pipeline = {git = "ssh://git@github.com/GDP-ADMIN/gen-ai-internal.git", subdirectory = "libs/gllm-pipeline"}
+
+python = ">=3.11,<3.13"
+semver = "^3.0.4"
+
+bosa-core = { git = "ssh://git@github.com/GDP-ADMIN/bosa.git", branch = "bosa-python-core-0.0.2", subdirectory = "python/bosa-core" }
+
+[tool.poetry.extras]
+flair= ["flair"]
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.1.1"
+pre-commit = "^3.6.2"
+pytest-cov = "^5.0.0"
+ruff = "^0.6.7"
+
+[tool.ruff]
+line-length = 120
+
+[tool.ruff.lint]
+ignore = ["B026", "C400", "C901", "E203", "E266", "F401", "F403", "F821"]
+select = ["B", "B9", "C", "D", "E", "F", "I", "PL", "W"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["D", "PLR"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.pydocstyle]
+convention = "google"
+add_ignore = ["D107"]
+
+# This group includes dependencies for compiling and stubs generation
+# use `poetry install --with compiler` to install these dependencies
+
+
+[tool.poetry.group.compiler]
+optional = true
+[tool.poetry.group.compiler.dependencies]
+nuitka = "2.5.6"
+# We use stubgen from mypy to generate stubs for our compiled modules
+# ref: https://mypy.readthedocs.io/en/stable/stubgen.html
+mypy = "^1.11.2"

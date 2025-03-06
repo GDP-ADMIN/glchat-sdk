@@ -1,0 +1,150 @@
+"""Pipeline Handler for Pipeline Builder plugins.
+
+This handler manages Pipeline Builder plugins and provides necessary services.
+
+Authors:
+    Samuel Lusandi (samuel.lusandi@gdplabs.id)
+    Hermes Vincentius Gani (hermes.v.gani@gdplabs.id)
+"""
+
+from typing import Any, Type
+
+from bosa_core import Plugin
+from bosa_core.plugin.handler import PluginHandler
+from gllm_core.utils import LoggerManager
+from gllm_pipeline.pipeline.pipeline import Pipeline
+from pydantic import BaseModel, ConfigDict
+
+from gllm_plugin.config.app_config import AppConfig
+from gllm_plugin.supported_models import ModelName
+
+
+class ChatbotConfig(BaseModel):
+    """Chatbot configuration class containing pipeline configs and metadata."""
+
+    config: dict[str, Any]
+    catalog: Any
+    pipeline_type: str
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
+
+class PipelinePresetConfig(BaseModel):
+    """Pipeline preset configuration class."""
+
+    preset_id: str
+    supported_models: list[str]
+
+
+class PipelineConfig(BaseModel):
+    """Pipeline configuration class."""
+
+    pipeline_type: str
+    chatbot_presets: dict[str, PipelinePresetConfig]
+
+
+logger = LoggerManager().get_logger(__name__)
+
+
+class PipelineHandler(PluginHandler):
+    """Handler for Pipeline Builder plugins.
+
+    This handler manages pipeline plugins and provides caching for built pipelines.
+    """
+
+    _pipeline_cache: dict[tuple[str, str], Pipeline]
+    _chatbot_configs: dict[str, ChatbotConfig]
+
+    def __init__(self, app_config: AppConfig):
+        """Initialize the pipeline handler.
+
+        Args:
+            app_config: Application configuration
+        """
+        self.app_config = app_config
+        self._pipeline_cache = {}
+        self.activated_configs: dict[str, PipelineConfig] = {}
+        self._builders = {}
+        self._chatbot_configs = {}
+        self._prepare_pipelines()
+
+    @classmethod
+    def create_injections(cls, instance: "PipelineHandler") -> dict[Type[Any], Any]:
+        """Create injection mappings for pipeline plugins.
+
+        Args:
+            instance: The handler instance providing injections
+
+        Returns:
+            Dictionary mapping service types to their instances
+        """
+        return {AppConfig: instance.app_config}
+
+    @classmethod
+    def initialize_plugin(cls, instance: "PipelineHandler", plugin: Plugin) -> None:
+        """Initialize plugin-specific resources.
+
+        This method is called after plugin creation and service injection.
+        For each plugin, we build pipelines for all supported models and cache them.
+
+        Args:
+            instance: The handler instance
+            plugin: The pipeline builder plugin instance
+        """
+        pipeline_type = plugin.name
+
+        if pipeline_type not in instance.activated_configs:
+            return
+
+        pipeline_config = instance.activated_configs[pipeline_type]
+
+        for chatbot_id, preset in pipeline_config.chatbot_presets.items():
+            if pipeline_type != instance._chatbot_configs[chatbot_id].pipeline_type:
+                continue
+
+            for model_name_str in preset.supported_models:
+                model_name = ModelName.from_string(model_name_str)
+                config_copy = instance._chatbot_configs[chatbot_id].config.copy()
+                config_copy["model_name"] = model_name
+                plugin.catalog = instance._chatbot_configs[chatbot_id].catalog
+                pipeline = plugin.build(config_copy)
+                instance._builders[chatbot_id] = plugin
+                instance._pipeline_cache[(chatbot_id, str(model_name))] = pipeline
+
+    def _prepare_pipelines(self):
+        """Build pipeline configurations from the chatbots configuration.
+
+        Args:
+            app_config (AppConfig): The application configuration.
+
+        Returns:
+            PipelineRouter: The pipeline router object.
+        """
+        self._chatbot_configs = {}
+        self._pipeline_cache = {}
+
+        pipeline_types: set[str] = set()
+        chatbot_presets: dict[str, PipelinePresetConfig] = {}
+        for chatbot_id, chatbot_info in self.app_config.chatbots.items():
+            if not chatbot_info.pipeline:
+                continue
+
+            pipeline_info = chatbot_info.pipeline
+            pipeline_type = pipeline_info["type"]
+
+            chatbot_presets[chatbot_id] = PipelinePresetConfig(
+                preset_id=pipeline_info["config"]["pipeline_preset_id"],
+                supported_models=list(pipeline_info["config"]["supported_models"].keys()),
+            )
+            logger.info(f"Storing pipeline config for chatbot `{chatbot_id}`")
+            self._chatbot_configs[chatbot_id] = ChatbotConfig(
+                config=pipeline_info["config"],
+                catalog=pipeline_info["catalog"],
+                pipeline_type=pipeline_type,
+            )
+            pipeline_types.add(pipeline_type)
+
+        for pipeline_type in pipeline_types:
+            self.activated_configs[pipeline_type] = PipelineConfig(
+                pipeline_type=pipeline_type,
+                chatbot_presets=chatbot_presets,
+            )

@@ -12,6 +12,7 @@ from typing import Any, Type
 from bosa_core import Plugin
 from bosa_core.plugin.handler import PluginHandler
 from gllm_core.utils import LoggerManager
+from gllm_inference.catalog import PromptBuilderCatalog, LMRequestProcessorCatalog
 from gllm_pipeline.pipeline.pipeline import Pipeline
 from pydantic import BaseModel, ConfigDict
 
@@ -23,7 +24,8 @@ class ChatbotConfig(BaseModel):
     """Chatbot configuration class containing pipeline configs and metadata."""
 
     config: dict[str, Any]
-    catalog: Any
+    prompt_builder_catalogs: dict[str, PromptBuilderCatalog] | None
+    lmrp_catalogs: dict[str, LMRequestProcessorCatalog] | None
     pipeline_type: str
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
@@ -200,6 +202,7 @@ class PipelineHandler(PluginHandler):
         chatbot_presets: dict[str, PipelinePresetConfig] = {}
         for chatbot_id, chatbot_info in self.app_config.chatbots.items():
             if not chatbot_info.pipeline:
+                logger.warning(f"Pipeline config not found for chatbot `{chatbot_id}`")
                 continue
 
             pipeline_info = chatbot_info.pipeline
@@ -209,10 +212,12 @@ class PipelineHandler(PluginHandler):
                 preset_id=pipeline_info["config"]["pipeline_preset_id"],
                 supported_models=list(pipeline_info["config"]["supported_models"].keys()),
             )
+
             logger.info(f"Storing pipeline config for chatbot `{chatbot_id}`")
             self._chatbot_configs[chatbot_id] = ChatbotConfig(
                 config=pipeline_info["config"],
-                catalog=pipeline_info["catalog"],
+                prompt_builder_catalogs=pipeline_info["prompt_builder_catalogs"],
+                lmrp_catalogs=pipeline_info["lmrp_catalogs"],
                 pipeline_type=pipeline_type,
             )
             pipeline_types.add(pipeline_type)
@@ -222,3 +227,15 @@ class PipelineHandler(PluginHandler):
                 pipeline_type=pipeline_type,
                 chatbot_presets=chatbot_presets,
             )
+
+    def _validate_pipeline(self, chatbot_id: str) -> None:
+        """Validate the pipeline configuration exists.
+
+        Args:
+            chatbot_id (str): The chatbot ID.
+
+        Raises:
+            ValueError: If the chatbot or pipeline configuration is not found.
+        """
+        if chatbot_id not in self._chatbot_configs:
+            raise ValueError(f"Pipeline configuration for chatbot `{chatbot_id}` not found")

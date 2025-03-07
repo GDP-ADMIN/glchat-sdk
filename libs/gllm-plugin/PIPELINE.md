@@ -5,7 +5,7 @@ This example will guide you through creating new pipeline classes from external 
 1. **Add `gllm-plugin` dependency in `pyproject.toml`**
 
     ```toml
-    gllm-plugin = {git = "ssh://git@github.com/GDP-ADMIN/gen-ai-internal.git", subdirectory = "libs/gllm-plugin"}
+    gllm-plugin = {git = "ssh://git@github.com/GDP-ADMIN/gen-ai-external.git", subdirectory = "libs/gllm-plugin"}
     ```
 
 2. **Define the Pipeline State**
@@ -20,33 +20,53 @@ This example will guide you through creating new pipeline classes from external 
 
     Create a new file `pipeline.py` that implements `PipelineBuilderPlugin[NewState, NewPresetConfig]`. This class will define the steps of the pipeline and how they interact with each other.
 
-5. **Add new pipeline to GLLM Backend dependency manager and register using `PluginManager`.**
-First, add the new pipeline to the `gllm_backend` dependency manager in the `pyproject.toml` file.
-```toml
-new-pipeline = {git = "ssh://git@github.com/new-pipeline", subdirectory = "/"}
+5. **Define the Pipeline Configurations**
+
+    Create a new file `config.yaml` and define the config for your new pipeline.
+    The config.yaml contains following:
+    - `rago_pipeline`: The name of the pipeline. Must match the name in `pipeline.py`.
+    - `presets`: The list of preset configurations. Each preset must contains config keys: `pipeline_preset_id`, `supported_models`, and all keys defined in `preset_config.py`. Optionally, the config keys can also contains keys in `BasePipelinePresetConfig` to override the default values. The following are the optional keys with their default values:
+      - `supported_agents: list[str] = []`
+      - `support_pii_anonymization: bool = False`
+      - `support_multimodal: bool = True`
+      - `use_docproc: bool = True`
+      - `search_types: list[SearchType] = [normal]`
+    - `chatbots`: The list of chatbot configurations. Each chatbot must contains following keys:
+      - `id`
+      - `display_name`
+      - `description`
+      - `pipeline_preset_id`: use 1 of the pipeline_preset_id defined in presets
+      - `inference_catalog`: path to catalog Google spreadsheet. The spreadsheet needs to allow access from GLChat Google account.
+        - `sheet_id`
+        - `prompt_builder_worksheet_id`
+        - `lmrp_worksheet_id`
+    - `user_chatbots`: The list of user chatbots.
+
+6. **Register the new pipeline to GLLM Backend using API.**
+
+Sample curl request:
+```
+curl --request POST \
+  --url http://localhost:8000/register-pipeline-plugin \
+  --header 'Content-Type: application/json' \
+  --data '{
+	"folder_name": "simple_pipeline",
+	"path": "/Users/username/Downloads/simple-pipeline"
+}'
 ```
 
 The project structure will be as follows:
 ```
-- gen-ai-template [git folder]
-  - applications
-    - gdplabs-gen-ai-starter-gllm-backend
-      - pyproject.toml [add dependency to folder /full/path/to/claudia-rag]
-
-- claudia-pipeline-repo [git folder]
+- simple-pipeline [git folder]
   - pyproject.toml [depends on gllm-plugin]
-  - pipeline
-    - claudia-rag
-      - pipeline.py
-      - state.py
-      - config.py
+  - simple_pipeline
+    - config.yaml
+    - pipeline.py
+    - preset_config.py
+    - state.py
 ```
 
-After following these steps, you can now use the new pipeline in GLChat by adding it to the pipeline configuration using import.
-```python
-from new_repository.config.pipeline.simple.preset_config import SimplePresetConfig
-from new_repository.config.pipeline.simple.state import SimpleState, SimpleStateKeys
-```
+After following these steps, you can now use the new pipeline in GLChat.
 
 
 ### Example Usage for Static Response Synthesizer
@@ -181,4 +201,66 @@ class SimplePipelineBuilder(PipelineBuilderPlugin[SimpleState, SimplePresetConfi
             StaticListResponseSynthesizer: The response synthesizer component.
         """
         return StaticListResponseSynthesizer()
+```
+
+`config.yaml`
+```yaml
+rago_pipeline: simple-pipeline
+
+
+presets:
+  - pipeline_preset_id: preset-1
+    supported_models:
+      - anthropic/claude-3-5-sonnet
+      - openai/gpt-4o-mini
+      - openai/gpt-4o
+    support_multimodal: true
+    use_docproc: false
+
+  - pipeline_preset_id: preset-2
+    supported_models:
+      - openai/gpt-4o
+      - openai/gpt-4o-mini
+    support_multimodal: false
+    use_docproc: false
+
+
+chatbots:
+  - id: simple-chatbot-1a
+    display_name: Simple Chatbot 1a
+    description: A chatbot using the preset 1
+    pipeline_preset_id: preset-1
+    inference_catalog:
+      sheet_id: "1X5g3Ruetgg27ybRZ7ie40oxXzbS4YLqRP5_rpQ7MYps"
+      prompt_builder_worksheet_id: "0"
+      lmrp_worksheet_id: "1151817216"
+
+  - id: simple-chatbot-1b
+    display_name: Simple Chatbot 1b
+    description: Another chatbot using the preset 1
+    pipeline_preset_id: preset-1
+    inference_catalog:
+      sheet_id: "1X5g3Ruetgg27ybRZ7ie40oxXzbS4YLqRP5_rpQ7MYps"
+      prompt_builder_worksheet_id: "0"
+      lmrp_worksheet_id: "1151817216"
+
+  - id: simple-chatbot-2
+    display_name: Simple Chatbot 2
+    description: A chatbot using the preset 2
+    pipeline_preset_id: preset-2
+    inference_catalog:
+      sheet_id: "1X5g3Ruetgg27ybRZ7ie40oxXzbS4YLqRP5_rpQ7MYps"
+      prompt_builder_worksheet_id: "0"
+      lmrp_worksheet_id: "1151817216"
+
+
+user_chatbots:
+  - user_id: user-new-1
+    chatbot_ids:
+      - simple-chatbot-1a
+      - simple-chatbot-1b
+
+  - user_id: user-new-2
+    chatbot_ids:
+      - "*"
 ```

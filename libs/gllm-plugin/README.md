@@ -20,10 +20,10 @@ A library to implement Plugin architecture and integrate with existing pipelines
 3. Install the library using Poetry:
     ```bash
     # Latest
-    poetry add "git+ssh://git@github.com/GDP-ADMIN/gen-ai-internal.git#subdirectory=libs/gllm-plugin"
+    poetry add "git+ssh://git@github.com/GDP-ADMIN/gen-ai-external.git#subdirectory=libs/gllm-plugin"
 
     # Specific version
-    poetry add "git+ssh://git@github.com/GDP-ADMIN/gen-ai-internal.git@gllm_plugin-v0.0.1#subdirectory=libs/gllm-plugin"
+    poetry add "git+ssh://git@github.com/GDP-ADMIN/gen-ai-external.git@gllm_plugin-v0.0.1#subdirectory=libs/gllm-plugin"
     ```
 
 4. At this step, you can deactivate Miniconda environment as Poetry will create and manage its own virtual environment for you.

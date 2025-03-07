@@ -20,7 +20,7 @@ class BasePipelinePresetConfig(BaseModel):
     Attributes:
         pipeline_preset_id (str): The pipeline preset id.
         supported_models (dict[str, Any]): The supported models.
-        supported_agents (list[dict[str, Any]]): The supported agents.
+        supported_agents (list[str]): The supported agents.
         support_pii_anonymization (bool): Whether the pipeline supports pii anonymization.
         support_multimodal (bool): Whether the pipeline supports multimodal.
         use_docproc (bool): Whether to use the document processor.
@@ -29,7 +29,7 @@ class BasePipelinePresetConfig(BaseModel):
 
     pipeline_preset_id: str
     supported_models: dict[str, Any]
-    supported_agents: list[dict[str, Any]]
+    supported_agents: list[str]
     support_pii_anonymization: bool
     support_multimodal: bool
     use_docproc: bool

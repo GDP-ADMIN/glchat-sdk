@@ -29,7 +29,7 @@ class TestPipelinePresetConfig:
 
     pipeline_preset_id: str = "test_preset"
     supported_models: dict[str, dict] = field(default_factory=lambda: {"openai/gpt-4o": {"max_tokens": 100}})
-    supported_agents: list[dict[str, dict]] = []
+    supported_agents: list[str] = []
     support_pii_anonymization: bool = False
     support_multimodal: bool = False
     use_docproc: bool = False

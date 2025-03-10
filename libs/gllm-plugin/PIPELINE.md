@@ -102,7 +102,7 @@ class SimpleStateKeys(StrEnum):
     RESPONSE_SYNTHESIS_BUNDLE = "response_synthesis_bundle"
 ```
 
-`preset.py`
+`preset_config.py`
 ```python
 from gllm_plugin.config.base_pipeline_preset_config import BasePipelinePresetConfig
 

@@ -24,8 +24,8 @@ This example will guide you through creating new pipeline classes from external 
 
     Create a new file `config.yaml` and define the config for your new pipeline.
     The config.yaml contains following:
-    - `rago_pipeline`: The name of the pipeline. Must match the name in `pipeline.py`.
-    - `presets`: The list of preset configurations. Each preset must contains config keys: `pipeline_preset_id`, `supported_models`, and all keys defined in `preset_config.py`. Optionally, the config keys can also contains keys in `BasePipelinePresetConfig` to override the default values. The following are the optional keys with their default values:
+    - `rago_pipeline`: The name of the pipeline. It must match the name in `pipeline.py`.
+    - `presets`: The list of preset configurations. Each preset must contain config keys: `pipeline_preset_id`, `supported_models`, and all keys defined in `preset_config.py`. Optionally, the config keys can also contain keys in `BasePipelinePresetConfig` to override the default values. The following are the optional keys with their default values:
       - `supported_agents: list[str] = []`
       - `support_pii_anonymization: bool = False`
       - `support_multimodal: bool = True`
@@ -45,7 +45,7 @@ This example will guide you through creating new pipeline classes from external 
 6. **Register the new pipeline to GLLM Backend using API.**
 
 Sample curl request:
-```
+```sh
 curl --request POST \
   --url http://localhost:8000/register-pipeline-plugin \
   --header 'Content-Type: application/json' \

@@ -54,9 +54,9 @@ class BaseChatHistoryStorage(ABC):
         Args:
             user_id (str): The ID of the user.
             query (str | None): A search query to filter conversations.
-            chatbot_ids (list[str] | None): A list of chatbot IDs to filter conversations.
-            cursor (str | None): A cursor for pagination.
-            limit (int | None): The maximum number of conversations to retrieve.
+            chatbot_ids (list[str] | None): A list of chatbot IDs to filter conversations. Defaults to None.
+            cursor (str | None): A cursor for pagination. Defaults to None.
+            limit (int | None): The maximum number of conversations to retrieve. Defaults to None.
             kwargs (Any): Additional arguments.
 
         Returns:
@@ -126,8 +126,8 @@ class BaseChatHistoryStorage(ABC):
             message (str): The message content.
             user_id (str): The ID of the user.
             conversation_id (str): The ID of the conversation.
-            parent_id (str | None): The ID of the parent message.
-            source (str | None): The source of the message.
+            parent_id (str | None, optional): The ID of the parent message. Defaults to None.
+            source (str | None, optional): The source of the message. Defaults to None.
             kwargs (Any): Additional arguments.
 
         Returns:
@@ -151,8 +151,8 @@ class BaseChatHistoryStorage(ABC):
             message (str): The message content.
             user_id (str): The ID of the user.
             conversation_id (str): The ID of the conversation.
-            parent_id (str | None): The ID of the parent message.
-            source (str | None): The source of the message.
+            parent_id (str | None): The ID of the parent message. Defaults to None.
+            source (str | None): The source of the message. Defaults to None.
             kwargs (Any): Additional arguments.
 
         Returns:
@@ -181,7 +181,7 @@ class BaseChatHistoryStorage(ABC):
             conversation_id (str): The ID of the conversation.
             parent_id (str): The ID of the parent message.
             source (str): The source of the message.
-            metadata_ (dict[str, Any] | None): Additional metadata for the message.
+            metadata_ (dict[str, Any] | None, optional): Additional metadata for the message. Defaults to None.
             kwargs (Any): Additional arguments.
 
         Returns:
@@ -204,7 +204,7 @@ class BaseChatHistoryStorage(ABC):
             user_id (str): The ID of the user.
             conversation_id (str): The ID of the conversation.
             message_list (list[Any]): A list of messages to save.
-            attachments (dict[str, Any] | None): Attachments associated with the messages.
+            attachments (dict[str, Any] | None): Attachments associated with the messages. Defaults to None.
             kwargs (Any): Additional arguments.
 
         Returns:
@@ -252,8 +252,8 @@ class BaseChatHistoryStorage(ABC):
         Args:
             user_id (str): The ID of the user.
             conversation_id (str): The ID of the conversation.
-            limit (int | None): The maximum number of messages to retrieve.
-            max_timestamp (datetime | None): The maximum timestamp for the messages.
+            limit (int | None): The maximum number of messages to retrieve. Defaults to None.
+            max_timestamp (datetime | None): The maximum timestamp for the messages. Defaults to None.
             kwargs (Any): Additional arguments.
 
         Returns:

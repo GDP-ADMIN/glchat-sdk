@@ -19,10 +19,13 @@ git config --global user.email "gdplabs@gdplabs.id"
 git config --global url."https://${GH_TOKEN}:x-oauth-basic@github.com/".insteadOf "https://github.com/"
 git config --global url."https://${GH_TOKEN}:x-oauth-basic@github.com".insteadOf "ssh://git@github.com"
 
-# Packages Installation
+# Google Cloud Authentication
 poetry config http-basic.gen-ai-internal oauth2accesstoken "$(cat token.key)"
+
+# Use binary version
 update_pyproject
 poetry install --all-extras --with compiler
+poetry add libmagic python-magic-bin
 poetry run pre-commit run
 poetry run coverage run -m pytest --cov-report=xml --cov=. tests/
 binary_build

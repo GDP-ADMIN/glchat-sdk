@@ -3,19 +3,7 @@ name: Build Binary
 on:
   push:
     tags:
-      - 'gllm_agents-v*'
-      - 'gllm_caching-v*'
-      - 'gllm_core-v*'
-      - 'gllm_datastore-v*'
-      - 'gllm_docproc-v*'
-      - 'gllm_generation-v*'
-      - 'gllm_inference-v*'
-      - 'gllm_misc-v*'
-      - 'gllm_pipeline-v*'
       - 'gllm_plugin-v*'
-      - 'gllm_privacy-v*'
-      - 'gllm_retrieval-v*'
-      - 'gllm_tools-v*'
   workflow_dispatch:
 
 jobs:
@@ -26,7 +14,6 @@ jobs:
       matrix:
         os: [windows-latest, macos-13, macos-14]
         python-version: ["3.11.0", "3.12.0"]
-
     steps:
     - uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python-version }}
@@ -37,19 +24,22 @@ jobs:
     - name: Setup Poetry
       uses: abatilo/actions-poetry@v3.0.0
       with:
-        poetry-version: 1.8.3
+        poetry-version: 2.1.1
       
-    - name: auth
+    - name: Google Cloud Authentication
       uses: 'google-github-actions/auth@v2'
       with:
         credentials_json: '${{ secrets.GCP_CREDENTIALS }}'
         
-    - name: 'Set up Cloud SDK'
+    - name: Setup Google Cloud SDK
       uses: 'google-github-actions/setup-gcloud@v2'
       
-    - name: 'Use gcloud CLI'
+    - name: Generate Google Authentication Token
       shell: bash
       run: |
+        export MODULE=$(echo "${TAG_NAME}" | sed -E 's/-v.*$//' | tr '_' '-')
+        echo "MODULE=${MODULE}" >> $GITHUB_ENV
+        cd libs/${MODULE}
         gcloud auth print-access-token > token.key
         
     - name: Build Binary
@@ -57,10 +47,8 @@ jobs:
       run: |
         export TAG_NAME="${{  github.ref_name }}"
         export MODULE=$(echo "${TAG_NAME}" | sed -E 's/-v.*$//' | tr '_' '-')
-        echo "MODULE=${MODULE}" >> $GITHUB_ENV
         echo "Processed module name: ${MODULE}"
         cd libs/${MODULE}
-
         if [ "$RUNNER_OS" == "macOS" ]; then
           poetry env use python$(echo "${{ matrix.python-version }}" | cut -d'.' -f1,2)
           brew install libmagic
@@ -69,12 +57,12 @@ jobs:
         bash build.ci.sh
       env:
         GH_TOKEN: ${{ secrets.GH_TOKEN }}
-        BASE_BRANCH: "main"
-        
-    - name: Upload Registry
+
+    - name: Upload Package To Registry
       shell: bash
       run: |
         # Setup .pypirc for Artifact Registry
+        cd libs/${MODULE}
         TOKEN=$(cat token.key)
         echo "[distutils]
         index-servers =
@@ -85,6 +73,5 @@ jobs:
         username: oauth2accesstoken
         password: $TOKEN" > ~/.pypirc\
 
-        cd libs/${MODULE}
         python -m pip install --upgrade pip twine keyring keyrings.google-artifactregistry-auth
         python -m twine upload --verbose --repository-url https://asia-southeast2-python.pkg.dev/gdp-labs/gen-ai/ dist/*.whl

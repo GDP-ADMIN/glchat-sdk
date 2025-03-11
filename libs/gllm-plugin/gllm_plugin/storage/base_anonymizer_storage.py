@@ -8,7 +8,7 @@ References:
 """
 
 from abc import ABC, abstractmethod
-from typing import List, TypeVar
+from typing import TypeVar
 
 AnonymizerMapping = TypeVar("AnonymizerMapping")
 MappingDataType = TypeVar("MappingDataType")
@@ -18,14 +18,14 @@ class BaseAnonymizerStorage(ABC):
     """Interface for anonymizer storage that defines methods for managing anonymizer mappings."""
 
     @abstractmethod
-    def get_mappings_by_conversation_id(self, conversation_id: str) -> List[AnonymizerMapping]:
+    def get_mappings_by_conversation_id(self, conversation_id: str) -> list[AnonymizerMapping]:
         """Retrieve anonymizer mappings by conversation ID.
 
-        Parameters:
-        conversation_id (str): The ID of the conversation.
+        Args:
+            conversation_id (str): The ID of the conversation.
 
         Returns:
-        List[AnonymizerMapping]: A list of anonymizer mappings associated with the conversation ID.
+            list[AnonymizerMapping]: A list of anonymizer mappings associated with the conversation ID.
         """
         pass
 
@@ -35,14 +35,14 @@ class BaseAnonymizerStorage(ABC):
     ) -> AnonymizerMapping:
         """Create a new anonymizer mapping.
 
-        Parameters:
-        conversation_id (str): The ID of the conversation.
-        pii_type (str): The type of personally identifiable information (PII).
-        anonymized_value (str): The anonymized value of the PII.
-        pii_value (str): The original PII value.
+        Args:
+            conversation_id (str): The ID of the conversation.
+            pii_type (str): The type of personally identifiable information (PII).
+            anonymized_value (str): The anonymized value of the PII.
+            pii_value (str): The original PII value.
 
         Returns:
-        AnonymizerMapping: The created anonymizer mapping.
+            AnonymizerMapping: The created anonymizer mapping.
         """
         pass
 

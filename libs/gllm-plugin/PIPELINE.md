@@ -1,6 +1,6 @@
 ### Add new Pipeline to GLLM Backend
 
-This example will guide you through creating new pipeline classes from external repository and integrate in GLChat.
+This example will guide you through creating new pipeline classes from external repository and integrating them in GLChat.
 
 1. **Add `gllm-plugin` dependency in `pyproject.toml`**
 
@@ -10,11 +10,11 @@ This example will guide you through creating new pipeline classes from external 
 
 2. **Define the Pipeline State**
 
-    Create a new file `state.py` and define the state for your new pipeline. This state will hold the necessary data throughout the pipeline's execution.
+    Create a new file `state.py` and define the state for your new pipeline (e.g., NewState). This state will hold the necessary data throughout the pipeline's execution.
 
 3. **Define the Pipeline Preset Configuration**
 
-    Create a new file `preset_config.py` and define the preset configuration for your new pipeline. This configuration will include any parameters needed to initialize the pipeline.
+    Create a new file `preset_config.py` and define the preset configuration for your new pipeline (e.g., NewPresetConfig). This configuration will include any parameters needed to initialize the pipeline.
 
 4. **Implement the Pipeline Builder**
 

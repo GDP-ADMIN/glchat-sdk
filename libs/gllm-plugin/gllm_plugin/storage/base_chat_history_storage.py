@@ -39,7 +39,6 @@ class DocumentStatus(StrEnum):
 class BaseChatHistoryStorage(ABC):
     """Interface for chat history storage that defines methods for managing chat conversations and messages."""
 
-    # Conversation CRUD operations
     @abstractmethod
     def create_conversation(self, user_id: str, conversation_title: str, chatbot_id: str, **kwargs: Any) -> Conversation:
         """Create a new conversation.
@@ -137,7 +136,6 @@ class BaseChatHistoryStorage(ABC):
         """
         pass
 
-    # Message CRUD operations
     @abstractmethod
     def add_message(self, message_role: MessageRole, message: str, user_id: str, conversation_id: str, 
                    parent_id: str, source: str, metadata_: dict[str, Any] | None = None, **kwargs: Any) -> Message:
@@ -283,7 +281,6 @@ class BaseChatHistoryStorage(ABC):
         """
         pass
 
-    # Document operations
     @abstractmethod
     def create_conversation_document(self, conversation_id: str, status: str = DocumentStatus.PROCESSING.value,
                                   file_hash: str = "", **kwargs: Any) -> ConversationDocument:
@@ -331,7 +328,6 @@ class BaseChatHistoryStorage(ABC):
         """
         pass
 
-    # Feedback operations
     @abstractmethod
     def save_feedback(self, user_id: str, message_id: str, feedback: str, **kwargs: Any) -> None:
         """Save feedback for a message.
@@ -347,7 +343,6 @@ class BaseChatHistoryStorage(ABC):
         """
         pass
 
-    # Anonymization operations
     @abstractmethod
     def get_deanonymized_message(self, user_id: str, conversation_id: str, message_id: str,
                                is_anonymized: bool, mappings: list[AnonymizerMapping], **kwargs: Any) -> Message:

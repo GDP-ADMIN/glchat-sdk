@@ -48,13 +48,13 @@ jobs:
         export TAG_NAME="${{  github.ref_name }}"
         export MODULE=$(echo "${TAG_NAME}" | sed -E 's/-v.*$//' | tr '_' '-')
         echo "Processed module name: ${MODULE}"
-        cd libs/${MODULE}
+        cd libs/
         if [ "$RUNNER_OS" == "macOS" ]; then
           poetry env use python$(echo "${{ matrix.python-version }}" | cut -d'.' -f1,2)
           brew install libmagic
         fi
 
-        bash build.ci.sh
+        bash build.ci.sh ${MODULE}
       env:
         GH_TOKEN: ${{ secrets.GH_TOKEN }}
 

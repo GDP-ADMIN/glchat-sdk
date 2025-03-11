@@ -1,4 +1,4 @@
-"""Constant for the API.
+"""Constants for the API.
 
 Authors:
     Ryan Ignatius Hadiwijaya (ryan.i.hadiwijaya@gdplabs.id)

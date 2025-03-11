@@ -9,7 +9,6 @@ References:
 
 from abc import ABC, abstractmethod
 from datetime import datetime
-from enum import Enum
 from typing import Any
 
 from typing_extensions import TypeVar
@@ -21,14 +20,14 @@ Message = TypeVar("Message")
 ConversationDocument = TypeVar("ConversationDocument")
 
 
-class MessageRole(str, Enum):
+class MessageRole(StrEnum):
     """Enum for Message Type."""
 
     USER = "USER"
     AI = "AI"
 
 
-class DocumentStatus(Enum):
+class DocumentStatus(StrEnum):
     """Enum for ConversationDocument Status."""
 
     PROCESSING = "processing"

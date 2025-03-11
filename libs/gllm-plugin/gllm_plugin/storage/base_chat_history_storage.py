@@ -51,7 +51,7 @@ class BaseChatHistoryStorage(ABC):
     ) -> list[Conversation]:
         """Retrieve a list of conversations for a user.
 
-        Parameters:
+        Args:
             user_id (str): The ID of the user.
             query (str | None): A search query to filter conversations.
             chatbot_ids (list[str] | None): A list of chatbot IDs to filter conversations.
@@ -68,7 +68,7 @@ class BaseChatHistoryStorage(ABC):
     def get_conversation(self, user_id: str, conversation_id: str, **kwargs: Any) -> Conversation | None:
         """Retrieve a specific conversation by its ID.
 
-        Parameters:
+        Args:
             user_id (str): The ID of the user.
             conversation_id (str): The ID of the conversation.
             kwargs (Any): Additional arguments.
@@ -84,11 +84,11 @@ class BaseChatHistoryStorage(ABC):
     ) -> Conversation:
         """Create a new conversation.
 
-        Parameters:
+        Args:
             user_id (str): The ID of the user.
             conversation_title (str): The title of the conversation.
             chatbot_id (str): The ID of the chatbot.
-            **kwargs: (Any): Additional arguments.
+            kwargs (Any): Additional arguments.
 
         Returns:
             Conversation: The created conversation.
@@ -99,7 +99,7 @@ class BaseChatHistoryStorage(ABC):
     def rename_conversation(self, user_id: str, conversation_id: str, new_title: str, **kwargs: Any) -> Conversation:
         """Rename an existing conversation.
 
-        Parameters:
+        Args:
             user_id (str): The ID of the user.
             conversation_id (str): The ID of the conversation.
             new_title (str): The new title of the conversation.
@@ -122,7 +122,7 @@ class BaseChatHistoryStorage(ABC):
     ) -> Message:
         """Add a user message to a conversation.
 
-        Parameters:
+        Args:
             message (str): The message content.
             user_id (str): The ID of the user.
             conversation_id (str): The ID of the conversation.
@@ -147,7 +147,7 @@ class BaseChatHistoryStorage(ABC):
     ) -> Message:
         """Add an AI message to a conversation.
 
-        Parameters:
+        Args:
             message (str): The message content.
             user_id (str): The ID of the user.
             conversation_id (str): The ID of the conversation.
@@ -174,7 +174,7 @@ class BaseChatHistoryStorage(ABC):
     ) -> Message:
         """Add a message to a conversation.
 
-        Parameters:
+        Args:
             message_role (MessageRole): The role of the message (USER or AI).
             message (str): The message content.
             user_id (str): The ID of the user.
@@ -200,7 +200,7 @@ class BaseChatHistoryStorage(ABC):
     ) -> list[Message]:
         """Save a list of messages to a conversation.
 
-        Parameters:
+        Args:
             user_id (str): The ID of the user.
             conversation_id (str): The ID of the conversation.
             message_list (list[Any]): A list of messages to save.
@@ -216,7 +216,7 @@ class BaseChatHistoryStorage(ABC):
     def get_messages_by_ids(self, message_ids: list[str], **kwargs: Any) -> list[Message]:
         """Retrieve messages by their IDs.
 
-        Parameters:
+        Args:
             message_ids (list[str]): A list of message IDs.
             kwargs (Any): Additional arguments.
 
@@ -229,7 +229,7 @@ class BaseChatHistoryStorage(ABC):
     def get_message_by_id(self, message_id: str, **kwargs: Any) -> Message:
         """Retrieve a specific message by its ID.
 
-        Parameters:
+        Args:
             message_id (str): The ID of the message.
             kwargs (Any): Additional arguments.
 
@@ -249,7 +249,7 @@ class BaseChatHistoryStorage(ABC):
     ) -> list[Message]:
         """Retrieve messages from a conversation.
 
-        Parameters:
+        Args:
             user_id (str): The ID of the user.
             conversation_id (str): The ID of the conversation.
             limit (int | None): The maximum number of messages to retrieve.
@@ -265,7 +265,7 @@ class BaseChatHistoryStorage(ABC):
     def delete_messages(self, user_id: str, message_ids: list[str], chatbot_ids: list[str], **kwargs: Any) -> None:
         """Delete messages by their IDs.
 
-        Parameters:
+        Args:
             user_id (str): The ID of the user.
             message_ids (list[str]): A list of message IDs to delete.
             chatbot_ids (list[str]): A list of chatbot IDs associated with the messages.
@@ -280,7 +280,7 @@ class BaseChatHistoryStorage(ABC):
     def delete_conversation(self, user_id: str, conversation_id: str, **kwargs: Any) -> None:
         """Delete a conversation by its ID.
 
-        Parameters:
+        Args:
             user_id (str): The ID of the user.
             conversation_id (str): The ID of the conversation.
             kwargs (Any): Additional arguments.
@@ -294,7 +294,7 @@ class BaseChatHistoryStorage(ABC):
     def delete_conversations(self, user_id: str, chatbot_id: str, **kwargs: Any) -> None:
         """Delete all conversations associated with a chatbot.
 
-        Parameters:
+        Args:
             user_id (str): The ID of the user.
             chatbot_id (str): The ID of the chatbot.
             kwargs (Any): Additional arguments.
@@ -308,7 +308,7 @@ class BaseChatHistoryStorage(ABC):
     def save_feedback(self, user_id: str, message_id: str, feedback: str, **kwargs: Any) -> None:
         """Save feedback for a message.
 
-        Parameters:
+        Args:
             user_id (str): The ID of the user.
             message_id (str): The ID of the message.
             feedback (str): The feedback content.
@@ -325,7 +325,7 @@ class BaseChatHistoryStorage(ABC):
     ) -> ConversationDocument:
         """Create a new conversation document.
 
-        Parameters:
+        Args:
             conversation_id (str): The ID of the conversation.
             status (str | None): The status of the document.
             file_hash (str | None): The hash of the file.
@@ -340,7 +340,7 @@ class BaseChatHistoryStorage(ABC):
     def get_conversation_document(self, document_id: str, **kwargs: Any) -> ConversationDocument:
         """Retrieve a conversation document by its ID.
 
-        Parameters:
+        Args:
             document_id (str): The ID of the document.
             kwargs (Any): Additional arguments.
 
@@ -361,7 +361,7 @@ class BaseChatHistoryStorage(ABC):
     ) -> ConversationDocument:
         """Update a conversation document.
 
-        Parameters:
+        Args:
             document_id (str): The ID of the document.
             status (str): The status of the document.
             number_of_chunks (int): The number of chunks in the document.
@@ -386,7 +386,7 @@ class BaseChatHistoryStorage(ABC):
     ) -> Message:
         """Retrieve a deanonymized message.
 
-        Parameters:
+        Args:
             user_id (str): The ID of the user.
             conversation_id (str): The ID of the conversation.
             message_id (str): The ID of the message.
@@ -409,7 +409,7 @@ class BaseChatHistoryStorage(ABC):
     ) -> list[Message]:
         """Retrieve a list of deanonymized messages.
 
-        Parameters:
+        Args:
             messages (list[Message]): A list of messages.
             is_anonymized (bool): Whether the messages are anonymized.
             mappings (list[AnonymizerMapping] | None): A list of anonymizer mappings.
@@ -424,7 +424,7 @@ class BaseChatHistoryStorage(ABC):
     def update_message_metadata(self, message_id: str, metadata_: dict[str, Any], **kwargs: Any) -> Message:
         """Update the metadata of a message.
 
-        Parameters:
+        Args:
             message_id (str): The ID of the message.
             metadata_ (dict[str, Any]): The metadata to update.
             kwargs (Any): Additional arguments.

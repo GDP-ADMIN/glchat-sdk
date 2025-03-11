@@ -60,7 +60,7 @@ def update_pyproject():
     print("Checking for modules to add to pyproject.toml")
 
     for module in pyproject["tool"]["poetry"]["dependencies"]:
-        if not re.match(r".*?(gllm|bosa).*?", module):
+        if not re.match(r".*?(gllm).*?", module):
             continue
 
         tag = pyproject["tool"]["poetry"]["dependencies"][module].get("tag", "")
@@ -97,6 +97,12 @@ def update_pyproject():
 
                 with open("pyproject.toml", "w") as f:
                     toml.dump(pyproject_data, f)
+                
+                print("\n--- pyproject.toml after update ---")
+                with open("pyproject.toml", "r") as f:
+                    print(f.read())
+                print("--- End of pyproject.toml ---\n")
+                    
                 print("Updated pyproject.toml successfully.")
             else:
                 print(f"Module {clean_module_name} not found. Skipping removal.")
@@ -157,6 +163,11 @@ def modify_pyproject(file_path):
         # Write the updated data back to pyproject.toml
         with open(file_path, "w") as file:
             toml.dump(pyproject_data, file)
+
+        print("\n--- pyproject.toml after final modification ---")
+        with open(file_path, "r") as file:
+            print(file.read())
+        print("--- End of pyproject.toml ---\n")
 
         print(f"Successfully updated {file_path}")
 

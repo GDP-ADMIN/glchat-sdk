@@ -66,8 +66,6 @@ function binary_build {
 }
 
 function update_pyproject {
-   mv pyproject.toml.backup pyproject.toml || echo "no toml backup"
-   rm -rf temp .venv .cache *.egg-info setup.py
    cp pyproject.toml pyproject.toml.backup
    pip install toml
    python "$CI_DIR/update_pyproject.py"

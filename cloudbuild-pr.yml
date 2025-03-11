@@ -1,6 +1,7 @@
 steps:
 - id: Generate Google Token
   name: gcr.io/cloud-builders/gcloud
+  dir: 'libs/${_MODULE}'
   entrypoint: 'bash'
   args:
     - '-c'

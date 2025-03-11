@@ -22,7 +22,7 @@ git config --global url."https://${GH_TOKEN}:x-oauth-basic@github.com".insteadOf
 # Packages Installation
 poetry config http-basic.gen-ai-internal oauth2accesstoken "$(cat token.key)"
 poetry lock
-poetry install --all-extras
+poetry install --all-extras --with compiler
 poetry run pre-commit run
 poetry run coverage run -m pytest --cov-report=xml --cov=. tests/
 binary_build

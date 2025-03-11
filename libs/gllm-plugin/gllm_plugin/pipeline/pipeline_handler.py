@@ -21,7 +21,14 @@ from gllm_plugin.supported_models import ModelName
 
 
 class ChatbotConfig(BaseModel):
-    """Chatbot configuration class containing pipeline configs and metadata."""
+    """Chatbot configuration class containing pipeline configs and metadata.
+    
+    Attributes:
+        config (dict[str, Any]): Pipeline configuration dictionary
+        prompt_builder_catalogs (dict[str, PromptBuilderCatalog] | None): Mapping of prompt builder catalogs
+        lmrp_catalogs (dict[str, LMRequestProcessorCatalog] | None): Mapping of LM request processor catalogs
+        pipeline_type (str): Type of pipeline to use
+    """
 
     config: dict[str, Any]
     prompt_builder_catalogs: dict[str, PromptBuilderCatalog] | None
@@ -31,14 +38,24 @@ class ChatbotConfig(BaseModel):
 
 
 class PipelinePresetConfig(BaseModel):
-    """Pipeline preset configuration class."""
+    """Pipeline preset configuration class.
+    
+    Attributes:
+        preset_id (str): Unique identifier for the pipeline preset
+        supported_models (list[str]): List of model names supported by this preset
+    """
 
     preset_id: str
     supported_models: list[str]
 
 
 class PipelineConfig(BaseModel):
-    """Pipeline configuration class."""
+    """Pipeline configuration class.
+    
+    Attributes:
+        pipeline_type (str): Type of pipeline
+        chatbot_presets (dict[str, PipelinePresetConfig]): Mapping of chatbot IDs to their preset configurations
+    """
 
     pipeline_type: str
     chatbot_presets: dict[str, PipelinePresetConfig]
@@ -51,6 +68,13 @@ class PipelineHandler(PluginHandler):
     """Handler for Pipeline Builder plugins.
 
     This handler manages pipeline plugins and provides caching for built pipelines.
+
+    Attributes:
+        _pipeline_cache (dict[tuple[str, str], Pipeline]): Cache mapping (chatbot_id, model_name) to Pipeline instances
+        _chatbot_configs (dict[str, ChatbotConfig]): Mapping of chatbot IDs to their configurations
+        app_config (AppConfig): Application configuration
+        activated_configs (dict[str, PipelineConfig]): Mapping of pipeline types to their configurations
+        _builders (dict[str, Plugin]): Mapping of chatbot IDs to their pipeline builder plugins
     """
 
     _pipeline_cache: dict[tuple[str, str], Pipeline]
@@ -240,3 +264,4 @@ class PipelineHandler(PluginHandler):
         """
         if chatbot_id not in self._chatbot_configs:
             raise ValueError(f"Pipeline configuration for chatbot `{chatbot_id}` not found")
+            

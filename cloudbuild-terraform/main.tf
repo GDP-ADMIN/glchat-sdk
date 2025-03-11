@@ -14,7 +14,6 @@ module "gcb_gen_ai_external_pr_sdk" {
   project_id = local.project_id.gdplabs
   for_each   = { for idx, val in local.combined : "${val.module}-${val.version}" => val }
 
-  disabled    = true
   name        = lower(replace("${local.repository["name"]}-pr-${each.value.module}-${each.value.version}", ".", "-"))
   description = "Gen AI External SDK"
   owner       = local.repository["owner"]
@@ -39,7 +38,6 @@ module "gcb_gen_ai_external_push_sdk" {
   project_id = local.project_id.gdplabs
   for_each   = { for idx, val in local.combined : "${val.module}-${val.version}" => val }
 
-  disabled    = true
   name        = lower(replace("${local.repository["name"]}-push-${each.value.module}-${each.value.version}", ".", "-"))
   description = "Gen AI External SDK"
   owner       = local.repository["owner"]
@@ -64,7 +62,6 @@ module "gcb_gen_ai_external_push_tag_sdk" {
   project_id = local.project_id.gdplabs
   for_each   = { for idx, val in local.combined : "${val.module}-${val.version}" => val }
 
-  disabled    = true
   name        = lower(replace("${local.repository["name"]}-push-tag-${each.value.module}-${each.value.version}", ".", "-"))
   description = "Gen AI External SDK"
   owner       = local.repository["owner"]

@@ -9,6 +9,7 @@ References:
 
 from abc import ABC, abstractmethod
 from datetime import datetime
+from enum import StrEnum
 from typing import Any
 
 from typing_extensions import TypeVar

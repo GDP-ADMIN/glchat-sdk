@@ -47,7 +47,6 @@ jobs:
     - name: Build Binary
       shell: bash
       run: |
-        export MODULE=$(echo "${TAG_NAME}" | sed -E 's/-v.*$//' | tr '_' '-')
         echo "Processed module name: ${MODULE}"
         cd libs/
         if [ "$RUNNER_OS" == "macOS" ]; then

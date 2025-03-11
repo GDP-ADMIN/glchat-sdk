@@ -22,7 +22,13 @@ class Provider(StrEnum):
     GOOGLE = "google"
     OPENAI = "openai"
     TGI = "tgi"
+    TEI = "tei"
     VLLM = "vllm"
+    GROQ = "groq"
+    TOGETHER_AI = "together-ai"
+    DEEPINFRA = "deepinfra"
+
+    ROUTABLE = "routable"
 
 
 class OpenAIModel(StrEnum):
@@ -30,8 +36,12 @@ class OpenAIModel(StrEnum):
 
     GPT_4O = "gpt-4o"
     GPT_4O_MINI = "gpt-4o-mini"
+    GPT_4_5_PREVIEW = "gpt-4.5-preview"
+    O1 = "o1"
     O1_MINI = "o1-mini"
     O1_PREVIEW = "o1-preview"
+    O3 = "o3"
+    O3_MINI = "o3-mini"
     TEXT_EMBEDDING_3_SMALL = "text-embedding-3-small"
     TEXT_EMBEDDING_3_LARGE = "text-embedding-3-large"
     TEXT_EMBEDDING_ADA_002 = "text-embedding-ada-002"
@@ -40,6 +50,7 @@ class OpenAIModel(StrEnum):
 class AnthropicModel(StrEnum):
     """Supported Anthropic models."""
 
+    CLAUDE_3_7_SONNET = "claude-3-7-sonnet"
     CLAUDE_3_5_SONNET = "claude-3-5-sonnet"
     CLAUDE_3_5_HAIKU = "claude-3-5-haiku"
     CLAUDE_3_OPUS = "claude-3-opus"
@@ -65,11 +76,55 @@ class DeepSeekModel(StrEnum):
     DEEPSEEK_REASONER = "deepseek-reasoner"
 
 
+class GroqModel(StrEnum):
+    """Supported Groq models."""
+
+    DEEPSEEK_R1_DISTILL_QWEN_32B = "deepseek-r1-distill-qwen-32b"
+    DEEPSEEK_R1_DISTILL_LLAMA_70B = "deepseek-r1-distill-llama-70b"
+    LLAMA_3_2_1B_PREVIEW = "llama-3.2-1b-preview"
+
+
+class TogetherAIModel(StrEnum):
+    """Supported Together.AI models."""
+
+    DEEPSEEK_V3 = "deepseek-ai/DeepSeek-V3"
+
+
+class DeepInfraModel(StrEnum):
+    """Supported DeepInfra models."""
+
+    QWEN_2_5_72B_INSTRUCT = "Qwen/Qwen2.5-72B-Instruct"
+    DEEPSEEK_R1_DISTILL_QWEN_32B = "deepseek-ai/DeepSeek-R1-Distill-Qwen-32B"
+    DEEPSEEK_R1 = "deepseek-ai/DeepSeek-R1"
+    DEEPSEEK_V3 = "deepseek-ai/DeepSeek-V3"
+
+
+class RoutableModel(StrEnum):
+    """Supported routable model presets.
+
+    These are presets that map a specific model name to a routable invoker.
+    The actual invoker will be determined by the router.
+
+    Currently supports:
+        - '__default__' - Strong model: gpt-4o. Weak model: gpt-4o-mini.
+        - 'gpt' - Strong model: o3-mini. Weak model: gpt-4o.
+        - 'deepseek' - Strong model: DeepSeek-R1-Distill-Qwen-32B. Weak model: DeepSeek-V3.
+    """
+
+    DEFAULT = "__default__"
+    GPT = "gpt"
+    DEEPSEEK = "deepseek"
+
+
 MODEL_MAP = {
     Provider.OPENAI: OpenAIModel,
     Provider.ANTHROPIC: AnthropicModel,
     Provider.GOOGLE: GoogleModel,
     Provider.DEEPSEEK: DeepSeekModel,
+    Provider.GROQ: GroqModel,
+    Provider.TOGETHER_AI: TogetherAIModel,
+    Provider.DEEPINFRA: DeepInfraModel,
+    Provider.ROUTABLE: RoutableModel,
 }
 
 DEFAULT_VERSION_MAP = {
@@ -77,8 +132,13 @@ DEFAULT_VERSION_MAP = {
     Provider.ANTHROPIC: "latest",
     Provider.GOOGLE: "latest",
     Provider.TGI: None,
+    Provider.TEI: None,
     Provider.VLLM: None,
     Provider.DEEPSEEK: None,
+    Provider.GROQ: None,
+    Provider.TOGETHER_AI: None,
+    Provider.DEEPINFRA: None,
+    Provider.ROUTABLE: None,
 }
 
 UNIMODAL_PROVIDERS = {Provider.TGI, Provider.VLLM}
@@ -97,7 +157,7 @@ def validate_model_name(model_name: str, provider: Provider) -> str:
     Raises:
         ValueError: If the model name is invalid for the provider.
     """
-    if provider == Provider.TGI:
+    if provider in {Provider.TGI, Provider.TEI}:
         try:
             HttpUrl(model_name)
             return model_name
@@ -160,6 +220,7 @@ class ModelName(BaseModel):
         Format varies by provider:
         - Cloud providers: 'provider/model-name[-version]'
         - TGI: 'tgi/[base64-encoded-url]'
+        - TEI: 'tei/[base64-encoded-url]'
         - VLLM: 'vllm/[model-name]@[base64-encoded-url]'
 
         Args:
@@ -181,7 +242,7 @@ class ModelName(BaseModel):
         except ValueError as err:
             raise ValueError(f"Invalid provider '{provider_str}'") from err
 
-        if provider == Provider.TGI:
+        if provider in {Provider.TGI, Provider.TEI}:
             try:
                 decoded_url = base64.b64decode(model_str).decode()
                 HttpUrl(decoded_url)
@@ -243,6 +304,7 @@ class ModelName(BaseModel):
 
         For cloud providers: name[-version]
         For TGI: base64-encoded-url
+        For TEI: base64-encoded-url
         For VLLM: model-name@base64-encoded-url
 
         Returns:
@@ -251,7 +313,7 @@ class ModelName(BaseModel):
         Raises:
             ValueError: If URL is required but not provided, or if URL is invalid.
         """
-        if self.provider == Provider.TGI:
+        if self.provider in {Provider.TGI, Provider.TEI}:
             return base64.b64encode(self.name.encode()).decode()
 
         if self.provider == Provider.VLLM:

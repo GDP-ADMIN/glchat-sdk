@@ -1,6 +1,4 @@
 [tool.poetry]
-
-
 name = "gllm-plugin"
 version = "0.0.1b1"
 description = ""

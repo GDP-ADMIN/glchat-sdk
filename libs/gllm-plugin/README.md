@@ -37,4 +37,4 @@ A library to implement Plugin architecture and integrate with existing pipelines
     ```
 
 ## Usage
-For more information, please refer to the [PIPELINE.md](https://gdp-admin.github.io/gen-ai-internal/gllm-plugin/PIPELINE.md).
+For more information, please refer to the [PIPELINE.md](https://github.com/GDP-ADMIN/gen-ai-external/blob/main/libs/gllm-plugin/PIPELINE.md).

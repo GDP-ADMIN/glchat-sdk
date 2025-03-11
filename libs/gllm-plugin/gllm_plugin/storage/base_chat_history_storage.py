@@ -53,10 +53,10 @@ class BaseChatHistoryStorage(ABC):
 
         Args:
             user_id (str): The ID of the user.
-            query (str | None): A search query to filter conversations.
-            chatbot_ids (list[str] | None): A list of chatbot IDs to filter conversations. Defaults to None.
-            cursor (str | None): A cursor for pagination. Defaults to None.
-            limit (int | None): The maximum number of conversations to retrieve. Defaults to None.
+            query (str, optional): A search query to filter conversations. Defaults to "".
+            chatbot_ids (list[str] | None, optional): A list of chatbot IDs to filter conversations. Defaults to None.
+            cursor (str | None, optional): A cursor for pagination. Defaults to None.
+            limit (int | None, optional): The maximum number of conversations to retrieve. Defaults to None.
             kwargs (Any): Additional arguments.
 
         Returns:
@@ -151,8 +151,8 @@ class BaseChatHistoryStorage(ABC):
             message (str): The message content.
             user_id (str): The ID of the user.
             conversation_id (str): The ID of the conversation.
-            parent_id (str | None): The ID of the parent message. Defaults to None.
-            source (str | None): The source of the message. Defaults to None.
+            parent_id (str | None, optional): The ID of the parent message. Defaults to None.
+            source (str | None, optional): The source of the message. Defaults to None.
             kwargs (Any): Additional arguments.
 
         Returns:
@@ -204,7 +204,7 @@ class BaseChatHistoryStorage(ABC):
             user_id (str): The ID of the user.
             conversation_id (str): The ID of the conversation.
             message_list (list[Any]): A list of messages to save.
-            attachments (dict[str, Any] | None): Attachments associated with the messages. Defaults to None.
+            attachments (dict[str, Any] | None, optional): Attachments associated with the messages. Defaults to None.
             kwargs (Any): Additional arguments.
 
         Returns:
@@ -252,8 +252,8 @@ class BaseChatHistoryStorage(ABC):
         Args:
             user_id (str): The ID of the user.
             conversation_id (str): The ID of the conversation.
-            limit (int | None): The maximum number of messages to retrieve. Defaults to None.
-            max_timestamp (datetime | None): The maximum timestamp for the messages. Defaults to None.
+            limit (int | None, optional): The maximum number of messages to retrieve. Defaults to None.
+            max_timestamp (datetime | None, optional): The maximum timestamp for the messages. Defaults to None.
             kwargs (Any): Additional arguments.
 
         Returns:
@@ -327,8 +327,8 @@ class BaseChatHistoryStorage(ABC):
 
         Args:
             conversation_id (str): The ID of the conversation.
-            status (str | None): The status of the document.
-            file_hash (str | None): The hash of the file.
+            status (str, optional): The status of the document. Defaults to DocumentStatus.PROCESSING.value.
+            file_hash (str, optional): The hash of the file. Defaults to "".
             kwargs (Any): Additional arguments.
 
         Returns:
@@ -365,8 +365,8 @@ class BaseChatHistoryStorage(ABC):
             document_id (str): The ID of the document.
             status (str): The status of the document.
             number_of_chunks (int): The number of chunks in the document.
-            message (str | None): A message associated with the document.
-            object_key (str | None): The object key of the document.
+            message (str | None, optional): A message associated with the document. Defaults to None.
+            object_key (str | None, optional): The object key of the document. Defaults to None.
             kwargs (Any): Additional arguments.
 
         Returns:
@@ -412,7 +412,7 @@ class BaseChatHistoryStorage(ABC):
         Args:
             messages (list[Message]): A list of messages.
             is_anonymized (bool): Whether the messages are anonymized.
-            mappings (list[AnonymizerMapping] | None): A list of anonymizer mappings.
+            mappings (list[AnonymizerMapping] | None, optional): A list of anonymizer mappings. Defaults to None.
             kwargs (Any): Additional arguments.
 
         Returns:

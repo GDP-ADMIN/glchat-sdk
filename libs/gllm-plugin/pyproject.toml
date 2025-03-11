@@ -1,18 +1,18 @@
 [tool.poetry]
+
+
 name = "gllm-plugin"
-version = "0.0.1"
+version = "0.0.1b1"
 description = ""
 authors = ["GenAI SDK Team <gat-sdk@gdplabs.id>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
+python = ">=3.11,<3.13"
+semver = "^3.0.4"
 gllm-core = {git = "ssh://git@github.com/GDP-ADMIN/gen-ai-internal.git", subdirectory = "libs/gllm-core"}
 gllm-inference = {git = "ssh://git@github.com/GDP-ADMIN/gen-ai-internal.git", subdirectory = "libs/gllm-inference"}
 gllm-pipeline = {git = "ssh://git@github.com/GDP-ADMIN/gen-ai-internal.git", subdirectory = "libs/gllm-pipeline"}
-
-python = ">=3.11,<3.13"
-semver = "^3.0.4"
-
 bosa-core = { git = "ssh://git@github.com/GDP-ADMIN/bosa.git", branch = "bosa-python-core-0.0.2", subdirectory = "python/bosa-core" }
 
 [tool.poetry.extras]
@@ -48,9 +48,13 @@ testpaths = ["tests"]
 convention = "google"
 add_ignore = ["D107"]
 
+[[tool.poetry.source]]
+name = "gen-ai-internal"
+url = "https://asia-southeast2-python.pkg.dev/gdp-labs/gen-ai/simple/"
+priority = "supplemental"
+
 # This group includes dependencies for compiling and stubs generation
 # use `poetry install --with compiler` to install these dependencies
-
 
 [tool.poetry.group.compiler]
 optional = true

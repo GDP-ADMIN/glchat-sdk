@@ -128,3 +128,5 @@ tokenizer/
 
 #vs code stuffs
 .vscode/
+
+token.key

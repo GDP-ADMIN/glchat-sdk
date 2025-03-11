@@ -37,15 +37,16 @@ jobs:
     - name: Generate Google Authentication Token
       shell: bash
       run: |
+        export TAG_NAME="${{  github.ref_name }}"
         export MODULE=$(echo "${TAG_NAME}" | sed -E 's/-v.*$//' | tr '_' '-')
         echo "MODULE=${MODULE}" >> $GITHUB_ENV
+        echo "TAG_NAME=${TAG_NAME}" >> $GITHUB_ENV
         cd libs/${MODULE}
         gcloud auth print-access-token > token.key
         
     - name: Build Binary
       shell: bash
       run: |
-        export TAG_NAME="${{  github.ref_name }}"
         export MODULE=$(echo "${TAG_NAME}" | sed -E 's/-v.*$//' | tr '_' '-')
         echo "Processed module name: ${MODULE}"
         cd libs/

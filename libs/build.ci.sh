@@ -20,8 +20,8 @@ git config --global url."https://${GH_TOKEN}:x-oauth-basic@github.com/".insteadO
 git config --global url."https://${GH_TOKEN}:x-oauth-basic@github.com".insteadOf "ssh://git@github.com"
 
 # Packages Installation
+update_pyproject
 poetry config http-basic.gen-ai-internal oauth2accesstoken "$(cat token.key)"
-poetry lock
 poetry install --all-extras --with compiler
 poetry run pre-commit run
 poetry run coverage run -m pytest --cov-report=xml --cov=. tests/

@@ -55,3 +55,4 @@ class BaseAnonymizerStorage(ABC):
             is_anonymized (bool): The flag to determine if the message is anonymized.
             mapping_data_type (MappingDataType): A dictionary of new anonymizer mappings to update for deanonymization.
         """
+        pass

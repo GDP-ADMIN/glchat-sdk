@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "gllm-plugin"
-version = "0.0.1b1"
+version = "0.0.1b2"
 description = ""
 authors = ["GenAI SDK Team <gat-sdk@gdplabs.id>"]
 readme = "README.md"
@@ -50,6 +50,11 @@ add_ignore = ["D107"]
 name = "gen-ai-internal"
 url = "https://asia-southeast2-python.pkg.dev/gdp-labs/gen-ai/simple/"
 priority = "supplemental"
+
+[[tool.poetry.source]]
+name = "gen-ai-external-publication"
+url = "https://asia-southeast2-python.pkg.dev/gdp-labs/gen-ai-external/"
+priority = "explicit"
 
 # This group includes dependencies for compiling and stubs generation
 # use `poetry install --with compiler` to install these dependencies

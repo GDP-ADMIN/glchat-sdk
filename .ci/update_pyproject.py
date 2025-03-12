@@ -13,6 +13,8 @@ import os
 import toml
 import re
 
+# Global regex pattern for internal dependencies
+INTERNAL_DEPS_REGEX = r".*?(gllm)[-_a-zA-Z0-9]*.*?"
 
 def module_exists(module_name):
     result = subprocess.run(
@@ -35,34 +37,17 @@ def update_pyproject():
 
     package_name = pyproject["tool"]["poetry"]["name"].replace("-", "_")
     print(f"Extracted package name: {package_name}")
-    tag_name = os.getenv("TAG_NAME", "notag")
-    print(f"tag name is {tag_name}")
-    if tag_name == "notag":
-        current_branch = (
-            subprocess.check_output(["git", "rev-parse", "--abbrev-ref", "HEAD"])
-            .strip()
-            .decode("utf-8")
-        )
-        print(f"the branch is {current_branch}")
-        if current_branch not in ["main", "master"]:
-            print("Adjust precommit config")
-            with open(".pre-commit-config.yaml", "r", encoding="utf-8") as file:
-                pre_commit_config = file.read()
-            pre_commit_config = pre_commit_config.replace(
-                'args: ["-rn", "-sn"]',
-                'args: ["-rn", "-sn", "--disable=no-name-in-module"]',
-            )
-            with open(".pre-commit-config.yaml", "w", encoding="utf-8") as file:
-                file.write(pre_commit_config)
 
     modules_to_add_setup = []
 
     print("Checking for modules to add to pyproject.toml")
 
     for module in pyproject["tool"]["poetry"]["dependencies"]:
-        if not re.match(r".*?(gllm).*?", module):
+        if not re.match(INTERNAL_DEPS_REGEX, module):
+            print(f"Skipping non-internal module: {module}")
             continue
 
+        print(f"Processing internal module: {module}")
         tag = pyproject["tool"]["poetry"]["dependencies"][module].get("tag", "")
         start_index = tag.rfind("v") + 1
         version = tag[start_index:]

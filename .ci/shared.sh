@@ -7,6 +7,9 @@ PYPROJECT_TOML="pyproject.toml"
 # Get the absolute path to the .ci directory
 CI_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+# Global regex pattern for finding internal dependencies
+INTERNAL_DEPS_REGEX='(gllm|bosa)[-_][a-zA-Z0-9_-]+'
+
 # Detect if the system is macOS or Linux for sed compatibility
 if [[ "$OSTYPE" == "darwin"* ]]; then
     SED_INPLACE="sed -i ''"
@@ -23,8 +26,32 @@ function binary_build {
 
   echo "Building package: $PACKAGE_NAME"
 
-  # Build the package using poetry and nuitka
-  poetry run nuitka --module "$PACKAGE_NAME" --include-package="$PACKAGE_NAME"
+  # Extract internal dependencies from pyproject.toml
+  INCLUDE_PACKAGES="$PACKAGE_NAME"
+  if [ -f "$PYPROJECT_TOML" ]; then
+    echo "Scanning $PYPROJECT_TOML for internal dependencies..."
+    DIRECT_DEPS=$(awk '/^\[tool\.poetry\.dependencies\]/{flag=1;next}/^\[/{flag=0}flag' "$PYPROJECT_TOML" | grep -E "^($INTERNAL_DEPS_REGEX)" | awk -F '[ ={}]' '{print $1}' | sed 's/-/_/g' | sort -u)
+    TABLE_DEPS=$(grep -E "^\[tool\.poetry\.dependencies\.($INTERNAL_DEPS_REGEX)\]" "$PYPROJECT_TOML" | grep -oE "\.($INTERNAL_DEPS_REGEX)\]" | grep -oE "($INTERNAL_DEPS_REGEX)" | sed 's/-/_/g' | sort -u)
+    DEPS="$DIRECT_DEPS $TABLE_DEPS"
+    
+    echo "Found direct dependencies: $DIRECT_DEPS"
+    echo "Found table dependencies: $TABLE_DEPS"
+    echo "Combined dependencies: $DEPS"
+    
+    if [ -n "$DEPS" ]; then
+      for DEP in $DEPS; do
+        if [ "$DEP" != "$PACKAGE_NAME" ]; then
+          INCLUDE_PACKAGES="$INCLUDE_PACKAGES,$DEP"
+          echo "Adding dependency to include: $DEP"
+        fi
+      done
+    fi
+  else
+    echo "Warning: $PYPROJECT_TOML not found, using only $PACKAGE_NAME"
+  fi
+  
+  echo "Including packages: $INCLUDE_PACKAGES"
+  poetry run nuitka --verbose --module "$PACKAGE_NAME" --include-package="$INCLUDE_PACKAGES"
 
   # Delete *.build directories to prevent errors when building the wheel
   find . -type d -name "*.build" -exec rm -rf {} +

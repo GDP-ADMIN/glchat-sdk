@@ -21,11 +21,18 @@ git config --global url."https://${GH_TOKEN}:x-oauth-basic@github.com".insteadOf
 
 # Google Cloud Authentication
 poetry config http-basic.gen-ai-internal oauth2accesstoken "$(cat token.key)"
+poetry config http-basic.gen-ai-external-publication oauth2accesstoken "$(cat token.key)"
 
 # Use binary version
 update_pyproject
 poetry install --all-extras --with compiler
-poetry add libmagic python-magic-bin
-poetry run pre-commit run
+
+if [ "$RUNNER_OS" == "Windows" ]; then
+  poetry add python-magic-bin libmagic
+elif [[ "$RUNNER_OS" == "macOS" ]]; then
+  brew install libmagic
+fi
+
+poetry run pre-commit run --files ./
 poetry run coverage run -m pytest --cov-report=xml --cov=. tests/
 binary_build

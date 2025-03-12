@@ -23,15 +23,14 @@ steps:
   waitFor: ['-']
 
 - id: Upload Packages
-  name: 'gcr.io/cloud-builders/twine'
+  name: 'asia.gcr.io/gdp-labs/gl-base/poetry:2.1.1-py3.12.0'
+  entrypoint: '/bin/bash'
   dir: 'libs/${_MODULE}'
   args:
-    - "upload"
-    - "--skip-existing"
-    - "--verbose"
-    - "--repository-url"
-    - "https://asia-southeast2-python.pkg.dev/gdp-labs/gen-ai/"
-    - "dist/*.whl"
+    - '-c'
+    - |-
+      poetry config http-basic.gen-ai-external-publication oauth2accesstoken "$(cat token.key)"
+      poetry publish --repository gen-ai-external-publication --skip-existing
 
 - id: Run SCA
   name: 'gcr.io/$PROJECT_ID/secops'
@@ -55,7 +54,6 @@ steps:
     - 'VERSION=${_VERSION}'
   secretEnv:
     - 'SCA_TOKEN'
-  waitFor: ['Test & Build']
 
 timeout: 30m
 options:

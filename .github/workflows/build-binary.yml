@@ -51,7 +51,6 @@ jobs:
         cd libs/
         if [ "$RUNNER_OS" == "macOS" ]; then
           poetry env use python$(echo "${{ matrix.python-version }}" | cut -d'.' -f1,2)
-          brew install libmagic
         fi
 
         bash build.ci.sh ${MODULE}
@@ -63,15 +62,4 @@ jobs:
       run: |
         # Setup .pypirc for Artifact Registry
         cd libs/${MODULE}
-        TOKEN=$(cat token.key)
-        echo "[distutils]
-        index-servers =
-            gen-ai
-
-        [gen-ai]
-        repository: https://asia-southeast2-python.pkg.dev/gdp-labs/gen-ai/
-        username: oauth2accesstoken
-        password: $TOKEN" > ~/.pypirc\
-
-        python -m pip install --upgrade pip twine keyring keyrings.google-artifactregistry-auth
-        python -m twine upload --verbose --repository-url https://asia-southeast2-python.pkg.dev/gdp-labs/gen-ai/ dist/*.whl
+        poetry publish --repository gen-ai-external-publication --skip-existing

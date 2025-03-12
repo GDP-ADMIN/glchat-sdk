@@ -26,6 +26,14 @@ class PipelineBuilderPlugin(Plugin, Generic[PipelineState, PipelinePresetConfig]
     """Base class for Pipeline Builder plugins.
 
     This class combines the Plugin architecture with the Pipeline Builder functionality.
+
+    Attributes:
+        name (str): The name of the plugin.
+        description (str): The description of the plugin.
+        version (str): The version of the plugin.
+        catalog (BaseCatalog): The catalog instance.
+        additional_config_class (Type[PipelineRuntimeConfig] | None): The additional runtime configuration class.
+        preset_config_class (Type[PipelinePresetConfig] | None): The preset configuration class
     """
 
     name: str

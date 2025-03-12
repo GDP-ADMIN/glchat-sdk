@@ -44,29 +44,39 @@ This example will guide you through creating new pipeline classes from external 
 
 6. **Register the new pipeline to GLLM Backend using API.**
 
-Sample curl request:
-```sh
-curl --request POST \
-  --url http://localhost:8000/register-pipeline-plugin \
-  --header 'Content-Type: application/json' \
-  --data '{
-	"folder_name": "simple_pipeline",
-	"path": "/Users/username/Downloads/simple-pipeline"
-}'
-```
+    Sample curl request:
+    ```sh
+    curl --request POST \
+    --url http://localhost:8000/register-pipeline-plugin \
+    --header 'Content-Type: application/json' \
+    --data '{
+        "folder_name": "simple_pipeline",
+        "path": "/Users/username/Downloads/simple-pipeline"
+    }'
+    ```
 
-The project structure will be as follows:
-```
-- simple-pipeline [git folder]
-  - pyproject.toml [depends on gllm-plugin]
-  - simple_pipeline
-    - config.yaml
-    - pipeline.py
-    - preset_config.py
-    - state.py
-```
+    The project structure will be as follows:
+    ```
+    - simple-pipeline [git folder]
+    - pyproject.toml [depends on gllm-plugin]
+    - simple_pipeline
+        - config.yaml
+        - pipeline.py
+        - preset_config.py
+        - state.py
+    ```
 
-After following these steps, you can now use the new pipeline in GLChat.
+    After following these steps, you can now use the new pipeline in GLChat.
+
+7. **Testing the New Pipeline in GLChat**
+
+    After registering the new pipeline, follow these steps to verify that it is active:
+
+    - Log in to GLChat using a user account assigned to a chatbot that uses the new pipeline.
+    - Check the available chatbots — you should see a chatbot configured with the new pipeline based on config.yaml.
+    - Interact with the chatbot to ensure that it responds using the registered pipeline.
+
+    This confirms that the new pipeline has been successfully integrated into GLChat.
 
 
 ### Example Usage for Static Response Synthesizer

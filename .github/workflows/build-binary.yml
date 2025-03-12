@@ -49,9 +49,6 @@ jobs:
       run: |
         echo "Processed module name: ${MODULE}"
         cd libs/
-        if [ "$RUNNER_OS" == "macOS" ]; then
-          poetry env use python$(echo "${{ matrix.python-version }}" | cut -d'.' -f1,2)
-        fi
 
         bash build.ci.sh ${MODULE}
       env:

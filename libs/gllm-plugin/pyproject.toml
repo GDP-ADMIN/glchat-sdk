@@ -4,7 +4,7 @@ version = "0.0.1b4"
 description = ""
 authors = ["GenAI SDK Team <gat-sdk@gdplabs.id>"]
 readme = "README.md"
-include = ["**/*.so","**/*.py"]
+include = ["**/*.so","**/*.pyi"]
 exclude = ["**/*.py", "**/.venv/**", "**/.cache/**"]
 
 [tool.poetry.build]

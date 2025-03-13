@@ -37,7 +37,6 @@ function binary_build {
   find "$PACKAGE_NAME" -name "*.pyi" -delete
   rm "$PACKAGE_NAME"'.pyi'
   find "$PACKAGE_NAME" -name "*.so" -delete
-  find . -name "pyproject.toml" -delete
   rm -f -- *.so
 
   echo "Cleaning up completed"

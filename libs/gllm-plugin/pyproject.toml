@@ -67,7 +67,7 @@ priority = "explicit"
 [tool.poetry.group.compiler]
 optional = true
 [tool.poetry.group.compiler.dependencies]
-nuitka = "2.6.8"
+nuitka = "2.5.6"
 # We use stubgen from mypy to generate stubs for our compiled modules
 # Ref: https://mypy.readthedocs.io/en/stable/stubgen.html
 mypy = "^1.11.2"

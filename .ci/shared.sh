@@ -21,7 +21,7 @@ function binary_build {
   # shellcheck disable=SC2001,SC2153
   PACKAGE_NAME=$(echo "$MODULE" | sed 's/-/_/g')
   echo "Building package: $PACKAGE_NAME"
-  poetry run nuitka --verbose --mode=package "$PACKAGE_NAME"
+  poetry run nuitka --verbose --module "$PACKAGE_NAME"
   find . -type d -name "*.build" -exec rm -rf {} +
 
   echo "Generating python interface files..."

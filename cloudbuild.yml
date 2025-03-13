@@ -29,8 +29,8 @@ steps:
   args:
     - '-c'
     - |-
-      poetry config http-basic.gen-ai-external-publication oauth2accesstoken "$(cat token.key)"
-      poetry publish --repository gen-ai-external-publication --skip-existing
+      poetry config http-basic.gen-ai-publication oauth2accesstoken "$(cat token.key)"
+      poetry publish --repository gen-ai-publication --skip-existing
 
 - id: Run SCA
   name: 'gcr.io/$PROJECT_ID/secops'

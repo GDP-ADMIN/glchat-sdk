@@ -20,13 +20,11 @@ git config --global url."https://${GH_TOKEN}:x-oauth-basic@github.com/".insteadO
 git config --global url."https://${GH_TOKEN}:x-oauth-basic@github.com".insteadOf "ssh://git@github.com"
 
 # Google Cloud Authentication
-poetry config http-basic.gen-ai-internal oauth2accesstoken "$(cat token.key)"
-poetry config http-basic.gen-ai-external-publication oauth2accesstoken "$(cat token.key)"
+poetry config http-basic.gen-ai oauth2accesstoken "$(cat token.key)"
+poetry config http-basic.gen-ai-publication oauth2accesstoken "$(cat token.key)"
 
-# Use binary version
-update_pyproject
+# Package Installation
 poetry install --all-extras --with compiler
-
 if [ "$RUNNER_OS" == "Windows" ]; then
   poetry add python-magic-bin libmagic
 elif [[ "$RUNNER_OS" == "macOS" ]]; then

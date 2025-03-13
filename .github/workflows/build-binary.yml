@@ -59,4 +59,4 @@ jobs:
       run: |
         # Setup .pypirc for Artifact Registry
         cd libs/${MODULE}
-        poetry publish --repository gen-ai-external-publication --skip-existing
+        poetry publish --repository gen-ai-publication --skip-existing

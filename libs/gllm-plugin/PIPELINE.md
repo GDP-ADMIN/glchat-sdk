@@ -76,8 +76,6 @@ This example will guide you through creating new pipeline classes from external 
     - Check the available chatbots — you should see a chatbot configured with the new pipeline based on config.yaml.
     - Interact with the chatbot to ensure that it responds using the registered pipeline.
 
-    This confirms that the new pipeline has been successfully integrated into GLChat.
-
 
 ### Example Usage for Static Response Synthesizer
 `state.py`
@@ -89,22 +87,23 @@ from gllm_core.event.event_emitter import EventEmitter
 
 
 class SimpleState(TypedDict):
-    """A TypedDict representing the state of a Simple pipeline.
+    """A TypedDict representing the state of the Simple Pipeline.
 
     Attributes:
-        response (str): The generated response to the user's query.
         response_synthesis_bundle (dict[str, Any]): The bundle of response synthesis.
+        response (str): The generated response to the user's query.
     """
 
-    response: str
     response_synthesis_bundle: dict[str, Any]
+    response: str
+
 
 
 class SimpleStateKeys(StrEnum):
-    """List of all possible keys in NoOpState."""
+    """List of all possible keys in SimpleState."""
 
-    RESPONSE = "response"
     RESPONSE_SYNTHESIS_BUNDLE = "response_synthesis_bundle"
+    RESPONSE = "response"
 ```
 
 `preset_config.py`
@@ -112,7 +111,7 @@ class SimpleStateKeys(StrEnum):
 from gllm_plugin.config.base_pipeline_preset_config import BasePipelinePresetConfig
 
 class SimplePresetConfig(BasePipelinePresetConfig):
-    """A Pydantic model representing the preset config of a Simple pipeline.
+    """A Pydantic model representing the preset config of the Simple Pipeline.
 
     Inherits attributes from `BasePipelinePresetConfig`.
 
@@ -135,7 +134,7 @@ from new_repository.config.pipeline.simple.state import SimpleState, SimpleState
 
 
 class SimplePipelineBuilder(PipelineBuilderPlugin[SimpleState, SimplePresetConfig]):
-    """Simple pipeline builder.
+    """The Simple Pipeline Builder.
 
     This pipeline will simply pass the user query to the response synthesizer.
     There are no prompt templates used in this pipeline.
@@ -147,7 +146,7 @@ class SimplePipelineBuilder(PipelineBuilderPlugin[SimpleState, SimplePresetConfi
     preset_config_class = SimplePresetConfig
 
     def __init__(self):
-        """Initialize the simple pipeline builder."""
+        """Initialize the Simple Pipeline Builder."""
         super().__init__()
 
     def build(self, pipeline_config: dict[str, Any]) -> Pipeline:
@@ -157,7 +156,7 @@ class SimplePipelineBuilder(PipelineBuilderPlugin[SimpleState, SimplePresetConfi
             pipeline_config (dict[str, Any]): The pipeline configuration.
 
         Returns:
-            Pipeline: The simple pipeline.
+            Pipeline: The Simple Pipeline.
         """
         response_synthesizer_step = step(
             component=self.build_response_synthesizer(),

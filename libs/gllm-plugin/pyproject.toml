@@ -1,18 +1,22 @@
 [tool.poetry]
 name = "gllm-plugin"
-version = "0.0.1"
+version = "0.0.1b4"
 description = ""
 authors = ["GenAI SDK Team <gat-sdk@gdplabs.id>"]
 readme = "README.md"
+include = ["**/*.so","**/*.pyi"]
+exclude = ["**/*.py", "**/.venv/**", "**/.cache/**"]
+
+[tool.poetry.build]
+script = "build.py"
+generate-setup-file = true
 
 [tool.poetry.dependencies]
-gllm-core = {git = "ssh://git@github.com/GDP-ADMIN/gen-ai-internal.git", subdirectory = "libs/gllm-core"}
-gllm-inference = {git = "ssh://git@github.com/GDP-ADMIN/gen-ai-internal.git", subdirectory = "libs/gllm-inference"}
-gllm-pipeline = {git = "ssh://git@github.com/GDP-ADMIN/gen-ai-internal.git", subdirectory = "libs/gllm-pipeline"}
-
 python = ">=3.11,<3.13"
 semver = "^3.0.4"
-
+gllm-core = { source = "gen-ai" }
+gllm-inference = { source = "gen-ai" }
+gllm-pipeline = { source = "gen-ai" }
 bosa-core = { git = "ssh://git@github.com/GDP-ADMIN/bosa.git", branch = "bosa-python-core-0.0.2", subdirectory = "python/bosa-core" }
 
 [tool.poetry.extras]
@@ -38,7 +42,7 @@ select = ["B", "B9", "C", "D", "E", "F", "I", "PL", "W"]
 convention = "google"
 
 [build-system]
-requires = ["poetry-core"]
+requires = ["poetry-core", "setuptools"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.pytest.ini_options]
@@ -48,14 +52,22 @@ testpaths = ["tests"]
 convention = "google"
 add_ignore = ["D107"]
 
+[[tool.poetry.source]]
+name = "gen-ai"
+url = "https://asia-southeast2-python.pkg.dev/gdp-labs/gen-ai/simple/"
+priority = "explicit"
+
+[[tool.poetry.source]]
+name = "gen-ai-publication"
+url = "https://asia-southeast2-python.pkg.dev/gdp-labs/gen-ai/"
+priority = "explicit"
+
 # This group includes dependencies for compiling and stubs generation
-# use `poetry install --with compiler` to install these dependencies
-
-
+# Use `poetry install --with compiler` to install these dependencies
 [tool.poetry.group.compiler]
 optional = true
 [tool.poetry.group.compiler.dependencies]
 nuitka = "2.5.6"
 # We use stubgen from mypy to generate stubs for our compiled modules
-# ref: https://mypy.readthedocs.io/en/stable/stubgen.html
+# Ref: https://mypy.readthedocs.io/en/stable/stubgen.html
 mypy = "^1.11.2"

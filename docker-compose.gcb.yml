@@ -1,0 +1,23 @@
+services:
+  builder:
+    image: asia.gcr.io/gdp-labs/gl-base/poetry:2.1.1-py${VERSION}.0
+    working_dir: /workspace/libs
+    entrypoint: /bin/bash
+    environment:
+      - GH_TOKEN=${GH_TOKEN:-notdefined}
+      - MODULE=${MODULE:-notdefined}
+    command:
+      - '-c'
+      - './build.ci.sh ${MODULE}'
+    env_file:
+      - 'libs/build.ci.env'
+    # entrypoint: /bin/sleep
+    # command:
+    #   - infinity
+    volumes:
+      - '.:/workspace'
+
+networks:
+  default:
+    external: true
+    name: cloudbuild

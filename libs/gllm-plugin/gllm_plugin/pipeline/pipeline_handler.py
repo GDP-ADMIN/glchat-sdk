@@ -216,6 +216,8 @@ class PipelineHandler(PluginHandler):
 
         Raises:
             ValueError: If the chatbot or pipeline is not found.
+        Raises:
+            ValueError: If the chatbot or pipeline is not found.
         """
         self._validate_pipeline(chatbot_id)
         config = self._chatbot_configs[chatbot_id].pipeline_config

@@ -76,6 +76,7 @@ class PipelineBuilderPlugin(Plugin, Generic[PipelineState, PipelinePresetConfig]
         Returns:
             Initial pipeline state
         """
+        pass
 
     @abstractmethod
     def build(
@@ -90,6 +91,7 @@ class PipelineBuilderPlugin(Plugin, Generic[PipelineState, PipelinePresetConfig]
         Returns:
             Pipeline: Built pipeline instance.
         """
+        pass
 
     def build_additional_runtime_config(
         self,

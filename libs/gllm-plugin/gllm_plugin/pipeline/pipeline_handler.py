@@ -49,7 +49,7 @@ class PipelinePresetConfig(BaseModel):
     supported_models: list[str]
 
 
-class PipelineConfig(BaseModel):
+class ChatbotPresetMapping(BaseModel):
     """Pipeline configuration class.
     
     Attributes:
@@ -73,7 +73,7 @@ class PipelineHandler(PluginHandler):
         _pipeline_cache (dict[tuple[str, str], Pipeline]): Cache mapping (chatbot_id, model_name) to Pipeline instances
         _chatbot_configs (dict[str, ChatbotConfig]): Mapping of chatbot IDs to their configurations
         app_config (AppConfig): Application configuration
-        activated_configs (dict[str, PipelineConfig]): Mapping of pipeline types to their configurations
+        activated_configs (dict[str, ChatbotPresetMapping]): Mapping of pipeline types to their configurations
         _builders (dict[str, Plugin]): Mapping of chatbot IDs to their pipeline builder plugins
     """
 
@@ -88,7 +88,7 @@ class PipelineHandler(PluginHandler):
         """
         self.app_config = app_config
         self._pipeline_cache = {}
-        self.activated_configs: dict[str, PipelineConfig] = {}
+        self.activated_configs: dict[str, ChatbotPresetMapping] = {}
         self._builders = {}
         self._chatbot_configs = {}
         self._prepare_pipelines()
@@ -248,7 +248,7 @@ class PipelineHandler(PluginHandler):
             pipeline_types.add(pipeline_type)
 
         for pipeline_type in pipeline_types:
-            self.activated_configs[pipeline_type] = PipelineConfig(
+            self.activated_configs[pipeline_type] = ChatbotPresetMapping(
                 pipeline_type=pipeline_type,
                 chatbot_presets=chatbot_presets,
             )

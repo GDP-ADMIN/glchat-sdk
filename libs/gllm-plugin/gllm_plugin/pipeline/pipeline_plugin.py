@@ -1,6 +1,6 @@
 """Base Pipeline Builder Plugin.
 
-This module defines the base class for Pipeline Builder plugins.
+This module defines the base class for pipeline builder plugins.
 
 Authors:
     Samuel Lusandi (samuel.lusandi@gdplabs.id)

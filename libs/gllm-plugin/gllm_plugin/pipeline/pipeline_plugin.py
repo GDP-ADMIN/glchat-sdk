@@ -23,7 +23,7 @@ PipelineRuntimeConfig = TypeVar("PipelineRuntimeConfig", bound="BaseModel")
 
 @Plugin.for_handler(PipelineHandler)
 class PipelineBuilderPlugin(Plugin, Generic[PipelineState, PipelinePresetConfig], ABC):
-    """Base class for Pipeline Builder plugins.
+    """Base class for pipeline builder plugins.
 
     This class combines the Plugin architecture with the Pipeline Builder functionality.
 

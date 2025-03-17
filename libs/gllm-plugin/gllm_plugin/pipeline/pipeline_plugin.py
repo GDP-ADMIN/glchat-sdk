@@ -85,7 +85,7 @@ class PipelineBuilderPlugin(Plugin, Generic[PipelineState, PipelinePresetConfig]
         """Build a pipeline instance.
 
         Args:
-            pipeline_config: Pipeline configuration including model name and other settings
+            pipeline_config: Pipeline configuration including model name and other settings.
 
         Returns:
             Pipeline: Built pipeline instance.

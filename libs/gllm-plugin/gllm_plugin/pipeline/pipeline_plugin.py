@@ -88,7 +88,7 @@ class PipelineBuilderPlugin(Plugin, Generic[PipelineState, PipelinePresetConfig]
             pipeline_config: Pipeline configuration including model name and other settings
 
         Returns:
-            Built pipeline instance
+            Pipeline: Built pipeline instance.
         """
 
     def build_additional_runtime_config(

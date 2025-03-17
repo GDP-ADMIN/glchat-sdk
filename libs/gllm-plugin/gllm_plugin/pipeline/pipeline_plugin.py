@@ -101,7 +101,7 @@ class PipelineBuilderPlugin(Plugin, Generic[PipelineState, PipelinePresetConfig]
             pipeline_config: Pipeline configuration
 
         Returns:
-            Additional runtime configuration
+            dict[str, Any]: Additional runtime configuration.
         """
         if not self.additional_config_class:
             return {}

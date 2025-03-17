@@ -76,6 +76,7 @@ class PipelineBuilderPlugin(Plugin, Generic[PipelineState, PipelinePresetConfig]
         Returns:
             Initial pipeline state
         """
+        pass
 
     @abstractmethod
     def build(

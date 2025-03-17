@@ -33,7 +33,7 @@ class PipelineBuilderPlugin(Plugin, Generic[PipelineState, PipelinePresetConfig]
         version (str): The version of the plugin.
         catalog (BaseCatalog): The catalog instance.
         additional_config_class (Type[PipelineRuntimeConfig] | None): The additional runtime configuration class.
-        preset_config_class (Type[PipelinePresetConfig] | None): The preset configuration class
+        preset_config_class (Type[PipelinePresetConfig] | None): The preset configuration class.
     """
 
     name: str

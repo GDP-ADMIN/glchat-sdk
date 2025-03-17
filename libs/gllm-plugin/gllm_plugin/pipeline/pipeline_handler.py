@@ -41,8 +41,8 @@ class PipelinePresetConfig(BaseModel):
     """Pipeline preset configuration class.
     
     Attributes:
-        preset_id (str): Unique identifier for the pipeline preset
-        supported_models (list[str]): List of model names supported by this preset
+        preset_id (str): Unique identifier for the pipeline preset.
+        supported_models (list[str]): List of model names supported by this preset.
     """
 
     preset_id: str

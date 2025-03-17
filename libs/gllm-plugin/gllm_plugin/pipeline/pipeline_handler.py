@@ -84,7 +84,7 @@ class PipelineHandler(PluginHandler):
         """Initialize the pipeline handler.
 
         Args:
-            app_config: Application configuration
+            app_config: Application configuration.
         """
         self.app_config = app_config
         self.activated_configs: dict[str, ChatbotPresetMapping] = {}

@@ -50,31 +50,31 @@ class PipelinePresetConfig(BaseModel):
 
 
 class ChatbotPresetMapping(BaseModel):
-    """Pipeline configuration class.
+    """Chatbot preset mapping.
     
     Attributes:
-        pipeline_type (str): Type of pipeline
-        chatbot_presets (dict[str, PipelinePresetConfig]): Mapping of chatbot IDs to their preset configurations
+        pipeline_type (str): Type of pipeline.
+        chatbot_preset_map (dict[str, PipelinePresetConfig]): Mapping of chatbot IDs to their pipeline preset configurations.
     """
 
     pipeline_type: str
-    chatbot_presets: dict[str, PipelinePresetConfig]
+    chatbot_preset_map: dict[str, PipelinePresetConfig]
 
 
 logger = LoggerManager().get_logger(__name__)
 
 
 class PipelineHandler(PluginHandler):
-    """Handler for Pipeline Builder plugins.
+    """Handler for pipeline builder plugins.
 
-    This handler manages pipeline plugins and provides caching for built pipelines.
+    This handler manages pipeline builder plugins and provides caching for built pipelines.
 
     Attributes:
-        _pipeline_cache (dict[tuple[str, str], Pipeline]): Cache mapping (chatbot_id, model_name) to Pipeline instances
-        _chatbot_configs (dict[str, ChatbotConfig]): Mapping of chatbot IDs to their configurations
-        app_config (AppConfig): Application configuration
-        activated_configs (dict[str, ChatbotPresetMapping]): Mapping of pipeline types to their configurations
-        _builders (dict[str, Plugin]): Mapping of chatbot IDs to their pipeline builder plugins
+        app_config (AppConfig): Application configuration.
+        activated_configs (dict[str, ChatbotPresetMapping]): Collection of chatbot preset mapping by pipeline types.
+        _chatbot_configs (dict[str, ChatbotConfig]): Mapping of chatbot IDs to their configurations.
+        _builders (dict[str, Plugin]): Mapping of chatbot IDs to their pipeline builder plugins.
+        _pipeline_cache (dict[tuple[str, str], Pipeline]): Cache mapping (chatbot_id, model_name) to Pipeline instances.
     """
 
     _pipeline_cache: dict[tuple[str, str], Pipeline]
@@ -87,10 +87,10 @@ class PipelineHandler(PluginHandler):
             app_config: Application configuration
         """
         self.app_config = app_config
-        self._pipeline_cache = {}
         self.activated_configs: dict[str, ChatbotPresetMapping] = {}
-        self._builders = {}
         self._chatbot_configs = {}
+        self._pipeline_cache = {}
+        self._builders = {}
         self._prepare_pipelines()
 
     @classmethod
@@ -123,7 +123,7 @@ class PipelineHandler(PluginHandler):
 
         pipeline_config = instance.activated_configs[pipeline_type]
 
-        for chatbot_id, preset in pipeline_config.chatbot_presets.items():
+        for chatbot_id, preset in pipeline_config.chatbot_preset_map.items():
             if pipeline_type != instance._chatbot_configs[chatbot_id].pipeline_type:
                 continue
 
@@ -229,7 +229,7 @@ class PipelineHandler(PluginHandler):
         self._pipeline_cache = {}
 
         pipeline_types: set[str] = set()
-        chatbot_presets: dict[str, PipelinePresetConfig] = {}
+        chatbot_preset_map: dict[str, PipelinePresetConfig] = {}
         for chatbot_id, chatbot_info in self.app_config.chatbots.items():
             if not chatbot_info.pipeline:
                 logger.warning(f"Pipeline config not found for chatbot `{chatbot_id}`")
@@ -238,7 +238,7 @@ class PipelineHandler(PluginHandler):
             pipeline_info = chatbot_info.pipeline
             pipeline_type = pipeline_info["type"]
 
-            chatbot_presets[chatbot_id] = PipelinePresetConfig(
+            chatbot_preset_map[chatbot_id] = PipelinePresetConfig(
                 preset_id=pipeline_info["config"]["pipeline_preset_id"],
                 supported_models=list(pipeline_info["config"]["supported_models"].keys()),
             )
@@ -255,7 +255,7 @@ class PipelineHandler(PluginHandler):
         for pipeline_type in pipeline_types:
             self.activated_configs[pipeline_type] = ChatbotPresetMapping(
                 pipeline_type=pipeline_type,
-                chatbot_presets=chatbot_presets,
+                chatbot_preset_map=chatbot_preset_map,
             )
 
     def _validate_pipeline(self, chatbot_id: str) -> None:

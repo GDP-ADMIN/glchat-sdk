@@ -17,7 +17,7 @@ semver = "^3.0.4"
 gllm-core = { source = "gen-ai" }
 gllm-inference = { source = "gen-ai" }
 gllm-pipeline = { source = "gen-ai" }
-bosa-core = { git = "ssh://git@github.com/GDP-ADMIN/bosa.git", branch = "bosa-python-core-0.0.2", subdirectory = "python/bosa-core" }
+bosa-core = { source = "gen-ai" }
 
 [tool.poetry.extras]
 flair= ["flair"]
@@ -55,7 +55,11 @@ add_ignore = ["D107"]
 [[tool.poetry.source]]
 name = "gen-ai"
 url = "https://asia-southeast2-python.pkg.dev/gdp-labs/gen-ai/simple/"
-priority = "explicit"
+priority = "primary"
+
+[[tool.poetry.source]]
+name = "pypi"
+priority = "supplemental"
 
 [[tool.poetry.source]]
 name = "gen-ai-publication"

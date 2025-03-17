@@ -201,7 +201,7 @@ class BaseChatHistoryStorage(ABC):
             user_id (str): The ID of the user.
             conversation_id (str): The ID of the conversation.
             message_list (list[Any]): A list of messages to save.
-            attachments (dict[str, Any] | None, optional): Attachments associated with the messages. Defaults to None.
+            attachments (dict[str, Any] | None): Attachments associated with the messages.
             kwargs (Any): Additional arguments.
 
         Returns:

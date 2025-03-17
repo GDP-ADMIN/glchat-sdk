@@ -1,6 +1,6 @@
-"""Pipeline Handler for Pipeline Builder plugins.
+"""Pipeline handler for pipeline builder plugins.
 
-This handler manages Pipeline Builder plugins and provides necessary services.
+This handler manages pipeline builder plugins and provides necessary services.
 
 Authors:
     Samuel Lusandi (samuel.lusandi@gdplabs.id)
@@ -24,16 +24,16 @@ class ChatbotConfig(BaseModel):
     """Chatbot configuration class containing pipeline configs and metadata.
     
     Attributes:
-        config (dict[str, Any]): Pipeline configuration dictionary
-        prompt_builder_catalogs (dict[str, PromptBuilderCatalog] | None): Mapping of prompt builder catalogs
-        lmrp_catalogs (dict[str, LMRequestProcessorCatalog] | None): Mapping of LM request processor catalogs
-        pipeline_type (str): Type of pipeline to use
+        pipeline_type (str): Type of pipeline to use.
+        pipeline_config (dict[str, Any]): Pipeline configuration dictionary.
+        prompt_builder_catalogs (dict[str, PromptBuilderCatalog] | None): Mapping of prompt builder catalogs.
+        lmrp_catalogs (dict[str, LMRequestProcessorCatalog] | None): Mapping of LM request processor catalogs.
     """
 
-    config: dict[str, Any]
+    pipeline_type: str
+    pipeline_config: dict[str, Any]
     prompt_builder_catalogs: dict[str, PromptBuilderCatalog] | None
     lmrp_catalogs: dict[str, LMRequestProcessorCatalog] | None
-    pipeline_type: str
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
 
@@ -129,7 +129,7 @@ class PipelineHandler(PluginHandler):
 
             for model_name_str in preset.supported_models:
                 model_name = ModelName.from_string(model_name_str)
-                config_copy = instance._chatbot_configs[chatbot_id].config.copy()
+                config_copy = instance._chatbot_configs[chatbot_id].pipeline_config.copy()
                 config_copy["model_name"] = model_name
                 plugin.prompt_builder_catalogs = instance._chatbot_configs[chatbot_id].prompt_builder_catalogs
                 plugin.lmrp_catalogs = instance._chatbot_configs[chatbot_id].lmrp_catalogs
@@ -179,7 +179,7 @@ class PipelineHandler(PluginHandler):
             ValueError: If the chatbot or pipeline is not found.
         """
         self._validate_pipeline(chatbot_id)
-        return self._chatbot_configs[chatbot_id].config
+        return self._chatbot_configs[chatbot_id].pipeline_config
 
     def get_pipeline_type(self, chatbot_id: str) -> str:
         """Get the pipeline type for the given chatbot and pipeline.
@@ -190,7 +190,7 @@ class PipelineHandler(PluginHandler):
         return self._chatbot_configs[chatbot_id].pipeline_type
 
     def get_use_docproc(self, chatbot_id: str) -> bool:
-        """Get whether DocProc should be used for this pipeline.
+        """Get whether DocProc should be used for this chatbot.
 
         Args:
             chatbot_id (str): The chatbot ID.
@@ -202,20 +202,23 @@ class PipelineHandler(PluginHandler):
             ValueError: If the chatbot or pipeline is not found.
         """
         self._validate_pipeline(chatbot_id)
-        config = self._chatbot_configs[chatbot_id].config.copy()
+        config = self._chatbot_configs[chatbot_id].pipeline_config.copy()
         return config["use_docproc"]
 
     def get_max_file_size(self, chatbot_id: str) -> int | None:
-        """Get maximum file size for the given chatbot and pipeline.
+        """Get maximum file size for the given chatbot.
 
         Args:
             chatbot_id (str): The chatbot ID.
 
         Returns:
             int | None: The maximum file size if provided.
+
+        Raises:
+            ValueError: If the chatbot or pipeline is not found.
         """
         self._validate_pipeline(chatbot_id)
-        config = self._chatbot_configs[chatbot_id].config.copy()
+        config = self._chatbot_configs[chatbot_id].pipeline_config.copy()
         return config.get("max_file_size")
 
     def _prepare_pipelines(self):
@@ -240,7 +243,7 @@ class PipelineHandler(PluginHandler):
 
             logger.info(f"Storing pipeline config for chatbot `{chatbot_id}`")
             self._chatbot_configs[chatbot_id] = ChatbotConfig(
-                config=pipeline_info["config"],
+                pipeline_config=pipeline_info["config"],
                 prompt_builder_catalogs=pipeline_info["prompt_builder_catalogs"],
                 lmrp_catalogs=pipeline_info["lmrp_catalogs"],
                 pipeline_type=pipeline_type,

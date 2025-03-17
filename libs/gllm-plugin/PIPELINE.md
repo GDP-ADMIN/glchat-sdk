@@ -1,6 +1,6 @@
 ### Add new Pipeline to GLLM Backend
 
-This example will guide you through creating new pipeline classes from external repository and integrating them in GLChat.
+This example will guide you through creating new pipeline classes from an external repository and integrating them into GLChat.
 
 1. **Add `gllm-plugin` dependency in `pyproject.toml`**
 

@@ -113,7 +113,7 @@ class PipelineBuilderPlugin(Plugin, Generic[PipelineState, PipelinePresetConfig]
         """Get the pipeline configuration.
 
         Returns:
-            Pipeline configuration
+            dict[str, Any]: Pipeline configuration.
         """
         if self.preset_config_class:
             return self.preset_config_class().model_dump()

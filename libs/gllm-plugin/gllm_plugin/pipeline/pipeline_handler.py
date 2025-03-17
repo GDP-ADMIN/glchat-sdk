@@ -202,7 +202,7 @@ class PipelineHandler(PluginHandler):
             ValueError: If the chatbot or pipeline is not found.
         """
         self._validate_pipeline(chatbot_id)
-        config = self._chatbot_configs[chatbot_id].pipeline_config.copy()
+        config = self._chatbot_configs[chatbot_id].pipeline_config
         return config["use_docproc"]
 
     def get_max_file_size(self, chatbot_id: str) -> int | None:
@@ -218,7 +218,7 @@ class PipelineHandler(PluginHandler):
             ValueError: If the chatbot or pipeline is not found.
         """
         self._validate_pipeline(chatbot_id)
-        config = self._chatbot_configs[chatbot_id].pipeline_config.copy()
+        config = self._chatbot_configs[chatbot_id].pipeline_config
         return config.get("max_file_size")
 
     def _prepare_pipelines(self):

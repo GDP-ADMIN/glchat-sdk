@@ -69,9 +69,9 @@ class PipelineBuilderPlugin(Plugin, Generic[PipelineState, PipelinePresetConfig]
         """Build the initial pipeline state.
 
         Args:
-            request_config: Request configuration
-            pipeline_config: Pipeline configuration
-            **kwargs: Additional state arguments
+            request_config: Request configuration.
+            pipeline_config: Pipeline configuration.
+            kwargs: Additional state arguments.
 
         Returns:
             Initial pipeline state

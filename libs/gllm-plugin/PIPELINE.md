@@ -77,7 +77,6 @@ This example will guide you through creating new pipeline classes from external 
     - Interact with the chatbot to ensure that it responds using the registered pipeline.
 
 
-### Example Usage for Static Response Synthesizer
 `state.py`
 ```python
 from enum import StrEnum

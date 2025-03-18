@@ -221,10 +221,8 @@ class PipelineHandler(PluginHandler):
         config = self._chatbot_configs[chatbot_id].pipeline_config
         return config.get("max_file_size")
 
-    def _prepare_pipelines(self):
+    def _prepare_pipelines(self) -> None:
         """Build pipeline configurations from the chatbots configuration."""
-        self._chatbot_configs = {}
-        self._pipeline_cache = {}
 
         pipeline_types: set[str] = set()
         chatbot_preset_map: dict[str, PipelinePresetConfig] = {}

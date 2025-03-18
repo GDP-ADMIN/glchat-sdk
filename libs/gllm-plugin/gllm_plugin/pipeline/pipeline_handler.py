@@ -265,4 +265,3 @@ class PipelineHandler(PluginHandler):
         """
         if chatbot_id not in self._chatbot_configs:
             raise ValueError(f"Pipeline configuration for chatbot `{chatbot_id}` not found")
-            

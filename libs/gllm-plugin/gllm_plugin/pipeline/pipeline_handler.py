@@ -71,14 +71,16 @@ class PipelineHandler(PluginHandler):
 
     Attributes:
         app_config (AppConfig): Application configuration.
-        activated_configs (dict[str, ChatbotPresetMapping]): Collection of chatbot preset mapping by pipeline types.
+        _activated_configs (dict[str, ChatbotPresetMapping]): Collection of chatbot preset mapping by pipeline types.
         _chatbot_configs (dict[str, ChatbotConfig]): Mapping of chatbot IDs to their configurations.
         _builders (dict[str, Plugin]): Mapping of chatbot IDs to their pipeline builder plugins.
         _pipeline_cache (dict[tuple[str, str], Pipeline]): Cache mapping (chatbot_id, model_name) to Pipeline instances.
     """
-
-    _pipeline_cache: dict[tuple[str, str], Pipeline]
-    _chatbot_configs: dict[str, ChatbotConfig]
+    _app_config: AppConfig
+    _activated_configs: dict[str, ChatbotPresetMapping] = {}
+    _chatbot_configs: dict[str, ChatbotConfig] = {}
+    _builders: dict[str, Plugin] = {}
+    _pipeline_cache: dict[tuple[str, str], Pipeline] = {}
 
     def __init__(self, app_config: AppConfig):
         """Initialize the pipeline handler.
@@ -86,11 +88,7 @@ class PipelineHandler(PluginHandler):
         Args:
             app_config: Application configuration.
         """
-        self.app_config = app_config
-        self.activated_configs: dict[str, ChatbotPresetMapping] = {}
-        self._chatbot_configs = {}
-        self._builders = {}
-        self._pipeline_cache = {}
+        self._app_config = app_config
         self._prepare_pipelines()
 
     @classmethod
@@ -118,10 +116,10 @@ class PipelineHandler(PluginHandler):
         """
         pipeline_type = plugin.name
 
-        if pipeline_type not in instance.activated_configs:
+        if pipeline_type not in instance._activated_configs:
             return
 
-        active_config = instance.activated_configs[pipeline_type]
+        active_config = instance._activated_configs[pipeline_type]
 
         for chatbot_id, preset in active_config.chatbot_preset_map.items():
             if pipeline_type != instance._chatbot_configs[chatbot_id].pipeline_type:
@@ -253,7 +251,7 @@ class PipelineHandler(PluginHandler):
             pipeline_types.add(pipeline_type)
 
         for pipeline_type in pipeline_types:
-            self.activated_configs[pipeline_type] = ChatbotPresetMapping(
+            self._activated_configs[pipeline_type] = ChatbotPresetMapping(
                 pipeline_type=pipeline_type,
                 chatbot_preset_map=chatbot_preset_map,
             )

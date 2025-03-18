@@ -89,19 +89,19 @@ class PipelineHandler(PluginHandler):
         self.app_config = app_config
         self.activated_configs: dict[str, ChatbotPresetMapping] = {}
         self._chatbot_configs = {}
-        self._pipeline_cache = {}
         self._builders = {}
+        self._pipeline_cache = {}
         self._prepare_pipelines()
 
     @classmethod
     def create_injections(cls, instance: "PipelineHandler") -> dict[Type[Any], Any]:
-        """Create injection mappings for pipeline plugins.
+        """Create injection mappings for pipeline builder plugins.
 
         Args:
-            instance: The handler instance providing injections
+            instance: The handler instance providing injections.
 
         Returns:
-            Dictionary mapping service types to their instances
+            Dictionary mapping service types to their instances.
         """
         return {AppConfig: instance.app_config}
 
@@ -110,30 +110,30 @@ class PipelineHandler(PluginHandler):
         """Initialize plugin-specific resources.
 
         This method is called after plugin creation and service injection.
-        For each plugin, we build pipelines for all supported models and cache them.
+        For each pipeline builder plugin, we build pipelines for all supported models and cache them.
 
         Args:
-            instance: The handler instance
-            plugin: The pipeline builder plugin instance
+            instance: The handler instance.
+            plugin: The pipeline builder plugin instance.
         """
         pipeline_type = plugin.name
 
         if pipeline_type not in instance.activated_configs:
             return
 
-        pipeline_config = instance.activated_configs[pipeline_type]
+        active_config = instance.activated_configs[pipeline_type]
 
-        for chatbot_id, preset in pipeline_config.chatbot_preset_map.items():
+        for chatbot_id, preset in active_config.chatbot_preset_map.items():
             if pipeline_type != instance._chatbot_configs[chatbot_id].pipeline_type:
                 continue
 
             for model_name_str in preset.supported_models:
                 model_name = ModelName.from_string(model_name_str)
-                config_copy = instance._chatbot_configs[chatbot_id].pipeline_config.copy()
-                config_copy["model_name"] = model_name
+                pipeline_config = instance._chatbot_configs[chatbot_id].pipeline_config.copy()
+                pipeline_config["model_name"] = model_name
                 plugin.prompt_builder_catalogs = instance._chatbot_configs[chatbot_id].prompt_builder_catalogs
                 plugin.lmrp_catalogs = instance._chatbot_configs[chatbot_id].lmrp_catalogs
-                pipeline = plugin.build(config_copy)
+                pipeline = plugin.build(pipeline_config)
                 instance._builders[chatbot_id] = plugin
                 instance._pipeline_cache[(chatbot_id, str(model_name))] = pipeline
 
@@ -147,7 +147,7 @@ class PipelineHandler(PluginHandler):
             Plugin: The pipeline builder instance.
 
         Raises:
-            ValueError: If the chatbot ID is invalid.
+            ValueError: If the chatbot ID is invalid or the model name is not supported.
         """
         return self._builders[chatbot_id]
 
@@ -182,7 +182,7 @@ class PipelineHandler(PluginHandler):
         return self._chatbot_configs[chatbot_id].pipeline_config
 
     def get_pipeline_type(self, chatbot_id: str) -> str:
-        """Get the pipeline type for the given chatbot and pipeline.
+        """Get the pipeline type for the given chatbot.
 
         Args:
             chatbot_id (str): The chatbot ID.
@@ -245,10 +245,10 @@ class PipelineHandler(PluginHandler):
 
             logger.info(f"Storing pipeline config for chatbot `{chatbot_id}`")
             self._chatbot_configs[chatbot_id] = ChatbotConfig(
+                pipeline_type=pipeline_type,
                 pipeline_config=pipeline_info["config"],
                 prompt_builder_catalogs=pipeline_info["prompt_builder_catalogs"],
                 lmrp_catalogs=pipeline_info["lmrp_catalogs"],
-                pipeline_type=pipeline_type,
             )
             pipeline_types.add(pipeline_type)
 

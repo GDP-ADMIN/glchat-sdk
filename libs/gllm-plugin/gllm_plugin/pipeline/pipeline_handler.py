@@ -76,7 +76,7 @@ class PipelineHandler(PluginHandler):
         _builders (dict[str, Plugin]): Mapping of chatbot IDs to their pipeline builder plugins.
         _pipeline_cache (dict[tuple[str, str], Pipeline]): Cache mapping (chatbot_id, model_name) to Pipeline instances.
     """
-    _app_config: AppConfig
+    app_config: AppConfig
     _activated_configs: dict[str, ChatbotPresetMapping] = {}
     _chatbot_configs: dict[str, ChatbotConfig] = {}
     _builders: dict[str, Plugin] = {}
@@ -88,7 +88,7 @@ class PipelineHandler(PluginHandler):
         Args:
             app_config: Application configuration.
         """
-        self._app_config = app_config
+        self.app_config = app_config
         self._prepare_pipelines()
 
     @classmethod

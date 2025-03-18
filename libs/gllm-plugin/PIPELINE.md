@@ -9,7 +9,7 @@ This example will guide you through creating new pipeline classes from external 
     poetry source add gen-ai https://asia-southeast2-python.pkg.dev/gdp-labs/gen-ai/simple/ --priority=primary
 
     # Add PyPI as supplemental source
-    poetry source add pypi https://pypi.org/simple --priority=supplemental
+    poetry source add pypi --priority=supplemental
 
     # Authenticate to GDP Labs SDK libraries (Only gat@gdplabs.id group team has access)
     poetry config http-basic.gen-ai oauth2accesstoken "$(gcloud auth print-access-token)"

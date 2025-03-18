@@ -253,3 +253,4 @@ zsdoc/data
 
 *.key
 *.pyi
+setup.cfg

@@ -24,7 +24,7 @@ A library to implement Plugin architecture and integrate with existing pipelines
     poetry source add gen-ai https://asia-southeast2-python.pkg.dev/gdp-labs/gen-ai/simple/ --priority=primary
 
     # Add PyPI as supplemental source
-    poetry source add pypi https://pypi.org/simple --priority=supplemental
+    poetry source add pypi --priority=supplemental
 
     # Authenticate to GDP Labs SDK libraries (only gat@gdplabs.id group team has access)
     poetry config http-basic.gen-ai oauth2accesstoken "$(gcloud auth print-access-token)"

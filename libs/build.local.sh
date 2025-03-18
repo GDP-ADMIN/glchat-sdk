@@ -1,5 +1,5 @@
 #!/bin/bash
-set -xe
+set -e
 
 # Check if at least one package folder name is provided
 if [ "$#" -lt 1 ]; then
@@ -30,6 +30,7 @@ do
 
   echo "Building wheel for $PACKAGE_NAME"
   # Build the wheel
+  poetry run stubgen --include-docstrings -p "${PACKAGE_NAME}" -o .
   poetry build --format wheel
 
   echo "Completed building: $PACKAGE_NAME"

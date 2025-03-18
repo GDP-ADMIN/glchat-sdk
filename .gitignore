@@ -252,3 +252,4 @@ zsdoc/data
 **/main_variables.tf
 
 *.key
+*.pyi

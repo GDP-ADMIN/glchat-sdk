@@ -2,10 +2,23 @@
 
 This example will guide you through creating new pipeline classes from external repository and integrating them in GLChat.
 
-1. **Add `gllm-plugin` dependency in `pyproject.toml`**
+1. **Add [`gllm-plugin`](https://console.cloud.google.com/artifacts/python/gdp-labs/asia-southeast2/gen-ai/gllm-plugin?project=gdp-labs) dependency in `pyproject.toml`**
 
-    ```toml
-    gllm-plugin = {git = "ssh://git@github.com/GDP-ADMIN/gen-ai-external.git", subdirectory = "libs/gllm-plugin"}
+    ```sh
+    # Add GDP Labs artifact repository as primary source
+    poetry source add gen-ai https://asia-southeast2-python.pkg.dev/gdp-labs/gen-ai/simple/ --priority=primary
+
+    # Add PyPI as supplemental source
+    poetry source add pypi https://pypi.org/simple --priority=supplemental
+
+    # Authenticate to GDP Labs SDK libraries (Only gat@gdplabs.id group team has access)
+    poetry config http-basic.gen-ai oauth2accesstoken "$(gcloud auth print-access-token)"
+
+    # Latest version
+    poetry add gllm-plugin --source gen-ai
+
+    # Specific version
+    poetry add gllm-plugin@0.0.1b5 --source gen-ai
     ```
 
 2. **Define the Pipeline State**

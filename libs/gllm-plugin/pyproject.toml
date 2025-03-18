@@ -1,11 +1,20 @@
 [tool.poetry]
 name = "gllm-plugin"
-version = "0.0.1b4"
+version = "0.0.1b5"
 description = ""
 authors = ["GenAI SDK Team <gat-sdk@gdplabs.id>"]
 readme = "README.md"
-include = ["**/*.so","**/*.pyi"]
-exclude = ["**/*.py", "**/.venv/**", "**/.cache/**"]
+packages = [{include = "gllm_plugin"}]
+include = [
+  "*.bin",                           # In case you have a Linux/MacOS CLI executable
+  "*.exe",                           # In case you have a Windows CLI executable
+  "*.pyd",                           # The compiled binary extension for Windows
+  "*.so",                            # The compiled binary extension for Linux/MacOS
+  "*.pyi",                           # Python interface stub files (aids autocomplete, interface inspection)
+  "gllm_plugin/**/*.pyi",            # Python interface stub files (aids autocomplete, interface inspection)
+  "gllm_plugin/**/*.html",           # Example of a static filetype you may want to include
+]
+exclude = ["**/*"]
 
 [tool.poetry.build]
 script = "build.py"
@@ -17,7 +26,7 @@ semver = "^3.0.4"
 gllm-core = { source = "gen-ai" }
 gllm-inference = { source = "gen-ai" }
 gllm-pipeline = { source = "gen-ai" }
-bosa-core = { git = "ssh://git@github.com/GDP-ADMIN/bosa.git", branch = "bosa-python-core-0.0.2", subdirectory = "python/bosa-core" }
+bosa-core = { source = "gen-ai" }
 
 [tool.poetry.extras]
 flair= ["flair"]
@@ -42,8 +51,8 @@ select = ["B", "B9", "C", "D", "E", "F", "I", "PL", "W"]
 convention = "google"
 
 [build-system]
-requires = ["poetry-core", "setuptools"]
-build-backend = "poetry.core.masonry.api"
+requires = ["setuptools>=42", "wheel", "nuitka==2.5.6", "toml>=0.10.2"]
+build-backend = "nuitka.distutils.Build"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -55,7 +64,11 @@ add_ignore = ["D107"]
 [[tool.poetry.source]]
 name = "gen-ai"
 url = "https://asia-southeast2-python.pkg.dev/gdp-labs/gen-ai/simple/"
-priority = "explicit"
+priority = "primary"
+
+[[tool.poetry.source]]
+name = "pypi"
+priority = "supplemental"
 
 [[tool.poetry.source]]
 name = "gen-ai-publication"

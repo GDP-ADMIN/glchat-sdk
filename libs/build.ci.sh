@@ -1,7 +1,5 @@
 #!/bin/bash
 set -e
-# shellcheck source=/dev/null
-source ../.ci/shared.sh
 
 # Check if at least one package folder name is provided
 if [ "$#" -ne 1 ]; then
@@ -33,4 +31,12 @@ fi
 
 poetry run pre-commit run --files ./
 poetry run coverage run -m pytest --cov-report=xml --cov=. tests/
-binary_build
+poetry run stubgen --include-docstrings -p "${MODULE//-/_}" -o .
+
+# Nuitka build backend read version from setup.cfg only, otherwise 0.0.0.
+cat <<EOF > setup.cfg
+[metadata]
+version = $(poetry version -s)
+EOF
+
+poetry build --format wheel --verbose

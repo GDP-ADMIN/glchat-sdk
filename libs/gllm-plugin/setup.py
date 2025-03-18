@@ -1,6 +1,4 @@
-#!/usr/bin/env python
-
-import setuptools
+from setuptools import setup
 
 if __name__ == "__main__":
-    setuptools.setup()
+    setup(build_with_nuitka=True)

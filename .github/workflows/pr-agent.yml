@@ -16,5 +16,5 @@ permissions:
 # This job is used to call the PR-Agent workflow
 jobs:
   call-workflow-pr-agent:
-    uses: GDP-ADMIN/action-hub/.github/workflows/pr-agent-glair.yml@main
+    uses: GDP-ADMIN/action-hub/.github/workflows/pr-agent-gdplabs.yml@main
     secrets: inherit

@@ -3,7 +3,6 @@
 # This is v0.2 of this workflow file
 
 name: PR-Agent
-
 on:
   pull_request:
     types: [opened, reopened, ready_for_review]
@@ -14,24 +13,8 @@ permissions:
   issues: write
   pull-requests: write
 
+# This job is used to call the PR-Agent workflow
 jobs:
-  pr_agent_job:
-    runs-on: ubuntu-latest
-    name: Run pr agent on every pull request
-    if: |
-      (github.event_name == 'pull_request') ||
-      (github.event_name == 'issue_comment' && 
-      (startsWith(github.event.comment.body, '/describe') || 
-        startsWith(github.event.comment.body, '/review') || 
-        startsWith(github.event.comment.body, '/improve') || 
-        startsWith(github.event.comment.body, '/ask')))
-    steps:
-      - name: PR Agent action step
-        id: pragent
-        uses: docker://codiumai/pr-agent@sha256:14165e525678ace7d9b51cda8652c2d74abb4e1d76b57c4a6ccaeba84663cc64
-        env:
-          OPENAI_KEY: ${{ secrets.OPENAI_KEY }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_ACTION_CONFIG.AUTO_DESCRIBE: true
-          GITHUB_ACTION_CONFIG.AUTO_REVIEW: true
-          GITHUB_ACTION_CONFIG.AUTO_IMPROVE: true
+  call-workflow-pr-agent:
+    uses: GDP-ADMIN/action-hub/.github/workflows/pr-agent-glair.yml@main
+    secrets: inherit

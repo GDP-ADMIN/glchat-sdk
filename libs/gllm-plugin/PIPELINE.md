@@ -89,7 +89,8 @@ This example will guide you through creating new pipeline classes from an extern
     - Check the available chatbots — you should see a chatbot configured with the new pipeline based on config.yaml.
     - Interact with the chatbot to ensure that it responds using the registered pipeline.
 
-
+    This confirms that the new pipeline has been successfully integrated into GLChat.
+    
 `state.py`
 ```python
 from enum import StrEnum

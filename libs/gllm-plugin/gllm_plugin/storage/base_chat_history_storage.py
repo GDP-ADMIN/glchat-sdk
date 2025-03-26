@@ -137,26 +137,6 @@ class BaseChatHistoryStorage(ABC):
         pass
 
     @abstractmethod
-    def add_message(self, message_role: MessageRole, message: str, user_id: str, conversation_id: str, 
-                   parent_id: str, source: str, metadata_: dict[str, Any] | None = None, **kwargs: Any) -> Message:
-        """Add a message to a conversation.
-
-        Args:
-            message_role (MessageRole): The role of the message (USER or AI).
-            message (str): The message content.
-            user_id (str): The ID of the user.
-            conversation_id (str): The ID of the conversation.
-            parent_id (str): The ID of the parent message.
-            source (str): The source of the message.
-            metadata_ (dict[str, Any] | None, optional): Additional metadata for the message. Defaults to None.
-            kwargs (Any): Additional arguments.
-
-        Returns:
-            Message: The added message.
-        """
-        pass
-
-    @abstractmethod
     def add_user_message(self, message: str, user_id: str, conversation_id: str, 
                         parent_id: str | None = None, source: str | None = None, **kwargs: Any) -> Message:
         """Add a user message to a conversation.

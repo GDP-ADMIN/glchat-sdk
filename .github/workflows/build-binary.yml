@@ -1,0 +1,62 @@
+name: Build Binary
+
+on:
+  push:
+    tags:
+      - 'gllm_plugin-v*'
+  workflow_dispatch:
+
+jobs:
+  Setup-SDK-Binary:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-13, macos-14]
+        python-version: ["3.11.0", "3.12.0"]
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+        
+    - name: Setup Poetry
+      uses: abatilo/actions-poetry@v3.0.0
+      with:
+        poetry-version: 2.1.1
+      
+    - name: Google Cloud Authentication
+      uses: 'google-github-actions/auth@v2'
+      with:
+        credentials_json: '${{ secrets.GCP_CREDENTIALS }}'
+        
+    - name: Setup Google Cloud SDK
+      uses: 'google-github-actions/setup-gcloud@v2'
+      
+    - name: Generate Google Authentication Token
+      shell: bash
+      run: |
+        export TAG_NAME="${{  github.ref_name }}"
+        export MODULE=$(echo "${TAG_NAME}" | sed -E 's/-v.*$//' | tr '_' '-')
+        echo "MODULE=${MODULE}" >> $GITHUB_ENV
+        echo "TAG_NAME=${TAG_NAME}" >> $GITHUB_ENV
+        cd libs/${MODULE}
+        gcloud auth print-access-token > token.key
+        
+    - name: Build Binary
+      shell: bash
+      run: |
+        echo "Processed module name: ${MODULE}"
+        cd libs/
+
+        bash build.ci.sh ${MODULE}
+      env:
+        GH_TOKEN: ${{ secrets.GH_TOKEN }}
+
+    - name: Upload Package To Registry
+      shell: bash
+      run: |
+        # Setup .pypirc for Artifact Registry
+        cd libs/${MODULE}
+        poetry publish --repository gen-ai-publication --skip-existing

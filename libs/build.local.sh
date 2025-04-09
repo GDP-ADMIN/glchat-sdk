@@ -24,6 +24,31 @@ do
     exit 1
   fi
 
+  # If we put below code in pyproject.toml, when developers installing this package with Git, the package will be built as binary (Nuitka).
+  cat <<EOF >> "pyproject.toml"
+
+[tool.poetry.build]
+script = "build.py"
+generate-setup-file = true
+
+[build-system]
+requires = ["setuptools", "wheel", "nuitka", "toml"]
+build-backend = "nuitka.distutils.Build"
+EOF
+
+  cat <<EOF > setup.py
+from setuptools import setup
+
+if __name__ == "__main__":
+    setup(build_with_nuitka=True)
+EOF
+
+  # Nuitka build backend read version from setup.cfg only, otherwise 0.0.0.
+  cat <<EOF > setup.cfg
+[metadata]
+version = $(poetry version -s)
+EOF
+
   echo "Install dependencies..."
   # install nutika & mypy in the virtual environment
   poetry install --with compiler

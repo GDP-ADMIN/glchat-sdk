@@ -14,6 +14,7 @@ from bosa_core.plugin.handler import PluginHandler
 from gllm_core.utils import LoggerManager
 from gllm_inference.catalog import PromptBuilderCatalog, LMRequestProcessorCatalog
 from gllm_pipeline.pipeline.pipeline import Pipeline
+from gllm_plugin.storage.base_chat_history_storage import BaseChatHistoryStorage
 from pydantic import BaseModel, ConfigDict
 
 from gllm_plugin.config.app_config import AppConfig
@@ -82,13 +83,14 @@ class PipelineHandler(PluginHandler):
     _builders: dict[str, Plugin] = {}
     _pipeline_cache: dict[tuple[str, str], Pipeline] = {}
 
-    def __init__(self, app_config: AppConfig):
+    def __init__(self, app_config: AppConfig, chat_history_storage: BaseChatHistoryStorage):
         """Initialize the pipeline handler.
 
         Args:
             app_config: Application configuration.
         """
         self.app_config = app_config
+        self.chat_history_storage = chat_history_storage
         self._prepare_pipelines()
 
     @classmethod
@@ -101,7 +103,10 @@ class PipelineHandler(PluginHandler):
         Returns:
             Dictionary mapping service types to their instances.
         """
-        return {AppConfig: instance.app_config}
+        return {
+            AppConfig: instance.app_config,
+            BaseChatHistoryStorage: instance.chat_history_storage,
+        }
 
     @classmethod
     def initialize_plugin(cls, instance: "PipelineHandler", plugin: Plugin) -> None:

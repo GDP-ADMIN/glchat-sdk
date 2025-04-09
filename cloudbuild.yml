@@ -29,8 +29,12 @@ steps:
   args:
     - '-c'
     - |-
-      poetry config http-basic.gen-ai-publication oauth2accesstoken "$(cat token.key)"
-      poetry publish --repository gen-ai-publication --skip-existing
+      if [ -n "${TAG_NAME}" ]; then
+        poetry config http-basic.gen-ai-publication oauth2accesstoken "$(cat token.key)"
+        poetry publish --repository gen-ai-publication --skip-existing
+      else
+        echo "No release tag detected. Skipping binary upload."
+      fi
 
 - id: Run SCA
   name: 'gcr.io/$PROJECT_ID/secops'

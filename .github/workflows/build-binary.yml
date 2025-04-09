@@ -24,7 +24,7 @@ jobs:
     - name: Setup Poetry
       uses: abatilo/actions-poetry@v3.0.0
       with:
-        poetry-version: 2.1.1
+        poetry-version: 1.8.2
       
     - name: Google Cloud Authentication
       uses: 'google-github-actions/auth@v2'

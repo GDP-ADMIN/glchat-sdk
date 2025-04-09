@@ -88,6 +88,7 @@ class PipelineHandler(PluginHandler):
 
         Args:
             app_config: Application configuration.
+            chat_history_storage: Chat history storage.
         """
         self.app_config = app_config
         self.chat_history_storage = chat_history_storage

@@ -21,6 +21,31 @@ git config --global url."https://${GH_TOKEN}:x-oauth-basic@github.com".insteadOf
 poetry config http-basic.gen-ai oauth2accesstoken "$(cat token.key)"
 poetry config http-basic.gen-ai-publication oauth2accesstoken "$(cat token.key)"
 
+# If we put below code in pyproject.toml, when developers installing this package with Git, the package will be built as binary (Nuitka).
+cat <<EOF >> "pyproject.toml"
+
+[tool.poetry.build]
+script = "build.py"
+generate-setup-file = true
+
+[build-system]
+requires = ["setuptools", "wheel", "nuitka", "toml"]
+build-backend = "nuitka.distutils.Build"
+EOF
+
+cat <<EOF > setup.py
+from setuptools import setup
+
+if __name__ == "__main__":
+    setup(build_with_nuitka=True)
+EOF
+
+# Nuitka build backend read version from setup.cfg only, otherwise 0.0.0.
+cat <<EOF > setup.cfg
+[metadata]
+version = $(poetry version -s)
+EOF
+
 # Package Installation
 poetry install --all-extras --with compiler
 if [ "$RUNNER_OS" == "Windows" ]; then
@@ -32,11 +57,5 @@ fi
 poetry run pre-commit run --files ./
 poetry run coverage run -m pytest --cov-report=xml --cov=. tests/
 poetry run stubgen --include-docstrings -p "${MODULE//-/_}" -o .
-
-# Nuitka build backend read version from setup.cfg only, otherwise 0.0.0.
-cat <<EOF > setup.cfg
-[metadata]
-version = $(poetry version -s)
-EOF
 
 poetry build --format wheel --verbose

@@ -52,6 +52,7 @@ if [ "$RUNNER_OS" == "Windows" ]; then
   poetry add python-magic-bin libmagic
 elif [[ "$RUNNER_OS" == "macOS" ]]; then
   brew install libmagic
+  brew install ccache
 fi
 
 poetry run pre-commit run --files ./

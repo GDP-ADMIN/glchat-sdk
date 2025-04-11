@@ -24,7 +24,7 @@ jobs:
     - name: Setup Poetry
       uses: abatilo/actions-poetry@v3.0.0
       with:
-        poetry-version: 2.1.1
+        poetry-version: 1.8.2
       
     - name: Google Cloud Authentication
       uses: 'google-github-actions/auth@v2'
@@ -53,6 +53,37 @@ jobs:
         bash build.ci.sh ${MODULE}
       env:
         GH_TOKEN: ${{ secrets.GH_TOKEN }}
+
+    - name: Retag Wheel for macOS
+      if: startsWith(matrix.os, 'macos')
+      shell: bash
+      run: |
+        echo "🏷 Retagging wheel for macOS"
+
+        # Extract macOS major version (e.g., 13 or 14)
+        MACOS_MAJOR=$(sw_vers -productVersion | cut -d '.' -f 1)
+
+        # Detect arch (should be arm64 on macos-14 runners)
+        ARCH=$(uname -m)
+        if [ "$ARCH" = "arm64" ]; then
+          PLATFORM_ARCH="arm64"
+        elif [ "$ARCH" = "x86_64" ]; then
+          PLATFORM_ARCH="x86_64"
+        else
+          echo "❌ Unsupported architecture: $ARCH"
+          exit 1
+        fi
+
+        # Construct the final platform tag
+        PLATFORM_TAG="macosx_${MACOS_MAJOR}_0_${PLATFORM_ARCH}"
+        echo "Using platform tag: ${PLATFORM_TAG}"
+
+        # Ensure wheel is installed
+        pip install wheel
+
+        # Retag the wheel
+        cd libs/${MODULE}
+        python3 -m wheel tags --platform-tag ${PLATFORM_TAG} --remove dist/*.whl
 
     - name: Upload Package To Registry
       shell: bash

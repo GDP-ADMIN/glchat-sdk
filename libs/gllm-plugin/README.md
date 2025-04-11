@@ -10,7 +10,7 @@ A library to implement Plugin architecture and integrate with existing pipelines
 
     You can install Python using [Miniconda](https://docs.anaconda.com/free/miniconda/index.html).
 
-2. [Poetry](https://python-poetry.org/docs/) v2.1.1 or above:
+2. [Poetry](https://python-poetry.org/docs/) v1.8.3:
 
     You can install Poetry using cURL (you need Python to install Poetry):
     ```bash

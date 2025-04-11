@@ -912,9 +912,11 @@ python-versions = ">=3.11,<4.0"
 files = [
     {file = "gllm_pipeline-0.2.15-cp311-cp311-macosx_13_0_x86_64.whl", hash = "sha256:c189866d226dd7b4be5679dc8da0ebc338dc22429903a782d8bb6072a28c6273"},
     {file = "gllm_pipeline-0.2.15-cp311-cp311-macosx_14_0_arm64.whl", hash = "sha256:922768cf9d3833a546f4a8930dcd65863ff8c05025ce2b1ac55cc8293f1ff128"},
+    {file = "gllm_pipeline-0.2.15-cp311-cp311-manylinux_2_31_x86_64.whl", hash = "sha256:725694f3ec797cb9f914e102ac514aa8be732de82a6b641e64acdfb443e1f896"},
     {file = "gllm_pipeline-0.2.15-cp311-cp311-win_amd64.whl", hash = "sha256:1ffb8656b5c86f13d194a72dd0ee1b965acaf36487f7a25e044e87a772ce87ab"},
     {file = "gllm_pipeline-0.2.15-cp312-cp312-macosx_13_0_x86_64.whl", hash = "sha256:3d4488e4a0c43de4ca0fc64bf34de5293304057eb80173dd1c7e4a67926819c8"},
     {file = "gllm_pipeline-0.2.15-cp312-cp312-macosx_14_0_arm64.whl", hash = "sha256:4b6357fd169e2349b73fa63e6adc4c47533104a6da9aa59e87c704033cc44b8b"},
+    {file = "gllm_pipeline-0.2.15-cp312-cp312-manylinux_2_31_x86_64.whl", hash = "sha256:52fba851f77d7490a9f59386bad2c9f8d22a394e30b4fa43b6a03099daadda21"},
     {file = "gllm_pipeline-0.2.15-cp312-cp312-win_amd64.whl", hash = "sha256:a54ef525696ed97c443fe1300cc505b7c646de6c9ea81c99743fe248cfd2583f"},
 ]
 

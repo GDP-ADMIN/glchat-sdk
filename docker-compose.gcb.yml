@@ -1,6 +1,6 @@
 services:
   builder:
-    image: asia.gcr.io/gdp-labs/gl-base/poetry:1.8.3-py${VERSION}.0
+    image: asia.gcr.io/gdp-labs/gl-base/poetry:1.8.2-py${VERSION}.0
     working_dir: /workspace/libs
     entrypoint: /bin/bash
     environment:

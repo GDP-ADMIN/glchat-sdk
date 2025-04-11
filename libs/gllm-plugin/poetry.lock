@@ -905,19 +905,19 @@ reference = "gen-ai"
 
 [[package]]
 name = "gllm-pipeline"
-version = "0.2.12"
+version = "0.2.15"
 description = "A library containing components related to Gen AI applications pipeline orchestration."
 optional = false
 python-versions = ">=3.11,<4.0"
 files = [
-    {file = "gllm_pipeline-0.2.12-cp311-cp311-macosx_13_0_x86_64.whl", hash = "sha256:cb61c6e8cf3d85a37794a38215cf6308b83e6be287d104c33a449a08924f9d96"},
-    {file = "gllm_pipeline-0.2.12-cp311-cp311-macosx_14_0_arm64.whl", hash = "sha256:f34b1782274586a9e6d3dbe5441b6442542fa7b4b393d5dbdd707b4a64dea521"},
-    {file = "gllm_pipeline-0.2.12-cp311-cp311-manylinux_2_31_x86_64.whl", hash = "sha256:592fd75a03fa39e17e4653e632605fae8a44796a51362f36a7e292d9a836de5c"},
-    {file = "gllm_pipeline-0.2.12-cp311-cp311-win_amd64.whl", hash = "sha256:a0d6384776d43837ce0849bea9cd4405cca1c1dbc1951544ae09eda4625dcf75"},
-    {file = "gllm_pipeline-0.2.12-cp312-cp312-macosx_13_0_x86_64.whl", hash = "sha256:ad9dadf818d07ebc4d22d87c3de40e5f4aa1a1df78b7b3cc1fb1056f5b113f13"},
-    {file = "gllm_pipeline-0.2.12-cp312-cp312-macosx_14_0_arm64.whl", hash = "sha256:afa1d09b9444b64bfc19dde1aabc4931034da8d1fafd0d15642ebe3feec0ff34"},
-    {file = "gllm_pipeline-0.2.12-cp312-cp312-manylinux_2_31_x86_64.whl", hash = "sha256:eefe50fe3ade7f329c331eb1aeaf1661f41359d7ce91ab8f1238e88bb0bf91c9"},
-    {file = "gllm_pipeline-0.2.12-cp312-cp312-win_amd64.whl", hash = "sha256:d314281413f5e3dfc5df7fff62875db6ed6065bc2ed68d99c8bc20006d68ae05"},
+    {file = "gllm_pipeline-0.2.15-cp311-cp311-macosx_13_0_x86_64.whl", hash = "sha256:c189866d226dd7b4be5679dc8da0ebc338dc22429903a782d8bb6072a28c6273"},
+    {file = "gllm_pipeline-0.2.15-cp311-cp311-macosx_14_0_arm64.whl", hash = "sha256:922768cf9d3833a546f4a8930dcd65863ff8c05025ce2b1ac55cc8293f1ff128"},
+    {file = "gllm_pipeline-0.2.15-cp311-cp311-manylinux_2_31_x86_64.whl", hash = "sha256:725694f3ec797cb9f914e102ac514aa8be732de82a6b641e64acdfb443e1f896"},
+    {file = "gllm_pipeline-0.2.15-cp311-cp311-win_amd64.whl", hash = "sha256:1ffb8656b5c86f13d194a72dd0ee1b965acaf36487f7a25e044e87a772ce87ab"},
+    {file = "gllm_pipeline-0.2.15-cp312-cp312-macosx_13_0_x86_64.whl", hash = "sha256:3d4488e4a0c43de4ca0fc64bf34de5293304057eb80173dd1c7e4a67926819c8"},
+    {file = "gllm_pipeline-0.2.15-cp312-cp312-macosx_14_0_arm64.whl", hash = "sha256:4b6357fd169e2349b73fa63e6adc4c47533104a6da9aa59e87c704033cc44b8b"},
+    {file = "gllm_pipeline-0.2.15-cp312-cp312-manylinux_2_31_x86_64.whl", hash = "sha256:52fba851f77d7490a9f59386bad2c9f8d22a394e30b4fa43b6a03099daadda21"},
+    {file = "gllm_pipeline-0.2.15-cp312-cp312-win_amd64.whl", hash = "sha256:a54ef525696ed97c443fe1300cc505b7c646de6c9ea81c99743fe248cfd2583f"},
 ]
 
 [package.dependencies]
@@ -1179,13 +1179,13 @@ files = [
 
 [[package]]
 name = "httpcore"
-version = "1.0.7"
+version = "1.0.8"
 description = "A minimal low-level HTTP client."
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "httpcore-1.0.7-py3-none-any.whl", hash = "sha256:a3fff8f43dc260d5bd363d9f9cf1830fa3a458b332856f34282de498ed420edd"},
-    {file = "httpcore-1.0.7.tar.gz", hash = "sha256:8551cb62a169ec7162ac7be8d4817d561f60e08eaa485234898414bb5a8a0b4c"},
+    {file = "httpcore-1.0.8-py3-none-any.whl", hash = "sha256:5254cf149bcb5f75e9d1b2b9f729ea4a4b883d1ad7379fc632b727cec23674be"},
+    {file = "httpcore-1.0.8.tar.gz", hash = "sha256:86e94505ed24ea06514883fd44d2bc02d90e77e7979c8eb71b90f41d364a1bad"},
 ]
 
 [package.dependencies]
@@ -3696,4 +3696,4 @@ flair = []
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.11,<3.13"
-content-hash = "6a1741c01d4157cd5fef4be929f24965d488cb8e0dc4c3b3534816f0c72ed004"
+content-hash = "72dcd28a81e3ad8ac3185ee81759eab526cb8c280b5a55204306b5642702e5e0"

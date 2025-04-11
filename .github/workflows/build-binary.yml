@@ -82,6 +82,7 @@ jobs:
         pip install wheel
 
         # Retag the wheel
+        cd libs/${MODULE}
         python3 -m wheel tags --platform-tag ${PLATFORM_TAG} --remove dist/*.whl
 
     - name: Upload Package To Registry

@@ -103,10 +103,12 @@ class SimpleState(TypedDict):
     """A TypedDict representing the state of the Simple Pipeline.
 
     Attributes:
+        event_emitter (EventEmitter): An event emitter instance.
         response_synthesis_bundle (dict[str, Any]): The bundle of response synthesis.
         response (str): The generated response to the user's query.
     """
 
+    event_emitter: EventEmitter
     response_synthesis_bundle: dict[str, Any]
     response: str
 
@@ -115,6 +117,7 @@ class SimpleState(TypedDict):
 class SimpleStateKeys(StrEnum):
     """List of all possible keys in SimpleState."""
 
+    EVENT_EMITTER = "event_emitter"
     RESPONSE_SYNTHESIS_BUNDLE = "response_synthesis_bundle"
     RESPONSE = "response"
 ```
@@ -174,6 +177,7 @@ class SimplePipelineBuilder(PipelineBuilderPlugin[SimpleState, SimplePresetConfi
         response_synthesizer_step = step(
             component=self.build_response_synthesizer(),
             input_state_map={
+                 "event_emitter": SimpleStateKeys.EVENT_EMITTER,
                 "state_variables": SimpleStateKeys.RESPONSE_SYNTHESIS_BUNDLE
             },
             output_state=SimpleStateKeys.RESPONSE,
@@ -200,6 +204,7 @@ class SimplePipelineBuilder(PipelineBuilderPlugin[SimpleState, SimplePresetConfi
             SimpleState: The initial state.
         """
         return SimpleState(
+            event_emitter=kwargs.get("event_emitter"),
             response_synthesis_bundle={"context_list": [f"Re: {request.get("message")}"]}
         )
 

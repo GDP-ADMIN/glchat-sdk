@@ -69,7 +69,11 @@ This example will guide you through creating new pipeline classes from an extern
         - `output_parser_kwargs`
     - `user_chatbots`: The list of user chatbots.
 
-6. **Register the new pipeline to GLLM Backend using API.**
+6. **Refer to the Example Repository**
+
+    You can find an example of a simple pipeline implementation in the following repository: [gen-ai-examples/simple-pipeline](https://github.com/GDP-ADMIN/gen-ai-examples/tree/main/examples/simple-pipeline). 
+
+7. **Register the new pipeline to GLLM Backend using API.**
 
     Sample curl request:
     ```sh
@@ -95,7 +99,7 @@ This example will guide you through creating new pipeline classes from an extern
 
     After following these steps, you can now use the new pipeline in GLChat.
 
-7. **Testing the New Pipeline in GLChat**
+8. **Testing the New Pipeline in GLChat**
 
     After registering the new pipeline, follow these steps to verify that it is active:
 

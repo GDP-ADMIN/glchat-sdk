@@ -162,7 +162,7 @@ def test_register_tool_instance():
     assert handler._tool_instances["custom_name"] == tool
 
 
-@patch("gllm_agents.plugins.tool_handler.PluginManager")
+@patch("gllm_plugin.tools.tool_handler.PluginManager")
 def test_get_tool_handler(mock_plugin_manager):
     """Test that get_tool_handler retrieves the handler from the plugin manager."""
     # Setup a mock handler
@@ -181,7 +181,7 @@ def test_get_tool_handler(mock_plugin_manager):
     assert handler == mock_handler
 
 
-@patch("gllm_agents.plugins.tool_handler.PluginManager")
+@patch("gllm_plugin.tools.tool_handler.PluginManager")
 def test_get_tool_handler_error(mock_plugin_manager):
     """Test that get_tool_handler handles errors gracefully."""
     # Setup the mock to raise an exception
@@ -197,7 +197,7 @@ def test_get_tool_handler_error(mock_plugin_manager):
     assert handler is None
 
 
-@patch("gllm_agents.plugins.tool_handler.PluginManager")
+@patch("gllm_plugin.tools.tool_handler.PluginManager")
 def test_get_plugin_manager(mock_plugin_manager):
     """Test that get_plugin_manager returns a plugin manager instance."""
     # Call the function
@@ -208,8 +208,8 @@ def test_get_plugin_manager(mock_plugin_manager):
     assert manager == mock_plugin_manager.return_value
 
 
-@patch("gllm_agents.plugins.tool_handler.PluginManager")
-@patch("gllm_agents.plugins.plugin.AGENT_TOOL_PLUGINS")
+@patch("gllm_plugin.tools.tool_handler.PluginManager")
+@patch("gllm_plugin.tools.plugin.AGENT_TOOL_PLUGINS")
 def test_initialize_tool_plugins(mock_agent_tool_plugins, mock_plugin_manager):
     """Test that initialize_tool_plugins sets everything up correctly."""
     # Setup mocks
@@ -223,7 +223,7 @@ def test_initialize_tool_plugins(mock_agent_tool_plugins, mock_plugin_manager):
 
     # Create a patch to mock the plugin registry
     with patch(
-        "gllm_agents.plugins.plugin.AGENT_TOOL_PLUGINS",
+        "gllm_plugin.tools.plugin.AGENT_TOOL_PLUGINS",
         [mock_plugin_class1, mock_plugin_class2],
     ):
         # Call the function
@@ -239,8 +239,8 @@ def test_initialize_tool_plugins(mock_agent_tool_plugins, mock_plugin_manager):
         assert handler.config_kwargs == {"test_config": "value"}
 
 
-@patch("gllm_agents.plugins.tool_handler.PluginManager")
-@patch("gllm_agents.plugins.plugin.AGENT_TOOL_PLUGINS")
+@patch("gllm_plugin.tools.tool_handler.PluginManager")
+@patch("gllm_plugin.tools.plugin.AGENT_TOOL_PLUGINS")
 def test_initialize_tool_plugins_with_failing_plugin(mock_agent_tool_plugins, mock_plugin_manager):
     """Test that initialize_tool_plugins handles plugin registration failures gracefully."""
     # Create a mock plugin manager instance

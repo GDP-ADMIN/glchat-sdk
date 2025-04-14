@@ -12,9 +12,7 @@ from bosa_core import Plugin, PluginManager
 from bosa_core.plugin.handler import PluginHandler
 from langchain_core.tools import BaseTool
 
-from gllm_plugin.tools.tool_plugin import (
-    ToolPlugin,
-)
+from gllm_plugin.tools.tool_plugin import ToolPlugin
 from gllm_plugin.utils.logger import logger
 
 
@@ -171,10 +169,8 @@ def initialize_tool_plugins(**config_kwargs) -> ToolHandler:
         tool_handler = initialize_tool_plugins()
         ```
     """
-    # Import the plugin registry
-    from gllm_agents.plugins.plugin import (
-        AGENT_TOOL_PLUGINS,
-    )
+    # Import the plugin registry from local module
+    from gllm_plugin.tools.plugin import AGENT_TOOL_PLUGINS
 
     # Create the tool handler without PII manager for simpler implementation
     tool_handler = ToolHandler(**config_kwargs)

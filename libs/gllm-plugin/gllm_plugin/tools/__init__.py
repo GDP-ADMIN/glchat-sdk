@@ -8,25 +8,21 @@ Authors:
 """
 
 # Re-export public API from appropriate modules
-# Import the new decorator
-from gllm_agents.plugins.decorators import (
-    tool_plugin,
-)
-from gllm_agents.plugins.plugin import (
+# Replace external imports with local ones
+from gllm_plugin.tools.decorators import tool_plugin
+from gllm_plugin.tools.plugin import (
     AGENT_TOOL_PLUGINS,
     PLUGIN_REGISTRY,
     register_tool_plugin,
     register_tool_plugin_from_path,
 )
-from gllm_agents.plugins.tool_handler import (
+from gllm_plugin.tools.tool_handler import (
     ToolHandler,
     get_plugin_manager,
     get_tool_handler,
     initialize_tool_plugins,
 )
-from gllm_agents.plugins.tool_plugin import (
-    ToolPlugin,
-)
+from gllm_plugin.tools.tool_plugin import ToolPlugin
 
 # For backward compatibility, provide a version in the main namespace
 __all__ = [

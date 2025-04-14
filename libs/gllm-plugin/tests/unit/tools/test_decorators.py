@@ -13,9 +13,7 @@ import pytest
 from langchain_core.tools import BaseTool
 from pydantic import BaseModel, Field
 
-from gllm_plugin.tools.decorators import (
-    tool_plugin,
-)
+from gllm_plugin.tools.decorators import tool_plugin
 
 
 # Mock input schema for testing
@@ -25,7 +23,7 @@ class TestInput(BaseModel):
     test_param: str = Field(description="Test parameter")
 
 
-@patch("gllm_agents.plugins.decorators.register_tool_plugin")
+@patch("gllm_plugin.tools.decorators.register_tool_plugin")
 def test_tool_plugin_decorator_basic(mock_register):
     """Test the basic functionality of the tool_plugin decorator."""
 
@@ -59,7 +57,7 @@ def test_tool_plugin_decorator_basic(mock_register):
     assert tool_instance.description == "Test tool description"
 
 
-@patch("gllm_agents.plugins.decorators.register_tool_plugin")
+@patch("gllm_plugin.tools.decorators.register_tool_plugin")
 def test_tool_plugin_decorator_with_custom_values(mock_register):
     """Test the tool_plugin decorator with custom name and description."""
 
@@ -94,7 +92,7 @@ def test_tool_plugin_decorator_with_invalid_class():
             pass
 
 
-@patch("gllm_agents.plugins.decorators.register_tool_plugin")
+@patch("gllm_plugin.tools.decorators.register_tool_plugin")
 def test_tool_plugin_decorator_registers_correctly(mock_register):
     """Test that the decorator correctly registers the tool plugin."""
 
@@ -116,7 +114,7 @@ def test_tool_plugin_decorator_registers_correctly(mock_register):
     assert registered_class.name == "unknown_tool_plugin"
 
 
-@patch("gllm_agents.plugins.decorators.register_tool_plugin")
+@patch("gllm_plugin.tools.decorators.register_tool_plugin")
 def test_tool_plugin_decorator_creates_plugin_with_create_tool(mock_register):
     """Test that the plugin's create_tool method properly instantiates the tool."""
 

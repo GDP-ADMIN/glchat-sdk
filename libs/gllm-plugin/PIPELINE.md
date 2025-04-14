@@ -23,11 +23,11 @@ This example will guide you through creating new pipeline classes from an extern
 
 2. **Define the Pipeline State**
 
-    Create a new file `state.py` and define the state for your new pipeline (e.g., NewState). This state will hold the necessary data throughout the pipeline's execution.
+    Create a new file `state.py` and define the state for your new pipeline (e.g., `NewState`). This state will hold the necessary data throughout the pipeline's execution.
 
 3. **Define the Pipeline Preset Configuration**
 
-    Create a new file `preset_config.py` and define the preset configuration for your new pipeline (e.g., NewPresetConfig). This configuration will include any parameters needed to initialize the pipeline.
+    Create a new file `preset_config.py` and define the preset configuration for your new pipeline (e.g., `NewPresetConfig`). This configuration will include any parameters needed to initialize the pipeline.
 
 4. **Implement the Pipeline Builder**
 
@@ -36,7 +36,7 @@ This example will guide you through creating new pipeline classes from an extern
 5. **Define the Pipeline Configurations**
 
     Create a new file `config.yaml` and define the config for your new pipeline.
-    The config.yaml contains following:
+    The `config.yaml` contains following:
     - `rago_pipeline`: The name of the pipeline. It must match the name in `pipeline.py`.
     - `presets`: The list of preset configurations. Each preset must contain config keys: `pipeline_preset_id`, `supported_models`, and all keys defined in `preset_config.py`. Optionally, the config keys can also contain keys in `BasePipelinePresetConfig` to override the default values. The following are the optional keys with their default values:
       - `supported_agents: list[str] = []`
@@ -88,13 +88,13 @@ This example will guide you through creating new pipeline classes from an extern
 
     The project structure will be as follows:
     ```
-    - simple-pipeline [git folder]
-    - pyproject.toml [depends on gllm-plugin]
-    - simple_pipeline
-        - config.yaml
-        - pipeline.py
-        - preset_config.py
-        - state.py
+    simple-pipeline [git folder]
+    ├── pyproject.toml [depends on gllm-plugin]
+    └── simple_pipeline/
+        ├── config.yaml
+        ├── pipeline.py
+        ├── preset_config.py
+        └── state.py
     ```
 
     After following these steps, you can now use the new pipeline in GLChat.
@@ -104,7 +104,7 @@ This example will guide you through creating new pipeline classes from an extern
     After registering the new pipeline, follow these steps to verify that it is active:
 
     - Log in to GLChat using a user account assigned to a chatbot that uses the new pipeline.
-    - Check the available chatbots — you should see a chatbot configured with the new pipeline based on config.yaml.
+    - Check the available chatbots — you should see a chatbot configured with the new pipeline based on `config.yaml`.
     - Interact with the chatbot to ensure that it responds using the registered pipeline.
 
     This confirms that the new pipeline has been successfully integrated into GLChat.

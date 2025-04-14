@@ -2485,4 +2485,4 @@ flair = []
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.11,<3.13"
-content-hash = "8fefee897b368b21c8fd86ea752676e59d15b9ccf54c99196c6ef0e2d6067700"
+content-hash = "b8e55f2b140f2cdfbc66f0774255388c28b2ed90c2094703c637d402ec7bec05"

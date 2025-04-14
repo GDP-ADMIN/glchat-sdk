@@ -18,8 +18,8 @@ exclude = ["**/*"]
 
 [tool.poetry.dependencies]
 python = ">=3.11,<3.13"
-langchain = "^0.3.23"
-langchain-core = "^0.3.51"
+langchain = "^0.3.0"
+langchain-core = ">=0.3.51"
 bosa-core = { version = "*", source = "gen-ai" }
 
 

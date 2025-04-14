@@ -16,13 +16,13 @@ from typing import Any, Dict, List, Optional, Type, Union
 from bosa_core import PluginManager
 from langchain_core.tools import BaseTool
 
-from gllm_agents.plugins.tool_handler import (
+from gllm_plugin.tools.tool_handler import (
     get_tool_handler,
 )
-from gllm_agents.plugins.tool_plugin import (
+from gllm_plugin.tools.tool_plugin import (
     ToolPlugin,
 )
-from gllm_agents.utils.logger import logger
+from gllm_plugin.utils.logger import logger
 
 # Dynamic registry that allows runtime registration of tools
 AGENT_TOOL_PLUGINS: List[Type[ToolPlugin]] = []

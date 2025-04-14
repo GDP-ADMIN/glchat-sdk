@@ -12,13 +12,13 @@ from typing import Callable, Optional, Type
 
 from langchain_core.tools import BaseTool
 
-from gllm_agents.plugins.plugin import (
+from gllm_plugin.tools.plugin import (
     register_tool_plugin,
 )
-from gllm_agents.plugins.tool_plugin import (
+from gllm_plugin.tools.tool_plugin import (
     ToolPlugin,
 )
-from gllm_agents.utils.logger import logger
+from gllm_plugin.utils.logger import logger
 
 
 def tool_plugin(

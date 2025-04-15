@@ -9,7 +9,7 @@ Authors:
 """
 
 import inspect
-from typing import Any, Callable, Dict, Optional, Type
+from typing import Any, Callable, Dict, Type
 
 from langchain_core.tools import BaseTool
 
@@ -18,19 +18,17 @@ from gllm_plugin.utils import logger
 
 def tool_plugin(
     version: str = "1.0.0",
-    name: Optional[str] = None,
-    description: Optional[str] = None,
 ) -> Callable[[Type[BaseTool]], Type[BaseTool]]:
     """Decorator to mark a BaseTool class as a tool plugin.
 
     This decorator adds metadata to the tool class that will be used by the
     plugin system when the tool is loaded. It doesn't directly register
     the tool with any system, allowing for use in external repositories.
+    The actual tool name and description are intended to be retrieved
+    from the tool instance at runtime.
 
     Args:
         version: Version of the plugin (defaults to "1.0.0")
-        name: Optional custom name for the plugin (defaults to tool's name)
-        description: Optional custom description (defaults to tool's description)
 
     Returns:
         A decorator function that wraps the tool class
@@ -59,35 +57,8 @@ def tool_plugin(
         if not issubclass(tool_class, BaseTool):
             raise TypeError(f"{tool_class.__name__} is not a subclass of BaseTool")
 
-        # Try to get the actual name by creating a test instance
-        # This solves the issue with properties not being accessible at class level
-        tool_name = "unknown_tool"
-        tool_description = "No description provided"
-
-        try:
-            # Create a test instance to get the actual name and description
-            test_instance = tool_class()
-            tool_name = test_instance.name
-            tool_description = test_instance.description
-            logger.info(f"Successfully got tool name from instance: {tool_name}")
-
-            # Store the actual tool name on the class for easier access
-            tool_class._actual_tool_name = tool_name
-
-        except Exception as e:
-            # Fall back to class attributes if instantiation fails
-            logger.info(f"Could not instantiate {tool_class.__name__} to get name: {str(e)}")
-            tool_name = getattr(tool_class, "name", "unknown_tool")
-            tool_description = getattr(tool_class, "description", "No description provided")
-
-        # Set plugin metadata for later discovery and registration
-        plugin_name = name or f"{tool_name}_plugin"
-        plugin_description = description or tool_description
-
-        # Store plugin metadata as class attributes for later registration
+        # Store basic plugin metadata as class attributes for later registration
         tool_class._plugin_metadata = {
-            "name": plugin_name,
-            "description": plugin_description,
             "version": version,
             "tool_class": tool_class.__name__,
             "module": tool_class.__module__,
@@ -98,7 +69,8 @@ def tool_plugin(
 
         # Log the preparation (but don't require any specific logger)
         try:
-            logger.info(f"Prepared tool {tool_name} as plugin {plugin_name} with version {version}")
+            # Simplified logging message
+            logger.info(f"Marked tool class {tool_class.__name__} as plugin with version {version}")
         except Exception:
             # Ignore logging errors in standalone mode
             pass

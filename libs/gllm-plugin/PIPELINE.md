@@ -2,7 +2,7 @@
 
 This example will guide you through creating new pipeline classes from an external repository and integrating them into GLChat.
 
-1. **Add [`gllm-plugin`](https://console.cloud.google.com/artifacts/python/gdp-labs/asia-southeast2/gen-ai/gllm-plugin?project=gdp-labs) dependency in `pyproject.toml`**
+1. **Install [`gllm-plugin`](https://console.cloud.google.com/artifacts/python/gdp-labs/asia-southeast2/gen-ai/gllm-plugin?project=gdp-labs) using Poetry:**
 
     ```sh
     # Add GDP Labs artifact repository as primary source
@@ -71,6 +71,17 @@ This example will guide you through creating new pipeline classes from an extern
 
 6. **Refer to the Example Repository**
 
+    The project structure will be as follows:
+    ```
+    simple-pipeline [git folder]
+    ├── pyproject.toml [depends on gllm-plugin]
+    └── simple_pipeline/
+        ├── config.yaml
+        ├── pipeline.py
+        ├── preset_config.py
+        └── state.py
+    ```
+
     You can find an example of a simple pipeline implementation in the following repository: [gen-ai-examples/simple-pipeline](https://github.com/GDP-ADMIN/gen-ai-examples/tree/main/examples/simple-pipeline). 
 
 7. **Register the new pipeline to GLLM Backend using API.**
@@ -84,17 +95,6 @@ This example will guide you through creating new pipeline classes from an extern
         "folder_name": "simple_pipeline",
         "path": "/Users/username/Downloads/simple-pipeline"
     }'
-    ```
-
-    The project structure will be as follows:
-    ```
-    simple-pipeline [git folder]
-    ├── pyproject.toml [depends on gllm-plugin]
-    └── simple_pipeline/
-        ├── config.yaml
-        ├── pipeline.py
-        ├── preset_config.py
-        └── state.py
     ```
 
     After following these steps, you can now use the new pipeline in GLChat.

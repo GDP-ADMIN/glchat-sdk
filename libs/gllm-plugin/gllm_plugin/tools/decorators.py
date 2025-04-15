@@ -1,24 +1,19 @@
-"""Tool Plugin Decorators.
+"""Tool Plugin Decorators for External Use.
 
-This module provides decorators for registering tool plugins using a simple decorator syntax
-rather than requiring explicit inheritance from ToolPlugin class.
+This module provides a standalone decorator for registering tool plugins using a simple decorator syntax
+without requiring direct dependencies on the core plugin system.
 
 Authors:
     Raymond Christopher (raymond.christopher@gdplabs.id)
+    Christian Trisno Sen Long Chen (christian.t.s.l.chen@gdplabs.id)
 """
 
 import inspect
-from typing import Callable, Optional, Type
+from typing import Any, Callable, Dict, Optional, Type
 
 from langchain_core.tools import BaseTool
 
-from gllm_plugin.tools.plugin import (
-    register_tool_plugin,
-)
-from gllm_plugin.tools.tool_plugin import (
-    ToolPlugin,
-)
-from gllm_plugin.utils.logger import logger
+from gllm_plugin.utils import logger
 
 
 def tool_plugin(
@@ -26,11 +21,11 @@ def tool_plugin(
     name: Optional[str] = None,
     description: Optional[str] = None,
 ) -> Callable[[Type[BaseTool]], Type[BaseTool]]:
-    """Decorator to register a BaseTool class as a tool plugin.
+    """Decorator to mark a BaseTool class as a tool plugin.
 
-    This decorator creates a dynamically generated ToolPlugin class
-    and registers it with the plugin system. This is the standard way
-    to create and register tools in the system.
+    This decorator adds metadata to the tool class that will be used by the
+    plugin system when the tool is loaded. It doesn't directly register
+    the tool with any system, allowing for use in external repositories.
 
     Args:
         version: Version of the plugin (defaults to "1.0.0")
@@ -60,32 +55,59 @@ def tool_plugin(
         tool_name = getattr(tool_class, "name", "unknown_tool")
         tool_description = getattr(tool_class, "description", "No description provided")
 
-        # Create a dynamic ToolPlugin class
+        # Set plugin metadata for later discovery and registration
         plugin_name = name or f"{tool_name}_plugin"
         plugin_description = description or tool_description
 
-        # Create a dynamic class that inherits from ToolPlugin
-        plugin_class = type(
-            f"{tool_class.__name__}Plugin",
-            (ToolPlugin,),
-            {
-                "name": plugin_name,
-                "description": plugin_description,
-                "version": version,
-                "create_tool": lambda self, **kwargs: tool_class(**kwargs),
-                "__module__": tool_class.__module__,
-                "__doc__": f"Auto-generated plugin for {tool_class.__name__}",
-            },
-        )
+        # Store plugin metadata as class attributes for later registration
+        tool_class._plugin_metadata = {
+            "name": plugin_name,
+            "description": plugin_description,
+            "version": version,
+            "tool_class": tool_class.__name__,
+            "module": tool_class.__module__,
+        }
 
-        # Register the dynamically created plugin
-        register_tool_plugin(plugin_class)
+        # Mark the class as a decorated tool plugin for easy discovery
+        tool_class._is_tool_plugin = True
 
-        # Attach the plugin class to the tool class for reference
-        tool_class._plugin_class = plugin_class
-
-        logger.info(f"Registered tool {tool_name} as plugin {plugin_name} with version {version}")
+        # Log the preparation (but don't require any specific logger)
+        try:
+            logger.info(f"Prepared tool {tool_name} as plugin {plugin_name} with version {version}")
+        except Exception:
+            # Ignore logging errors in standalone mode
+            pass
 
         return tool_class
 
     return decorator
+
+
+def is_tool_plugin(obj: Any) -> bool:
+    """Check if an object is a tool plugin.
+
+    Args:
+        obj: The object to check
+
+    Returns:
+        True if the object is a decorated tool plugin, False otherwise
+    """
+    return inspect.isclass(obj) and getattr(obj, "_is_tool_plugin", False) is True
+
+
+def get_plugin_metadata(tool_class: Type[BaseTool]) -> Dict[str, Any]:
+    """Get the plugin metadata from a decorated tool class.
+
+    Args:
+        tool_class: The tool class to get metadata from
+
+    Returns:
+        A dictionary of plugin metadata
+
+    Raises:
+        ValueError: If the tool class is not a decorated tool plugin
+    """
+    if not is_tool_plugin(tool_class):
+        raise ValueError(f"{tool_class.__name__} is not a decorated tool plugin")
+
+    return getattr(tool_class, "_plugin_metadata", {})

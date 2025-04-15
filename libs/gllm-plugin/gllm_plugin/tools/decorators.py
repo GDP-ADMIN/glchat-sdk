@@ -48,12 +48,37 @@ def tool_plugin(
     """
 
     def decorator(tool_class: Type[BaseTool]) -> Type[BaseTool]:
-        if not inspect.isclass(tool_class) or not issubclass(tool_class, BaseTool):
-            raise TypeError(f"Expected a BaseTool subclass, got {tool_class}")
+        """Decorator for BaseTool classes to register them as plugins.
 
-        # Extract tool metadata for plugin creation using a simple approach
-        tool_name = getattr(tool_class, "name", "unknown_tool")
-        tool_description = getattr(tool_class, "description", "No description provided")
+        Args:
+            tool_class: The BaseTool class to decorate
+
+        Returns:
+            The decorated BaseTool class with plugin metadata
+        """
+        if not issubclass(tool_class, BaseTool):
+            raise TypeError(f"{tool_class.__name__} is not a subclass of BaseTool")
+
+        # Try to get the actual name by creating a test instance
+        # This solves the issue with properties not being accessible at class level
+        tool_name = "unknown_tool"
+        tool_description = "No description provided"
+
+        try:
+            # Create a test instance to get the actual name and description
+            test_instance = tool_class()
+            tool_name = test_instance.name
+            tool_description = test_instance.description
+            logger.info(f"Successfully got tool name from instance: {tool_name}")
+
+            # Store the actual tool name on the class for easier access
+            tool_class._actual_tool_name = tool_name
+
+        except Exception as e:
+            # Fall back to class attributes if instantiation fails
+            logger.info(f"Could not instantiate {tool_class.__name__} to get name: {str(e)}")
+            tool_name = getattr(tool_class, "name", "unknown_tool")
+            tool_description = getattr(tool_class, "description", "No description provided")
 
         # Set plugin metadata for later discovery and registration
         plugin_name = name or f"{tool_name}_plugin"

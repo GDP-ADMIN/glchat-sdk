@@ -87,8 +87,8 @@ class PipelineHandler(PluginHandler):
         """Initialize the pipeline handler.
 
         Args:
-            app_config: Application configuration.
-            chat_history_storage: Chat history storage.
+            app_config (AppConfig): Application configuration.
+            chat_history_storage (BaseChatHistoryStorage): Chat history storage.
         """
         self.app_config = app_config
         self.chat_history_storage = chat_history_storage
@@ -99,10 +99,10 @@ class PipelineHandler(PluginHandler):
         """Create injection mappings for pipeline builder plugins.
 
         Args:
-            instance: The handler instance providing injections.
+            instance (PipelineHandler): The handler instance providing injections.
 
         Returns:
-            Dictionary mapping service types to their instances.
+            dict[Type[Any], Any]: Dictionary mapping service types to their instances.
         """
         return {
             AppConfig: instance.app_config,
@@ -117,8 +117,8 @@ class PipelineHandler(PluginHandler):
         For each pipeline builder plugin, we build pipelines for all supported models and cache them.
 
         Args:
-            instance: The handler instance.
-            plugin: The pipeline builder plugin instance.
+            instance (PipelineHandler): The handler instance.
+            plugin (Plugin): The pipeline builder plugin instance.
         """
         pipeline_type = plugin.name
 

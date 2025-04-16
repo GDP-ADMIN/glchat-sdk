@@ -25,7 +25,6 @@ gllm-core = { version = "*", source = "gen-ai" }
 gllm-inference = { version = "*", source = "gen-ai" }
 gllm-pipeline = { version = "*", source = "gen-ai" }
 bosa-core = { version = "*", source = "gen-ai" }
-colorama = "^0.4.6"
 
 [tool.poetry.extras]
 flair= ["flair"]

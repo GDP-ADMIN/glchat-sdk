@@ -10,7 +10,7 @@ Authors:
 """
 
 import inspect
-from typing import Any, Callable, Dict, Type
+from typing import Any, Callable, Type
 
 from langchain_core.tools import BaseTool
 
@@ -29,10 +29,10 @@ def tool_plugin(
     from the tool instance at runtime.
 
     Args:
-        version: Version of the plugin. Defaults to "1.0.0".
+        version (str): Version of the plugin. Defaults to "1.0.0".
 
     Returns:
-        A decorator function that wraps the tool class.
+        Callable[[Type[BaseTool]], Type[BaseTool]]: A decorator function that wraps the tool class.
 
     Example:
         ```python
@@ -53,7 +53,7 @@ def tool_plugin(
         It validates that the decorated class is a subclass of BaseTool.
 
         Args:
-            tool_class: The BaseTool class to be decorated with plugin metadata.
+            tool_class (Type[BaseTool]): The BaseTool class to be decorated with plugin metadata.
 
         Returns:
             Type[BaseTool]: The decorated BaseTool class with added plugin metadata.
@@ -88,7 +88,7 @@ def is_tool_plugin(obj: Any) -> bool:
     """Check if an object is a tool plugin.
 
     Args:
-        obj: The object to check.
+        obj (Any): The object to check.
 
     Returns:
         bool: True if the object is a decorated tool plugin, False otherwise.
@@ -96,14 +96,14 @@ def is_tool_plugin(obj: Any) -> bool:
     return inspect.isclass(obj) and getattr(obj, "_is_tool_plugin", False) is True
 
 
-def get_plugin_metadata(tool_class: Type[BaseTool]) -> Dict[str, Any]:
+def get_plugin_metadata(tool_class: Type[BaseTool]) -> dict[str, Any]:
     """Get the plugin metadata from a decorated tool class.
 
     Args:
-        tool_class: The tool class to get metadata from.
+        tool_class (Type[BaseTool]): The tool class to get metadata from.
 
     Returns:
-        Dict[str, Any]: A dictionary of plugin metadata.A dictionary of plugin metadata.
+        dict[str, Any]: A dictionary of plugin metadata.
 
     Raises:
         ValueError: If the tool class is not a decorated tool plugin.

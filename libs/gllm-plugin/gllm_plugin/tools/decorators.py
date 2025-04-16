@@ -1,7 +1,8 @@
 """Tool Plugin Decorators for External Use.
 
-This module provides a standalone decorator for registering tool plugins using a simple decorator syntax
-without requiring direct dependencies on the core plugin system.
+This module provides utilities for marking and preparing tool plugins using a decorator-based approach.
+The decorators and utilities can be used independently in external repositories, as they only add
+metadata to tool classes without creating any connections to a plugin registration system.
 
 Authors:
     Raymond Christopher (raymond.christopher@gdplabs.id)
@@ -9,7 +10,7 @@ Authors:
 """
 
 import inspect
-from typing import Any, Callable, Dict, Type
+from typing import Any, Callable, Type
 
 from langchain_core.tools import BaseTool
 
@@ -28,10 +29,10 @@ def tool_plugin(
     from the tool instance at runtime.
 
     Args:
-        version: Version of the plugin (defaults to "1.0.0")
+        version (str): Version of the plugin. Defaults to "1.0.0".
 
     Returns:
-        A decorator function that wraps the tool class
+        Callable[[Type[BaseTool]], Type[BaseTool]]: A decorator function that wraps the tool class.
 
     Example:
         ```python
@@ -46,18 +47,21 @@ def tool_plugin(
     """
 
     def decorator(tool_class: Type[BaseTool]) -> Type[BaseTool]:
-        """Decorator for BaseTool classes to register them as plugins.
+        """Marks a BaseTool class as a plugin by adding metadata for discovery.
+
+        This decorator adds plugin metadata to the tool class and marks it for later discovery.
+        It validates that the decorated class is a subclass of BaseTool.
 
         Args:
-            tool_class: The BaseTool class to decorate
+            tool_class (Type[BaseTool]): The BaseTool class to be decorated with plugin metadata.
 
         Returns:
-            The decorated BaseTool class with plugin metadata
+            Type[BaseTool]: The decorated BaseTool class with added plugin metadata.
         """
         if not issubclass(tool_class, BaseTool):
             raise TypeError(f"{tool_class.__name__} is not a subclass of BaseTool")
 
-        # Store basic plugin metadata as class attributes for later registration
+        # Store basic plugin metadata as class attributes for later discovery
         tool_class._plugin_metadata = {
             "version": version,
             "tool_class": tool_class.__name__,
@@ -84,25 +88,25 @@ def is_tool_plugin(obj: Any) -> bool:
     """Check if an object is a tool plugin.
 
     Args:
-        obj: The object to check
+        obj (Any): The object to check.
 
     Returns:
-        True if the object is a decorated tool plugin, False otherwise
+        bool: True if the object is a decorated tool plugin, False otherwise.
     """
     return inspect.isclass(obj) and getattr(obj, "_is_tool_plugin", False) is True
 
 
-def get_plugin_metadata(tool_class: Type[BaseTool]) -> Dict[str, Any]:
+def get_plugin_metadata(tool_class: Type[BaseTool]) -> dict[str, Any]:
     """Get the plugin metadata from a decorated tool class.
 
     Args:
-        tool_class: The tool class to get metadata from
+        tool_class (Type[BaseTool]): The tool class to get metadata from.
 
     Returns:
-        A dictionary of plugin metadata
+        dict[str, Any]: A dictionary of plugin metadata.
 
     Raises:
-        ValueError: If the tool class is not a decorated tool plugin
+        ValueError: If the tool class is not a decorated tool plugin.
     """
     if not is_tool_plugin(tool_class):
         raise ValueError(f"{tool_class.__name__} is not a decorated tool plugin")

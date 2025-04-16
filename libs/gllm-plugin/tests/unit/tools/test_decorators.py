@@ -7,7 +7,7 @@ Authors:
 """
 
 from typing import Any, Optional
-from unittest.mock import Mock, patch
+from unittest.mock import patch
 
 import pytest
 from langchain_core.tools import BaseTool
@@ -28,7 +28,20 @@ class TestInput(BaseModel):
 
 @patch("gllm_plugin.tools.decorators.logger")
 def test_tool_plugin_decorator_basic(mock_logger):
-    """Test the basic functionality of the tool_plugin decorator."""
+    """Test the basic functionality of the tool_plugin decorator.
+
+    Condition:
+        - A BaseTool subclass is decorated with @tool_plugin
+        - The version is set to "1.0.0"
+        - The decorated tool has standard name and description attributes
+        - The tool is instantiated and its _run method is called
+
+    Expected:
+        - The tool class should have _is_tool_plugin attribute set to True
+        - The tool class should have _plugin_metadata with correct version
+        - The tool instance should maintain normal BaseTool functionality
+        - The logger should be called to record the tool marking
+    """
 
     # Define a tool class with the decorator
     @tool_plugin(version="1.0.0")
@@ -61,7 +74,15 @@ def test_tool_plugin_decorator_basic(mock_logger):
 
 @patch("gllm_plugin.tools.decorators.logger")
 def test_tool_plugin_decorator_with_invalid_class(mock_logger):
-    """Test that the decorator raises an error when used on a non-BaseTool class."""
+    """Test that the decorator raises an error when used on a non-BaseTool class.
+
+    Condition:
+        - A regular class that doesn't inherit from BaseTool is decorated
+        - The @tool_plugin decorator is applied with version "1.0.0"
+
+    Expected:
+        - TypeError should be raised with a message indicating the class is not a subclass of BaseTool
+    """
     with pytest.raises(TypeError, match="is not a subclass of BaseTool"):
 
         @tool_plugin(version="1.0.0")
@@ -71,7 +92,19 @@ def test_tool_plugin_decorator_with_invalid_class(mock_logger):
 
 @patch("gllm_plugin.tools.decorators.logger")
 def test_is_tool_plugin_function(mock_logger):
-    """Test the is_tool_plugin helper function."""
+    """Test the is_tool_plugin helper function.
+
+    Condition:
+        - A BaseTool subclass is decorated with @tool_plugin
+        - Another BaseTool subclass is not decorated
+        - Various non-class objects are tested
+
+    Expected:
+        - is_tool_plugin returns True only for the decorated tool class
+        - is_tool_plugin returns False for undecorated classes
+        - is_tool_plugin returns False for non-class objects and None
+        - The logger is called for the decoration process
+    """
 
     @tool_plugin(version="1.0.0")
     class DecoratedTool(BaseTool):
@@ -100,7 +133,19 @@ def test_is_tool_plugin_function(mock_logger):
 
 @patch("gllm_plugin.tools.decorators.logger")
 def test_get_plugin_metadata(mock_logger):
-    """Test the get_plugin_metadata helper function."""
+    """Test the get_plugin_metadata helper function.
+
+    Condition:
+        - A BaseTool subclass is decorated with @tool_plugin and version "1.0.0"
+        - Another BaseTool subclass is not decorated
+        - get_plugin_metadata is called on both classes
+
+    Expected:
+        - get_plugin_metadata returns correct metadata for decorated class
+        - Metadata contains the version "1.0.0"
+        - ValueError is raised when called on an undecorated class
+        - The logger is called during the decoration process
+    """
 
     @tool_plugin(version="1.0.0")
     class MetadataTool(BaseTool):
@@ -131,7 +176,19 @@ def test_get_plugin_metadata(mock_logger):
 
 @patch("gllm_plugin.tools.decorators.logger")
 def test_tool_plugin_with_args(mock_logger):
-    """Test that the tool plugin works with tools that take constructor arguments."""
+    """Test that the tool plugin works with tools that take constructor arguments.
+
+    Condition:
+        - A BaseTool subclass with custom constructor arguments is decorated
+        - The tool is instantiated with a custom argument value
+        - The tool's _run method uses the custom argument
+
+    Expected:
+        - The tool is properly decorated with metadata
+        - The tool instance correctly stores and uses the custom argument
+        - The plugin metadata contains the correct version
+        - The logger is called during the decoration process
+    """
 
     @tool_plugin(version="1.0.0")
     class ToolWithArgs(BaseTool):
@@ -161,7 +218,19 @@ def test_tool_plugin_with_args(mock_logger):
 
 @patch("gllm_plugin.tools.decorators.logger")
 def test_tool_plugin_decorator_logging_failure(mock_logger):
-    """Test that the decorator handles logging failures gracefully."""
+    """Test that the decorator handles logging failures gracefully.
+
+    Condition:
+        - The logger is configured to raise an exception when info is called
+        - A BaseTool subclass is decorated with @tool_plugin
+
+    Expected:
+        - The decoration process completes successfully despite the logging error
+        - The tool class has the _is_tool_plugin attribute set to True
+        - The tool class has _plugin_metadata with the correct version
+        - No exceptions are propagated from the decorator
+        - The logger.info method was called exactly once
+    """
 
     # Configure the mock logger's info method to raise an exception
     mock_logger.info.side_effect = Exception("Simulated logging error")

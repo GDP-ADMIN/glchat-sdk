@@ -1,17 +1,19 @@
-"""Plugin system for GLLM Agents.
+"""Tool plugin system for GLLM Agents.
 
-This module initializes the plugin system for all agent types and provides mechanisms for dynamic
-tool registration similar to VSCode extensions.
+This module provides a plugin system for tools, allowing dynamic marking and preparation of tools
+similar to VSCode's extension model. Tools can be decorated with metadata while remaining independent
+from the core registration mechanism.
 
 Authors:
     Raymond Christopher (raymond.christopher@gdplabs.id)
 """
 
-# Re-export public API from appropriate modules
-# Replace external imports with local ones
-from gllm_plugin.tools.decorators import get_plugin_metadata, is_tool_plugin, tool_plugin
+from gllm_plugin.tools.decorators import (
+    get_plugin_metadata,
+    is_tool_plugin,
+    tool_plugin,
+)
 
-# For backward compatibility, provide a version in the main namespace
 __all__ = [
     "tool_plugin",
     "is_tool_plugin",

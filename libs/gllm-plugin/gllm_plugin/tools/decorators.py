@@ -14,8 +14,9 @@ from typing import Any, Callable, Type
 
 from langchain_core.tools import BaseTool
 
-from gllm_plugin.utils import logger
+from gllm_core.utils import LoggerManager
 
+logger = LoggerManager().get_logger()
 
 def tool_plugin(
     version: str = "1.0.0",

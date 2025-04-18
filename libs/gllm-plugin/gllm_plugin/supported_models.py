@@ -57,6 +57,7 @@ class AzureOpenAIModel(StrEnum):
 
     GPT_4O = "gpt-4o"
     GPT_4O_MINI = "gpt-4o-mini"
+    TEXT_EMBEDDING_3_SMALL = "text-embedding-3-small"
 
 
 class AnthropicModel(StrEnum):

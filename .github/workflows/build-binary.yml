@@ -9,6 +9,8 @@ on:
 jobs:
   Setup-SDK-Binary:
     runs-on: ${{ matrix.os }}
+    permissions:
+      id-token: write  # Required for PyPI Trusted Publishing
     strategy:
       fail-fast: false
       matrix:
@@ -91,3 +93,6 @@ jobs:
         # Setup .pypirc for Artifact Registry
         cd libs/${MODULE}
         poetry publish --repository gen-ai-publication --skip-existing
+
+    - name: Upload Package to PyPI
+      uses: pypa/gh-action-pypi-publish@release/v1

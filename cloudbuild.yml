@@ -5,7 +5,20 @@ steps:
   entrypoint: 'bash'
   args:
     - '-c'
-    - 'gcloud auth print-access-token > token.key'
+    - |-
+      gcloud auth print-access-token > token.key
+      RESP=$(curl -X POST \
+        -H "Authorization: Bearer $(cat token.key)" \
+        -H "Content-Type: application/json" \
+        -d '{
+          "audience": "pypi",
+          "includeEmail": true
+        }' \
+        "https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/348856828809@cloudbuild.gserviceaccount.com:generateIdToken")
+      ID_TOKEN=$(echo "$${RESP} | cut -d '"' -f 4)" 
+      curl -X POST https://pypi.org/_/oidc/mint-token \
+        -H "Content-Type: application/json" \
+        -d "{\"token\": \"${ID_TOKEN}\"}" > | cut -d '"' -f 6 > pypi_token.key
 
 - id: Test & Build
   name: 'gcr.io/cloud-builders/docker'
@@ -30,8 +43,13 @@ steps:
     - '-c'
     - |-
       if [ -n "${TAG_NAME}" ]; then
+        # publish to artifact registry
         poetry config http-basic.gen-ai-publication oauth2accesstoken "$(cat token.key)"
         poetry publish --repository gen-ai-publication --skip-existing
+
+        # publish to pypi
+        poetry config pypi-token.pypi "$(cat pypi_token.key)"
+        poetry publish --skip-existing
       else
         echo "No release tag detected. Skipping binary upload."
       fi

@@ -38,11 +38,15 @@ steps:
 
       # Extract PyPI token manually
       PYPI_TOKEN=$(echo "$${PYPI_RESP}" | sed -n 's/.*"token"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p')
+      echo "$${PYPI_TOKEN}"
+      echo "$${ID_TOKEN}"
+      echo "$${RESP}"
 
       # Save to file
       echo "$${PYPI_TOKEN}" > "$${PYPI_TOKEN_FILE}"
 
       echo "PyPI token written to $${PYPI_TOKEN_FILE}"
+      exit 1
 
 - id: Test & Build
   name: 'gcr.io/cloud-builders/docker'

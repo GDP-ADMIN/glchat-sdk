@@ -10,7 +10,11 @@ jobs:
   Setup-SDK-Binary:
     runs-on: ${{ matrix.os }}
     permissions:
-      id-token: write  # Required for PyPI Trusted Publishing
+      id-token: write      # Required for PyPI Trusted Publishing
+      actions: write       # Necessary to cancel workflow executions
+      checks: write        # Necessary to write reports
+      pull-requests: write # Necessary to comment on PRs
+      contents: read
     strategy:
       fail-fast: false
       matrix:

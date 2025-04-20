@@ -69,11 +69,14 @@ steps:
         poetry publish --repository gen-ai-publication --skip-existing
 
         # publish to pypi
-        poetry config pypi-token.pypi "$(cat pypi_token.key)"
         poetry publish --skip-existing
       else
         echo "No release tag detected. Skipping binary upload."
       fi
+  env:
+    - 'POETRY_HTTP_BASIC_PYPI_PASSWORD=__token__'
+  secretEnv:
+    - 'POETRY_HTTP_BASIC_PYPI_PASSWORD'
 
 - id: Run SCA
   name: 'gcr.io/$PROJECT_ID/secops'
@@ -115,5 +118,7 @@ availableSecrets:
     env: 'GH_TOKEN'
   - versionName: "projects/$PROJECT_ID/secrets/INFRA_GL_SONARQUBE_TOKEN/versions/latest"
     env: 'SCA_TOKEN'
+  - versionName: "projects/$PROJECT_ID/secrets/GLX_SRE_PYPI_API_TOKEN/versions/latest"
+    env: 'POETRY_HTTP_BASIC_PYPI_PASSWORD'
 
 tags: ['gen-ai-external', 'push']

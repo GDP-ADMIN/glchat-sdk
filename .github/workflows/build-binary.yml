@@ -3,7 +3,7 @@ name: Build Binary
 on:
   push:
     tags:
-      - 'gllm_plugin-v*'
+      - 'dummy'
   workflow_dispatch:
 
 jobs:

@@ -28,7 +28,7 @@ steps:
         "https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/$${SERVICE_ACCOUNT}:generateIdToken")
 
       # Extract "token" field manually
-      ID_TOKEN=$(echo "$RESP" | sed -n 's/.*"token"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p')
+      ID_TOKEN=$(echo "$${RESP}" | sed -n 's/.*"token"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p')
 
       # Step 3: Exchange ID token for PyPI token
       echo "Requesting PyPI OIDC token..."

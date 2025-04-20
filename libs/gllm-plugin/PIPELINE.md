@@ -39,7 +39,6 @@ This example will guide you through creating new pipeline classes from an extern
     The `config.yaml` contains following:
     - `rago_pipeline`: The name of the pipeline. It must match the name in `pipeline.py`.
     - `presets`: The list of preset configurations. Each preset must contain config keys: `pipeline_preset_id`, `supported_models`, and all keys defined in `preset_config.py`. Optionally, the config keys can also contain keys in `BasePipelinePresetConfig` to override the default values. The following are the optional keys with their default values:
-      - `supported_agents: list[str] = []`
       - `support_pii_anonymization: bool = False`
       - `support_multimodal: bool = True`
       - `use_docproc: bool = True`
@@ -49,6 +48,7 @@ This example will guide you through creating new pipeline classes from an extern
       - `display_name: str`
       - `description: str`
       - `pipeline_preset_id`: use 1 of the pipeline_preset_id defined in presets
+      - `supported_agents: list[str] = []`
       - `lmrp_catalogs`:
         - `name: str`: The name of the catalog.
         - `scope: str`: The scope of the catalog.

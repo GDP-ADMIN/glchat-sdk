@@ -96,3 +96,5 @@ jobs:
 
     - name: Upload Package to PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
+      with:
+        packages-dir: libs/${MODULE}/dist/

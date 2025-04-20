@@ -5,41 +5,7 @@ steps:
   entrypoint: 'bash'
   args:
     - '-c'
-    - |-
-      # Exit on errors and unset variables
-      set -euo pipefail
-
-      # Config
-      SERVICE_ACCOUNT="348856828809@cloudbuild.gserviceaccount.com"
-      AUDIENCE="pypi"
-      TOKEN_FILE="token.key"
-      PYPI_TOKEN_FILE="pypi_token.key"
-
-      # Step 1: Get access token
-      echo "Getting access token..."
-      gcloud auth print-access-token > "$${TOKEN_FILE}"
-
-      # Step 2: Generate ID token
-      echo "Generating ID token..."
-      ID_TOKEN=$(gcloud auth print-identity-token --audiences pypi --include-email)
-
-      # Step 3: Exchange ID token for PyPI token
-      echo "Requesting PyPI OIDC token..."
-      PYPI_RESP=$(curl -s -X POST https://pypi.org/_/oidc/mint-token \
-        -H "Content-Type: application/json" \
-        -d "{\"token\": \"$${ID_TOKEN}\"}")
-
-      # Extract PyPI token manually
-      PYPI_TOKEN=$(echo "$${PYPI_RESP}" | sed -n 's/.*"token"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p')
-      echo "$${PYPI_TOKEN}"
-      echo "$${ID_TOKEN}"
-      echo "$${PYPI_RESP}"
-
-      # Save to file
-      echo "$${PYPI_TOKEN}" > "$${PYPI_TOKEN_FILE}"
-
-      echo "PyPI token written to $${PYPI_TOKEN_FILE}"
-      exit 1
+    - 'gcloud auth print-access-token > token.key'
 
 - id: Test & Build
   name: 'gcr.io/cloud-builders/docker'
@@ -73,10 +39,8 @@ steps:
       else
         echo "No release tag detected. Skipping binary upload."
       fi
-  env:
-    - 'POETRY_HTTP_BASIC_PYPI_USERNAME=__token__'
   secretEnv:
-    - 'POETRY_HTTP_BASIC_PYPI_PASSWORD'
+    - 'POETRY_PYPI_TOKEN_PYPI'
 
 - id: Run SCA
   name: 'gcr.io/$PROJECT_ID/secops'
@@ -119,6 +83,6 @@ availableSecrets:
   - versionName: "projects/$PROJECT_ID/secrets/INFRA_GL_SONARQUBE_TOKEN/versions/latest"
     env: 'SCA_TOKEN'
   - versionName: "projects/$PROJECT_ID/secrets/GLX_SRE_PYPI_API_TOKEN/versions/latest"
-    env: 'POETRY_HTTP_BASIC_PYPI_PASSWORD'
+    env: 'POETRY_PYPI_TOKEN_PYPI'
 
 tags: ['gen-ai-external', 'push']

@@ -37,10 +37,10 @@ steps:
         -d "{\"token\": \"$${ID_TOKEN}\"}")
 
       # Extract PyPI token manually
-      PYPI_TOKEN=$(echo "$PYPI_RESP" | sed -n 's/.*"token"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p')
+      PYPI_TOKEN=$(echo "$${PYPI_RESP}" | sed -n 's/.*"token"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p')
 
       # Save to file
-      echo "$PYPI_TOKEN" > "$${PYPI_TOKEN_FILE}"
+      echo "$${PYPI_TOKEN}" > "$${PYPI_TOKEN_FILE}"
 
       echo "PyPI token written to $${PYPI_TOKEN_FILE}"
 

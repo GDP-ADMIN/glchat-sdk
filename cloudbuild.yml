@@ -74,7 +74,7 @@ steps:
         echo "No release tag detected. Skipping binary upload."
       fi
   env:
-    - 'POETRY_HTTP_BASIC_PYPI_PASSWORD=__token__'
+    - 'POETRY_HTTP_BASIC_PYPI_USERNAME=__token__'
   secretEnv:
     - 'POETRY_HTTP_BASIC_PYPI_PASSWORD'
 

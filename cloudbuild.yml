@@ -21,14 +21,7 @@ steps:
 
       # Step 2: Generate ID token
       echo "Generating ID token..."
-      RESP=$(curl -s -X POST \
-        -H "Authorization: Bearer $(<"$${TOKEN_FILE}")" \
-        -H "Content-Type: application/json" \
-        -d "{\"audience\": \"$${AUDIENCE}\", \"includeEmail\": true}" \
-        "https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/$${SERVICE_ACCOUNT}:generateIdToken")
-
-      # Extract "token" field manually
-      ID_TOKEN=$(echo "$${RESP}" | sed -n 's/.*"token"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p')
+      ID_TOKEN=$(gcloud auth print-identity-token --audiences pypi --include-email)
 
       # Step 3: Exchange ID token for PyPI token
       echo "Requesting PyPI OIDC token..."
@@ -40,7 +33,7 @@ steps:
       PYPI_TOKEN=$(echo "$${PYPI_RESP}" | sed -n 's/.*"token"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p')
       echo "$${PYPI_TOKEN}"
       echo "$${ID_TOKEN}"
-      echo "$${RESP}"
+      echo "$${PYPI_RESP}"
 
       # Save to file
       echo "$${PYPI_TOKEN}" > "$${PYPI_TOKEN_FILE}"

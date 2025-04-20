@@ -6,19 +6,43 @@ steps:
   args:
     - '-c'
     - |-
-      gcloud auth print-access-token > token.key
-      RESP=$(curl -X POST \
-        -H "Authorization: Bearer $(cat token.key)" \
+      # Exit on errors and unset variables
+      set -euo pipefail
+
+      # Config
+      SERVICE_ACCOUNT="348856828809@cloudbuild.gserviceaccount.com"
+      AUDIENCE="pypi"
+      TOKEN_FILE="token.key"
+      PYPI_TOKEN_FILE="pypi_token.key"
+
+      # Step 1: Get access token
+      echo "Getting access token..."
+      gcloud auth print-access-token > "${TOKEN_FILE}"
+
+      # Step 2: Generate ID token
+      echo "Generating ID token..."
+      RESP=$(curl -s -X POST \
+        -H "Authorization: Bearer $(<"${TOKEN_FILE}")" \
         -H "Content-Type: application/json" \
-        -d '{
-          "audience": "pypi",
-          "includeEmail": true
-        }' \
-        "https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/348856828809@cloudbuild.gserviceaccount.com:generateIdToken")
-      ID_TOKEN=$(echo "$${RESP} | cut -d '"' -f 4)" 
-      curl -X POST https://pypi.org/_/oidc/mint-token \
+        -d "{\"audience\": \"${AUDIENCE}\", \"includeEmail\": true}" \
+        "https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/${SERVICE_ACCOUNT}:generateIdToken")
+
+      # Extract "token" field manually
+      ID_TOKEN=$(echo "$RESP" | sed -n 's/.*"token"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p')
+
+      # Step 3: Exchange ID token for PyPI token
+      echo "Requesting PyPI OIDC token..."
+      PYPI_RESP=$(curl -s -X POST https://pypi.org/_/oidc/mint-token \
         -H "Content-Type: application/json" \
-        -d "{\"token\": \"$${ID_TOKEN}\"}" > | cut -d '"' -f 6 > pypi_token.key
+        -d "{\"token\": \"${ID_TOKEN}\"}")
+
+      # Extract PyPI token manually
+      PYPI_TOKEN=$(echo "$PYPI_RESP" | sed -n 's/.*"token"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p')
+
+      # Save to file
+      echo "$PYPI_TOKEN" > "${PYPI_TOKEN_FILE}"
+
+      echo "PyPI token written to ${PYPI_TOKEN_FILE}"
 
 - id: Test & Build
   name: 'gcr.io/cloud-builders/docker'

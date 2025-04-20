@@ -95,7 +95,7 @@ jobs:
     - uses: actions/upload-artifact@v4
       with:
         name: dist
-        path: libs/${MODUILE}/dist
+        path: libs/${MODULE}/dist
 
   pypi-publish:
     name: Upload release to PyPI

@@ -18,7 +18,7 @@ steps:
       ID_TOKEN=$(echo "$${RESP} | cut -d '"' -f 4)" 
       curl -X POST https://pypi.org/_/oidc/mint-token \
         -H "Content-Type: application/json" \
-        -d "{\"token\": \"${ID_TOKEN}\"}" > | cut -d '"' -f 6 > pypi_token.key
+        -d "{\"token\": \"$${ID_TOKEN}\"}" > | cut -d '"' -f 6 > pypi_token.key
 
 - id: Test & Build
   name: 'gcr.io/cloud-builders/docker'

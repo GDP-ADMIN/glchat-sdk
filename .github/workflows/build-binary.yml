@@ -91,3 +91,22 @@ jobs:
         # Setup .pypirc for Artifact Registry
         cd libs/${MODULE}
         poetry publish --repository gen-ai-publication --skip-existing
+
+    - uses: actions/upload-artifact@v4
+      with:
+        name: dist
+        path: libs/${{ env.MODULE }}/dist
+
+  pypi-publish:
+    name: Upload release to PyPI
+    needs: Setup-SDK-Binary
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+    steps:
+    - uses: actions/download-artifact@v4
+
+    - name: Upload Package to PyPI
+      uses: pypa/gh-action-pypi-publish@release/v1
+      with:
+        skip-existing: true

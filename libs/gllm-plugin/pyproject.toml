@@ -21,10 +21,10 @@ python = ">=3.11,<3.13"
 semver = "^3.0.4"
 langchain = "^0.3.0"
 langchain-core = ">=0.3.51"
-gllm-core = { version = "*", source = "gen-ai" }
-gllm-inference = { version = "*", source = "gen-ai" }
-gllm-pipeline = { version = "*", source = "gen-ai" }
-bosa-core = { version = "*", source = "gen-ai" }
+gllm-core-binary = { version = "*" }
+gllm-inference-binary = { version = "*" }
+gllm-pipeline-binary = { version = "*" }
+bosa-core-binary = { version = "*" }
 
 [tool.poetry.extras]
 flair= ["flair"]
@@ -34,6 +34,7 @@ pytest = "^8.1.1"
 pre-commit = "^3.6.2"
 pytest-cov = "^5.0.0"
 ruff = "^0.6.7"
+mypy = "^1.11.2"
 
 [tool.ruff]
 line-length = 120
@@ -58,24 +59,9 @@ add_ignore = ["D107"]
 [[tool.poetry.source]]
 name = "gen-ai"
 url = "https://asia-southeast2-python.pkg.dev/gdp-labs/gen-ai/simple/"
-priority = "primary"
-
-[[tool.poetry.source]]
-name = "pypi"
-priority = "supplemental"
+priority = "explicit"
 
 [[tool.poetry.source]]
 name = "gen-ai-publication"
 url = "https://asia-southeast2-python.pkg.dev/gdp-labs/gen-ai/"
 priority = "explicit"
-
-# This group includes dependencies for compiling and stubs generation
-# Use `poetry install --with compiler` to install these dependencies
-
-[tool.poetry.group.compiler]
-optional = true
-[tool.poetry.group.compiler.dependencies]
-nuitka = "2.5.6"
-# We use stubgen from mypy to generate stubs for our compiled modules
-# Ref: https://mypy.readthedocs.io/en/stable/stubgen.html
-mypy = "^1.11.2"

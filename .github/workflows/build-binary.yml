@@ -15,6 +15,7 @@ jobs:
       matrix:
         os: [windows-latest, macos-13, macos-14]
         python-version: ["3.11.0", "3.12.0"]
+    continue-on-error: true
     steps:
     - uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python-version }}
@@ -95,19 +96,25 @@ jobs:
 
     - uses: actions/upload-artifact@v4
       with:
-        name: dist
+        name: dist-${{ matrix.os }}-${{ matrix.python-version }}
         path: libs/${{ env.MODULE }}/dist
 
   pypi-publish:
     name: Upload release to PyPI
     needs: Setup-SDK-Binary
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [windows-latest, macos-13, macos-14]
+        python-version: ["3.11.0", "3.12.0"]
     permissions:
       id-token: write
     steps:
     - uses: actions/download-artifact@v4
+      name: dist-${{ matrix.os }}-${{ matrix.python-version }}
 
     - name: Upload Package to PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
       with:
         skip-existing: true
+        packages-dir: dist-${{ matrix.os }}-${{ matrix.python-version }}

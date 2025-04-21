@@ -1,5 +1,9 @@
 #!/bin/bash
+# shellcheck disable=SC2064
 set -e
+
+# shellcheck source=/dev/null
+source ./shared.sh
 
 # Check if at least one package folder name is provided
 if [ "$#" -lt 1 ]; then
@@ -13,53 +17,37 @@ echo "Build started..."
 # Loop through each package folder name provided as arguments
 for FOLDER_NAME in "$@"
 do
-  # Convert folder name (with hyphens) to package name (with underscores)
-  PACKAGE_NAME=$(echo "$FOLDER_NAME" | tr '-' '_')
-
-  # Enter the package directory
+  trap "git checkout -- '$FOLDER_NAME/$(convert_to_snake_case "$FOLDER_NAME")' '$FOLDER_NAME/poetry.lock' '$FOLDER_NAME/pyproject.toml'" EXIT
+  echo "Processing package: $FOLDER_NAME"
   if [ -d "$FOLDER_NAME" ]; then
-    pushd "$FOLDER_NAME" || exit
+    cd "$FOLDER_NAME" || exit
   else
     echo "Error: Folder $FOLDER_NAME does not exist."
     exit 1
   fi
 
-  # If we put below code in pyproject.toml, when developers installing this package with Git, the package will be built as binary (Nuitka).
-  cat <<EOF >> "pyproject.toml"
+  install_system_dependencies
+  gcloud auth print-access-token > token.key
+  configure_poetry_auth token.key
+  configure_build_files "$FOLDER_NAME"
+  modify_pyproject_toml "$FOLDER_NAME"
+  install_dependencies
 
-[tool.poetry.build]
-script = "build.py"
-generate-setup-file = true
+  PACKAGE_NAME=$(convert_to_snake_case "$FOLDER_NAME")
 
-[build-system]
-requires = ["setuptools", "wheel", "nuitka", "toml"]
-build-backend = "nuitka.distutils.Build"
-EOF
+  echo "Running quality checks..."
+  run_pre_commit "./"
+  
+  echo "Running tests..."
+  run_tests
 
-  cat <<EOF > setup.py
-from setuptools import setup
+  echo "Building package: $PACKAGE_NAME"
+  build_with_nuitka "$PACKAGE_NAME"
 
-if __name__ == "__main__":
-    setup(build_with_nuitka=True)
-EOF
-
-  # Nuitka build backend read version from setup.cfg only, otherwise 0.0.0.
-  cat <<EOF > setup.cfg
-[metadata]
-version = $(poetry version -s)
-EOF
-
-  echo "Install dependencies..."
-  # install nutika & mypy in the virtual environment
-  poetry install --with compiler
-
-  echo "Building wheel for $PACKAGE_NAME"
-  # Build the wheel
-  poetry run stubgen --include-docstrings -p "${PACKAGE_NAME}" -o .
-  poetry build --format wheel
-
-  echo "Completed building: $PACKAGE_NAME"
+  echo "✅ Completed building: $PACKAGE_NAME"
 
   # Move back to the parent directory (libs)
-  popd
+  cd ..
 done
+
+echo "✅ All packages built successfully!"

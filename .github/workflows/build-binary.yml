@@ -8,6 +8,7 @@ on:
 
 jobs:
   Setup-SDK-Binary:
+    timeout-minutes: 20
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false

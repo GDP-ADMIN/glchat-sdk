@@ -18,6 +18,7 @@ class Provider(StrEnum):
     """Supported model providers."""
 
     ANTHROPIC = "anthropic"
+    AZURE_OPENAI = "azure-openai"
     DEEPSEEK = "deepseek"
     GOOGLE = "google"
     OPENAI = "openai"
@@ -27,6 +28,7 @@ class Provider(StrEnum):
     GROQ = "groq"
     TOGETHER_AI = "together-ai"
     DEEPINFRA = "deepinfra"
+    VOYAGE = "voyage"
 
     ROUTABLE = "routable"
 
@@ -37,6 +39,9 @@ class OpenAIModel(StrEnum):
     GPT_4O = "gpt-4o"
     GPT_4O_MINI = "gpt-4o-mini"
     GPT_4_5_PREVIEW = "gpt-4.5-preview"
+    GPT_4_1 = "gpt-4.1"
+    GPT_4_1_MINI = "gpt-4.1-mini"
+    GPT_4_1_NANO = "gpt-4.1-nano"
     O1 = "o1"
     O1_MINI = "o1-mini"
     O1_PREVIEW = "o1-preview"
@@ -45,6 +50,14 @@ class OpenAIModel(StrEnum):
     TEXT_EMBEDDING_3_SMALL = "text-embedding-3-small"
     TEXT_EMBEDDING_3_LARGE = "text-embedding-3-large"
     TEXT_EMBEDDING_ADA_002 = "text-embedding-ada-002"
+
+
+class AzureOpenAIModel(StrEnum):
+    """Supported Azure OpenAI models."""
+
+    GPT_4O = "gpt-4o"
+    GPT_4O_MINI = "gpt-4o-mini"
+    TEXT_EMBEDDING_3_SMALL = "text-embedding-3-small"
 
 
 class AnthropicModel(StrEnum):
@@ -63,6 +76,8 @@ class GoogleModel(StrEnum):
     GEMINI_1_5_FLASH_8B = "gemini-1.5-flash-8b"
     GEMINI_1_5_PRO = "gemini-1.5-pro"
     GEMINI_2_0_FLASH = "gemini-2.0-flash"
+    GEMINI_2_0_FLASH_LITE = "gemini-2.0-flash-lite"
+    GEMINI_2_5_PRO = "gemini-2.5-pro"
     TEXT_EMBEDDING_GECKO_001 = "textembedding-gecko@001"
     TEXT_EMBEDDING_GECKO_003 = "textembedding-gecko@003"
     TEXT_EMBEDDING_004 = "text-embedding-004"
@@ -99,6 +114,18 @@ class DeepInfraModel(StrEnum):
     DEEPSEEK_V3 = "deepseek-ai/DeepSeek-V3"
 
 
+class VoyageModel(StrEnum):
+    """Supported Voyage models."""
+
+    VOYAGE_3_LARGE = "voyage-3-large"
+    VOYAGE_3 = "voyage-3"
+    VOYAGE_3_LITE = "voyage-3-lite"
+    VOYAGE_CODE_3 = "voyage-code-3"
+    VOYAGE_FINANCE_2 = "voyage-finance-2"
+    VOYAGE_LAW_2 = "voyage-law-2"
+    VOYAGE_CODE_2 = "voyage-code-2"
+
+
 class RoutableModel(StrEnum):
     """Supported routable model presets.
 
@@ -125,6 +152,8 @@ MODEL_MAP = {
     Provider.TOGETHER_AI: TogetherAIModel,
     Provider.DEEPINFRA: DeepInfraModel,
     Provider.ROUTABLE: RoutableModel,
+    Provider.VOYAGE: VoyageModel,
+    Provider.AZURE_OPENAI: AzureOpenAIModel,
 }
 
 DEFAULT_VERSION_MAP = {
@@ -139,9 +168,24 @@ DEFAULT_VERSION_MAP = {
     Provider.TOGETHER_AI: None,
     Provider.DEEPINFRA: None,
     Provider.ROUTABLE: None,
+    Provider.VOYAGE: None,
+    Provider.AZURE_OPENAI: None,
 }
 
 UNIMODAL_PROVIDERS = {Provider.TGI, Provider.VLLM}
+UNIMODAL_MODELS = {
+    DeepInfraModel.DEEPSEEK_R1,
+    DeepInfraModel.DEEPSEEK_R1_DISTILL_QWEN_32B,
+    DeepInfraModel.DEEPSEEK_V3,
+    DeepInfraModel.QWEN_2_5_72B_INSTRUCT,
+    RoutableModel.DEEPSEEK,
+    DeepSeekModel.DEEPSEEK_CHAT,
+    DeepSeekModel.DEEPSEEK_REASONER,
+    GroqModel.DEEPSEEK_R1_DISTILL_QWEN_32B,
+    GroqModel.DEEPSEEK_R1_DISTILL_LLAMA_70B,
+    GroqModel.LLAMA_3_2_1B_PREVIEW,
+    TogetherAIModel.DEEPSEEK_V3,
+}
 
 
 def validate_model_name(model_name: str, provider: Provider) -> str:
@@ -206,10 +250,13 @@ class ModelName(BaseModel):
     model_config = ConfigDict(frozen=True)
 
     provider: Provider
-    name: Annotated[str, BeforeValidator(lambda v, info: validate_model_name(v, info.data.get("provider")))]
+    name: Annotated[
+        str,
+        BeforeValidator(lambda v, info: validate_model_name(v, info.data.get("provider"))),
+    ]
     version: Annotated[
         str | None,
-        BeforeValidator(lambda v, info: DEFAULT_VERSION_MAP[info.data.get("provider")] if v is None else v),
+        BeforeValidator(lambda v, info: (DEFAULT_VERSION_MAP[info.data.get("provider")] if v is None else v)),
     ] = None
     url: HttpUrl | None = None
 

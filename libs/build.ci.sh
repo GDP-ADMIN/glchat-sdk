@@ -46,14 +46,27 @@ cat <<EOF > setup.cfg
 version = $(poetry version -s)
 EOF
 
-# Package Installation
-poetry install --all-extras --with compiler
+# Build Dependency Installation
 if [ "$RUNNER_OS" == "Windows" ]; then
   poetry add python-magic-bin libmagic
 elif [[ "$RUNNER_OS" == "macOS" ]]; then
   brew install libmagic
   brew install ccache
+  brew install gsed
+  # override sed with gsed
+  sed() { gsed "$@"; }
 fi
+
+MODULE_BINARY_NAME="${MODULE}-binary"
+
+sed -i "s/name = \"$MODULE\"/name = \"$MODULE_BINARY_NAME\"/" pyproject.toml
+sed -i "s/gllm-\([a-zA-Z-]*\) = {git = \"ssh:\/\/git@github.com\/GDP-ADMIN\/gen-ai-internal.git\", subdirectory = \"libs\/gllm-\1\"\(, [^}]*\)\?}/gllm-\1-binary = {version = \"*\", source = \"gen-ai\"\2}/g" pyproject.toml
+sed -i "s/bosa-\([a-zA-Z-]*\) = {git = \"ssh:\/\/git@github.com\/GDP-ADMIN\/gen-ai-internal.git\", subdirectory = \"libs\/bosa-\1\"\(, [^}]*\)\?}/bosa-\1-binary = {version = \"*\", source = \"gen-ai\"\2}/g" pyproject.toml
+
+poetry lock --no-update
+
+# Package Installation
+poetry install --all-extras --with compiler
 
 poetry run pre-commit run --files ./
 poetry run coverage run -m pytest --cov-report=xml --cov=. tests/

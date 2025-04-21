@@ -69,12 +69,12 @@ class PipelineBuilderPlugin(Plugin, Generic[PipelineState, PipelinePresetConfig]
         """Build the initial pipeline state.
 
         Args:
-            request_config: Request configuration.
-            pipeline_config: Pipeline configuration.
-            kwargs: Additional state arguments.
+            request_config (dict[str, Any]): Request configuration.
+            pipeline_config (dict[str, Any]): Pipeline configuration.
+            kwargs (Any): Additional state arguments.
 
         Returns:
-            Initial pipeline state
+            PipelineState: Initial pipeline state.
         """
         pass
 
@@ -86,7 +86,7 @@ class PipelineBuilderPlugin(Plugin, Generic[PipelineState, PipelinePresetConfig]
         """Build a pipeline instance.
 
         Args:
-            pipeline_config: Pipeline configuration including model name and other settings.
+            pipeline_config (dict[str, Any]): Pipeline configuration including model name and other settings.
 
         Returns:
             Pipeline: Built pipeline instance.
@@ -100,7 +100,7 @@ class PipelineBuilderPlugin(Plugin, Generic[PipelineState, PipelinePresetConfig]
         """Build additional runtime configuration.
 
         Args:
-            pipeline_config: Pipeline configuration.
+            pipeline_config (dict[str, Any]): Pipeline configuration.
 
         Returns:
             dict[str, Any]: Additional runtime configuration.

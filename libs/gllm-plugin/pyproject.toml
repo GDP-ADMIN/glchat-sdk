@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "gllm-plugin"
-version = "0.0.5"
+version = "0.0.6"
 description = ""
 authors = ["GenAI SDK Team <gat-sdk@gdplabs.id>"]
 readme = "README.md"

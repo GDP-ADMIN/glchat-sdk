@@ -156,6 +156,22 @@ MODEL_MAP = {
     Provider.AZURE_OPENAI: AzureOpenAIModel,
 }
 
+MODEL_KEY_MAP = {
+    Provider.ANTHROPIC: "ANTHROPIC_API_KEY",
+    Provider.AZURE_OPENAI: "AZURE_OPENAI_API_KEY",
+    Provider.DEEPSEEK: "DEEPSEEK_API_KEY",
+    Provider.GOOGLE: "GOOGLE_VERTEX_CREDENTIAL_PATH",
+    Provider.OPENAI: "OPENAI_API_KEY",
+    Provider.TGI: "TGI_API_KEY",
+    Provider.TEI: "TEI_API_KEY",
+    Provider.VLLM: "VLLM_API_KEY",
+    Provider.GROQ: "GROQ_API_KEY",
+    Provider.TOGETHER_AI: "TOGETHER_API_KEY",
+    Provider.DEEPINFRA: "DEEPINFRA_API_KEY",
+    Provider.VOYAGE: "VOYAGE_API_KEY",
+    Provider.ROUTABLE: ""
+}
+
 DEFAULT_VERSION_MAP = {
     Provider.OPENAI: None,
     Provider.ANTHROPIC: "latest",

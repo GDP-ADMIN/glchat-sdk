@@ -160,7 +160,7 @@ MODEL_KEY_MAP = {
     Provider.ANTHROPIC: "ANTHROPIC_API_KEY",
     Provider.AZURE_OPENAI: "AZURE_OPENAI_API_KEY",
     Provider.DEEPSEEK: "DEEPSEEK_API_KEY",
-    Provider.GOOGLE: "",
+    Provider.GOOGLE: "GOOGLE_GENERATIVE_AI_API_KEY",
     Provider.OPENAI: "OPENAI_API_KEY",
     Provider.TGI: "TGI_API_KEY",
     Provider.TEI: "TEI_API_KEY",

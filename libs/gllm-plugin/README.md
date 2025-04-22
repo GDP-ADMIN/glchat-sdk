@@ -20,21 +20,25 @@ A library to implement Plugin architecture and integrate with existing pipelines
 3. Install the library using Poetry:
 
     ```bash
-    # Add GDP Labs artifact repository as primary source
-    poetry source add gen-ai https://asia-southeast2-python.pkg.dev/gdp-labs/gen-ai/simple/ --priority=primary
+    # Install the latest version
+    poetry add gllm-plugin-binary
 
-    # Add PyPI as supplemental source
-    poetry source add pypi --priority=supplemental
-
-    # Authenticate to GDP Labs SDK libraries (only gat@gdplabs.id group team has access)
-    poetry config http-basic.gen-ai oauth2accesstoken "$(gcloud auth print-access-token)"
-    
-    # Latest version
-    poetry add gllm-plugin --source gen-ai
-
-    # Specific version
-    poetry add gllm-plugin@0.0.1b5 --source gen-ai
+    # Install a specific version
+    poetry add gllm-plugin-binary@0.0.5
     ```
+
+    <details>
+    <summary>Install using pip</summary>
+
+    ```bash
+    # Install the latest version
+    pip install gllm-plugin-binary
+
+    # Install a specific version
+    pip install gllm-plugin-binary==0.0.5
+    ```
+
+    </details>
 
 4. At this step, you can deactivate Miniconda environment as Poetry will create and manage its own virtual environment for you.
     ```bash

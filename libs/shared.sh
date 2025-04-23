@@ -18,6 +18,7 @@ configure_poetry_auth() {
 
 # Function to configure build files
 configure_build_files() {
+    local version="$1"
     if ! grep -q "\[tool.poetry.build\]" pyproject.toml; then
         cat <<EOF >> "pyproject.toml"
 
@@ -38,10 +39,8 @@ if __name__ == "__main__":
     setup(build_with_nuitka=True)
 EOF
 
-    cat <<EOF > setup.cfg
-[metadata]
-version = $(poetry version -s)
-EOF
+    # update package version
+    poetry version $version
 }
 
 # Function to install system dependencies based on OS

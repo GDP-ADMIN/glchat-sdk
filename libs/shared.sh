@@ -27,7 +27,12 @@ script = "build.py"
 generate-setup-file = true
 
 [build-system]
-requires = ["setuptools", "wheel", "nuitka", "toml"]
+requires = [
+    "setuptools==75.9.1",
+    "wheel==0.45.1",
+    "nuitka==2.6.9",
+    "toml==0.10.2"
+]
 build-backend = "nuitka.distutils.Build"
 EOF
     fi

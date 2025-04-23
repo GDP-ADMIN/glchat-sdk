@@ -18,6 +18,7 @@ steps:
   env:
     - 'MODULE=${_MODULE}'
     - 'VERSION=${_VERSION}'
+    - 'TAG_NAME=${TAG_NAME}'
   secretEnv:
     - 'GH_TOKEN'
   waitFor: ['-']

@@ -5,7 +5,7 @@ set -e
 source ./shared.sh
 
 # Check if at least one package folder name is provided
-if [ "$#" -le 1 ]; then
+if [ "$#" -le 0 ]; then
   echo "Error: Missing required argument package_name"
   echo "Usage: ./build.ci.sh <package_name> <package_version>"
   echo "- package_version must follow semantic version PEP440, default (0.0.0)."

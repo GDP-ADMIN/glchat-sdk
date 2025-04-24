@@ -52,7 +52,7 @@ jobs:
         echo "Processed module name: ${MODULE}"
         cd libs/
 
-        bash build.ci.sh ${MODULE}
+        bash build.ci.sh ${MODULE} $(echo "${TAG_NAME}" | sed -E "s/^.*-v//")
       env:
         GH_TOKEN: ${{ secrets.GH_TOKEN }}
 

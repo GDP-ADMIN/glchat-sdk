@@ -1,62 +1,52 @@
 #!/bin/bash
 set -e
 
+# shellcheck source=/dev/null
+source ./shared.sh
+
 # Check if at least one package folder name is provided
-if [ "$#" -ne 1 ]; then
-  echo "Error: No package folder names provided."
-  echo "Usage: ./build.local.sh <package_name>"
+if [ "$#" -le 0 ]; then
+  echo "Error: Missing required argument package_name"
+  echo "Usage: ./build.ci.sh <package_name> <package_version>"
+  echo "- package_version must follow semantic version PEP440, default (0.0.0)."
+  echo "  https://peps.python.org/pep-0440/"
+  echo "- Available package_name options:"
+  echo "---"
+  echo "$(echo "$(ls)" | grep gllm-)"
+  echo "---"
   exit 1
 fi
 
-cd "$MODULE"
+MODULE="$1"
+VERSION="$2"
 
-# Git Authentication
-git config --unset credential.helper || :
-git config --global user.username "infra-gl"
-git config --global user.email "gdplabs@gdplabs.id"
-git config --global url."https://${GH_TOKEN}:x-oauth-basic@github.com/".insteadOf "https://github.com/"
-git config --global url."https://${GH_TOKEN}:x-oauth-basic@github.com".insteadOf "ssh://git@github.com"
+PEP440_REGEX='^([0-9]+!)?([0-9]+(\.[0-9]+)*)((a|b|rc)[0-9]+)?(\.post[0-9]+)?(\.dev[0-9]+)?(\+([a-zA-Z0-9]+(\.[a-zA-Z0-9]+)*))?$'
 
-# Google Cloud Authentication
-poetry config http-basic.gen-ai oauth2accesstoken "$(cat token.key)"
-poetry config http-basic.gen-ai-publication oauth2accesstoken "$(cat token.key)"
-
-# If we put below code in pyproject.toml, when developers installing this package with Git, the package will be built as binary (Nuitka).
-cat <<EOF >> "pyproject.toml"
-
-[tool.poetry.build]
-script = "build.py"
-generate-setup-file = true
-
-[build-system]
-requires = ["setuptools", "wheel", "nuitka", "toml"]
-build-backend = "nuitka.distutils.Build"
-EOF
-
-cat <<EOF > setup.py
-from setuptools import setup
-
-if __name__ == "__main__":
-    setup(build_with_nuitka=True)
-EOF
-
-# Nuitka build backend read version from setup.cfg only, otherwise 0.0.0.
-cat <<EOF > setup.cfg
-[metadata]
-version = $(poetry version -s)
-EOF
-
-# Package Installation
-poetry install --all-extras --with compiler
-if [ "$RUNNER_OS" == "Windows" ]; then
-  poetry add python-magic-bin libmagic
-elif [[ "$RUNNER_OS" == "macOS" ]]; then
-  brew install libmagic
-  brew install ccache
+# Perform the regex match
+if [[ "$VERSION" =~ $PEP440_REGEX ]]; then
+    echo "Valid version: $VERSION"
+else
+    echo "Invalid version: $VERSION. Overriding to 0.0.0."
+    VERSION="0.0.0"
 fi
 
-poetry run pre-commit run --files ./
-poetry run coverage run -m pytest --cov-report=xml --cov=. tests/
-poetry run stubgen --include-docstrings -p "${MODULE//-/_}" -o .
+echo "Using version: $VERSION"
 
-poetry build --format wheel --verbose
+cd "$MODULE" || { echo "Module/Package directory not found"; exit 1; }
+
+install_system_dependencies
+configure_poetry_auth
+configure_build_files "$VERSION"
+modify_pyproject_toml "$MODULE"
+install_dependencies
+
+MODULE_DIR=$(convert_to_snake_case "$MODULE")
+
+# Run quality checks and tests
+run_pre_commit "./"
+run_tests
+
+# Build the package
+build_with_nuitka "$MODULE_DIR"
+
+cd ..

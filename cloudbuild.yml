@@ -18,6 +18,7 @@ steps:
   env:
     - 'MODULE=${_MODULE}'
     - 'VERSION=${_VERSION}'
+    - 'TAG_NAME=${TAG_NAME}'
   secretEnv:
     - 'GH_TOKEN'
   waitFor: ['-']
@@ -30,11 +31,17 @@ steps:
     - '-c'
     - |-
       if [ -n "${TAG_NAME}" ]; then
+        # publish to artifact registry
         poetry config http-basic.gen-ai-publication oauth2accesstoken "$(cat token.key)"
         poetry publish --repository gen-ai-publication --skip-existing
+
+        # publish to pypi
+        poetry publish --skip-existing
       else
         echo "No release tag detected. Skipping binary upload."
       fi
+  secretEnv:
+    - 'POETRY_PYPI_TOKEN_PYPI'
 
 - id: Run SCA
   name: 'gcr.io/$PROJECT_ID/secops'
@@ -76,5 +83,7 @@ availableSecrets:
     env: 'GH_TOKEN'
   - versionName: "projects/$PROJECT_ID/secrets/INFRA_GL_SONARQUBE_TOKEN/versions/latest"
     env: 'SCA_TOKEN'
+  - versionName: "projects/$PROJECT_ID/secrets/GLX_SRE_PYPI_API_TOKEN/versions/latest"
+    env: 'POETRY_PYPI_TOKEN_PYPI'
 
 tags: ['gen-ai-external', 'push']

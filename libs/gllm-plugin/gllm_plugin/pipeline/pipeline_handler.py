@@ -18,7 +18,7 @@ from gllm_plugin.storage.base_chat_history_storage import BaseChatHistoryStorage
 from pydantic import BaseModel, ConfigDict
 
 from gllm_plugin.config.app_config import AppConfig
-from gllm_plugin.supported_models import ModelName
+from gllm_plugin.supported_models import MODEL_KEY_MAP, ModelName
 
 
 class ChatbotConfig(BaseModel):
@@ -87,8 +87,8 @@ class PipelineHandler(PluginHandler):
         """Initialize the pipeline handler.
 
         Args:
-            app_config: Application configuration.
-            chat_history_storage: Chat history storage.
+            app_config (AppConfig): Application configuration.
+            chat_history_storage (BaseChatHistoryStorage): Chat history storage.
         """
         self.app_config = app_config
         self.chat_history_storage = chat_history_storage
@@ -99,10 +99,10 @@ class PipelineHandler(PluginHandler):
         """Create injection mappings for pipeline builder plugins.
 
         Args:
-            instance: The handler instance providing injections.
+            instance (PipelineHandler): The handler instance providing injections.
 
         Returns:
-            Dictionary mapping service types to their instances.
+            dict[Type[Any], Any]: Dictionary mapping service types to their instances.
         """
         return {
             AppConfig: instance.app_config,
@@ -117,8 +117,8 @@ class PipelineHandler(PluginHandler):
         For each pipeline builder plugin, we build pipelines for all supported models and cache them.
 
         Args:
-            instance: The handler instance.
-            plugin: The pipeline builder plugin instance.
+            instance (PipelineHandler): The handler instance.
+            plugin (Plugin): The pipeline builder plugin instance.
         """
         pipeline_type = plugin.name
 
@@ -135,6 +135,11 @@ class PipelineHandler(PluginHandler):
                 model_name = ModelName.from_string(model_name_str)
                 pipeline_config = instance._chatbot_configs[chatbot_id].pipeline_config.copy()
                 pipeline_config["model_name"] = model_name
+                provider = model_name.provider
+                api_key = MODEL_KEY_MAP.get(provider)
+                if api_key:
+                    pipeline_config["api_key"] = api_key
+
                 plugin.prompt_builder_catalogs = instance._chatbot_configs[chatbot_id].prompt_builder_catalogs
                 plugin.lmrp_catalogs = instance._chatbot_configs[chatbot_id].lmrp_catalogs
                 pipeline = plugin.build(pipeline_config)

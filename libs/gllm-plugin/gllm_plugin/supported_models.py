@@ -47,6 +47,7 @@ class OpenAIModel(StrEnum):
     O1_PREVIEW = "o1-preview"
     O3 = "o3"
     O3_MINI = "o3-mini"
+    O4_MINI = "o4-mini"
     TEXT_EMBEDDING_3_SMALL = "text-embedding-3-small"
     TEXT_EMBEDDING_3_LARGE = "text-embedding-3-large"
     TEXT_EMBEDDING_ADA_002 = "text-embedding-ada-002"
@@ -78,6 +79,7 @@ class GoogleModel(StrEnum):
     GEMINI_2_0_FLASH = "gemini-2.0-flash"
     GEMINI_2_0_FLASH_LITE = "gemini-2.0-flash-lite"
     GEMINI_2_5_PRO = "gemini-2.5-pro"
+    GEMINI_2_5_FLASH = "gemini-2.5-flash"
     TEXT_EMBEDDING_GECKO_001 = "textembedding-gecko@001"
     TEXT_EMBEDDING_GECKO_003 = "textembedding-gecko@003"
     TEXT_EMBEDDING_004 = "text-embedding-004"
@@ -103,6 +105,7 @@ class TogetherAIModel(StrEnum):
     """Supported Together.AI models."""
 
     DEEPSEEK_V3 = "deepseek-ai/DeepSeek-V3"
+    DEEPSEEK_R1 = "deepseek-ai/DeepSeek-R1"
 
 
 class DeepInfraModel(StrEnum):

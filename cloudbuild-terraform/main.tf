@@ -8,6 +8,17 @@ resource "google_cloudbuildv2_repository" "gdp_admin" {
   remote_uri        = "https://github.com/${local.repository.owner}/${local.repository.name}.git"
 }
 
+resource "google_cloudbuildv2_repository" "gdp_admin_new" {
+  provider = google-beta
+  project  = local.project_id["gdplabs"]
+  location = var.region
+
+  name              = "${local.repository.host-asia-southeast2}-${local.repository.name}"
+  parent_connection = local.repository.host-asia-southeast2
+  remote_uri        = "https://github.com/${local.repository.owner}/${local.repository.name}.git"
+}
+
+
 module "gcb_gen_ai_external_pr_sdk" {
   source     = "s3::https://s3.amazonaws.com/gl-terraform-modules/terraform-gcp-gcb/terraform-gcp-gcb-1.0.0.zip"
   location   = var.region
@@ -16,7 +27,7 @@ module "gcb_gen_ai_external_pr_sdk" {
 
   name        = lower(replace("${local.repository["name"]}-pr-${each.value.module}-${each.value.version}", ".", "-"))
   description = "Gen AI External SDK"
-  owner       = local.repository["owner"]
+  owner       = local.repository["host-asia-southeast2"]
   repo_name   = local.repository["name"]
   substitutions = {
     "_MODULE" = each.value.module
@@ -40,7 +51,7 @@ module "gcb_gen_ai_external_push_sdk" {
 
   name        = lower(replace("${local.repository["name"]}-push-${each.value.module}-${each.value.version}", ".", "-"))
   description = "Gen AI External SDK"
-  owner       = local.repository["owner"]
+  owner       = local.repository["host-asia-southeast2"]
   repo_name   = local.repository["name"]
   substitutions = {
     "_MODULE" = each.value.module
@@ -64,7 +75,7 @@ module "gcb_gen_ai_external_push_tag_sdk" {
 
   name        = lower(replace("${local.repository["name"]}-push-tag-${each.value.module}-${each.value.version}", ".", "-"))
   description = "Gen AI External SDK"
-  owner       = local.repository["owner"]
+  owner       = local.repository["host-asia-southeast2"]
   repo_name   = local.repository["name"]
   substitutions = {
     "_MODULE" = each.value.module

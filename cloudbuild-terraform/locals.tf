@@ -2,6 +2,7 @@ locals {
   repository = {
     name  = "gen-ai-external"
     owner = "GDP-ADMIN"
+    host-asia-southeast2 = "GDP-ADMIN3"
   }
   
   versions = [

@@ -170,8 +170,12 @@ class PipelineHandler(PluginHandler):
         Args:
             instance (PipelineHandler): The handler instance.
         """
+        processed_plugins = set()
         for plugin in instance._builders.values():
-            await plugin.cleanup()
+            plugin_name = plugin.name
+            if plugin_name not in processed_plugins:
+                await plugin.cleanup()
+                processed_plugins.add(plugin_name)
 
     def get_pipeline_builder(self, chatbot_id: str) -> Plugin:
         """Get a pipeline builder instance for the given chatbot.

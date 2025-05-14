@@ -176,23 +176,7 @@ class PipelineHandler(PluginHandler):
         if pipeline_type not in instance._activated_configs:
             return
 
-        active_config = instance._activated_configs[pipeline_type]
-
-        for chatbot_id, preset in active_config.chatbot_preset_map.items():
-            try:
-                if pipeline_type != instance._chatbot_configs[chatbot_id].pipeline_type:
-                    continue
-
-                for model_name_str in preset.supported_models:
-                    model_name = ModelName.from_string(model_name_str)
-                    pipeline_config = instance._chatbot_configs[chatbot_id].pipeline_config.copy()
-                    pipeline_config["model_name"] = model_name
-                    pipeline = instance._pipeline_cache.get((chatbot_id, str(model_name)))
-                    if pipeline:
-                        await plugin.cleanup(pipeline_config)
-            except Exception as e:
-                logger.error(f"Error cleanup plugin for chatbot `{chatbot_id}`", e)
-                pass
+        await plugin.cleanup()
 
     def get_pipeline_builder(self, chatbot_id: str) -> Plugin:
         """Get a pipeline builder instance for the given chatbot.

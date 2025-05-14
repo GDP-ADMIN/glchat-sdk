@@ -190,8 +190,8 @@ class PipelineHandler(PluginHandler):
                     pipeline = instance._pipeline_cache[(chatbot_id, str(model_name))]
                     if pipeline:
                         await plugin.cleanup(pipeline_config)
-            except Exception:
-                logger.error(f"Error cleanup plugin for chatbot `{chatbot_id}`")
+            except Exception as e:
+                logger.error(f"Error cleanup plugin for chatbot `{chatbot_id}`", e)
                 pass
 
     def get_pipeline_builder(self, chatbot_id: str) -> Plugin:

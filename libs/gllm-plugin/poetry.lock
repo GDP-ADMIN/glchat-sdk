@@ -852,6 +852,33 @@ files = [
 ]
 
 [[package]]
+name = "gllm-core"
+version = "0.2.17"
+description = "A library containing core components for Gen AI applications."
+optional = false
+python-versions = ">=3.11,<3.13"
+files = []
+develop = false
+
+[package.dependencies]
+colorama = "0.4.6"
+deprecation = "2.1.0"
+google = "3.0.0"
+google-auth = "2.38.0"
+gspread = "6.1.4"
+numpy = "1.26.4"
+pydantic = "2.11.4"
+scipy = "1.15.1"
+virtualenv = "20.30.0"
+
+[package.source]
+type = "git"
+url = "ssh://git@github.com/GDP-ADMIN/gen-ai-internal.git"
+reference = "gllm_core-v0.2.17"
+resolved_reference = "8754152702c48507a45e44af7a9b5cb2366d0b17"
+subdirectory = "libs/gllm-core"
+
+[[package]]
 name = "gllm-core-binary"
 version = "0.2.17"
 description = "A library containing core components for Gen AI applications."
@@ -880,30 +907,22 @@ scipy = "1.15.1"
 virtualenv = "20.30.0"
 
 [[package]]
-name = "gllm-datastore-binary"
-version = "0.0.16"
+name = "gllm-datastore"
+version = "0.0.23"
 description = "A library containing data store components for Gen AI applications."
 optional = false
-python-versions = "<3.13,>=3.11"
-files = [
-    {file = "gllm_datastore_binary-0.0.16-cp311-cp311-macosx_13_0_x86_64.whl", hash = "sha256:63e78149ecdd34dd5ceca52a29da6c3f79cbd68683bd4bfd349da3223a680b2c"},
-    {file = "gllm_datastore_binary-0.0.16-cp311-cp311-macosx_14_0_arm64.whl", hash = "sha256:1d3ab2592f909726b28023066dc280142969a74c56c2521a3a2531e762550fa4"},
-    {file = "gllm_datastore_binary-0.0.16-cp311-cp311-manylinux_2_31_x86_64.whl", hash = "sha256:c571788c80c01f5001c8037c83e897fe79a58ceaca03aefec6b51ef1aae86fa2"},
-    {file = "gllm_datastore_binary-0.0.16-cp311-cp311-win_amd64.whl", hash = "sha256:a009b8f480b9e9990605dd221248deb404604d00847e13658690d51543a4c329"},
-    {file = "gllm_datastore_binary-0.0.16-cp312-cp312-macosx_13_0_x86_64.whl", hash = "sha256:55bc6c57b6b8a8f86d3d4361b4180490689a5ed2cddeb5490b13dfe590ec659e"},
-    {file = "gllm_datastore_binary-0.0.16-cp312-cp312-macosx_14_0_arm64.whl", hash = "sha256:5f054ca69879a50ad92903caad6255fa5026833020e646bb9cae5bb6009afdc4"},
-    {file = "gllm_datastore_binary-0.0.16-cp312-cp312-manylinux_2_31_x86_64.whl", hash = "sha256:c3de1e92bbd3c5d89b418734184c0290edf424cd976a64995f228255a3387511"},
-    {file = "gllm_datastore_binary-0.0.16-cp312-cp312-win_amd64.whl", hash = "sha256:fba6cd44a160baa35e8f423b0c541ddd66b02d0c463082808b632663629d2669"},
-]
+python-versions = ">=3.11,<3.13"
+files = []
+develop = false
 
 [package.dependencies]
-gllm-core-binary = "*"
-gllm-inference-binary = "*"
-nebula3-python = ">=3.8.3,<4.0.0"
-neo4j = ">=5.28.1,<6.0.0"
+gllm-core = {git = "ssh://git@github.com/GDP-ADMIN/gen-ai-internal.git", rev = "gllm_core-v0.2.17", subdirectory = "libs/gllm-core"}
+gllm-inference = {git = "ssh://git@github.com/GDP-ADMIN/gen-ai-internal.git", rev = "gllm_inference-v0.2.50", subdirectory = "libs/gllm-inference"}
+nebula3-python = "^3.8.3"
+neo4j = "^5.28.1"
 pandas = "2.2.2"
-pysqlite3-binary = {version = ">=0.5.4,<0.6.0", markers = "sys_platform == \"linux\""}
-sqlalchemy = ">=2.0.37,<3.0.0"
+pysqlite3-binary = {version = "^0.5.4", markers = "sys_platform == \"linux\""}
+sqlalchemy = "^2.0.37"
 
 [package.extras]
 chroma = ["chromadb (>=0.6.3,<0.7.0)", "langchain-chroma (>=0.2.2,<0.3.0)"]
@@ -911,6 +930,50 @@ elasticsearch = ["langchain-elasticsearch (==0.3.0)"]
 fuzzy = ["python-levenshtein (==0.26.1)"]
 kg = ["Jinja2 (>=3.1.4,<4.0.0)", "llama-index-core (>=0.12.0,<0.13.0)", "llama-index-graph-stores-nebula (>=0.4.0,<0.5.0)", "llama-index-graph-stores-neo4j (>=0.4.0,<0.5.0)"]
 redis = ["redis (==5.2.1)"]
+
+[package.source]
+type = "git"
+url = "ssh://git@github.com/GDP-ADMIN/gen-ai-internal.git"
+reference = "gllm_datastore-v0.0.23"
+resolved_reference = "cd5b76bbad1498a4157a15445db1e82c859f380f"
+subdirectory = "libs/gllm-datastore"
+
+[[package]]
+name = "gllm-inference"
+version = "0.2.50"
+description = "A library containing components related to model inferences in Gen AI applications."
+optional = false
+python-versions = ">=3.11,<3.13"
+files = []
+develop = false
+
+[package.dependencies]
+gllm-core = {git = "ssh://git@github.com/GDP-ADMIN/gen-ai-internal.git", rev = "gllm_core-v0.2.17", subdirectory = "libs/gllm-core"}
+jinja2 = "3.1.4"
+langchain = "0.3.0"
+libmagic = {version = "^1.0", markers = "sys_platform == \"win32\""}
+pandas = "2.2.2"
+protobuf = "5.28.2"
+python-magic = "0.4.27"
+python-magic-bin = {version = "^0.4.14", markers = "sys_platform == \"win32\""}
+sentencepiece = "0.2.0"
+
+[package.extras]
+anthropic = ["anthropic (==0.49.0)"]
+google = ["google-genai (==1.12.1)"]
+google-genai = ["langchain-google-genai (==2.0.8)"]
+google-vertexai = ["langchain-google-vertexai (==2.0.21)"]
+huggingface = ["huggingface-hub (==0.26.2)", "transformers (==4.46.1)"]
+openai = ["langchain-openai (==0.3.12)", "openai (==1.74.0)"]
+twelvelabs = ["twelvelabs (==0.4.4)"]
+voyage = ["langchain-voyageai (==0.1.4)"]
+
+[package.source]
+type = "git"
+url = "ssh://git@github.com/GDP-ADMIN/gen-ai-internal.git"
+reference = "gllm_inference-v0.2.50"
+resolved_reference = "1fe348b213bf9693263577c6cf6342e98bd65875"
+subdirectory = "libs/gllm-inference"
 
 [[package]]
 name = "gllm-inference-binary"
@@ -951,26 +1014,26 @@ twelvelabs = ["twelvelabs (==0.4.4)"]
 voyage = ["langchain-voyageai (==0.1.4)"]
 
 [[package]]
-name = "gllm-pipeline-binary"
-version = "0.2.17"
+name = "gllm-pipeline"
+version = "0.2.20"
 description = "A library containing components related to Gen AI applications pipeline orchestration."
 optional = false
-python-versions = "<4.0,>=3.11"
-files = [
-    {file = "gllm_pipeline_binary-0.2.17-cp311-cp311-macosx_13_0_x86_64.whl", hash = "sha256:b02ba61bf947dd04961fadfb433250c44b16d2d1202f814cd64035fec26ca460"},
-    {file = "gllm_pipeline_binary-0.2.17-cp311-cp311-macosx_14_0_arm64.whl", hash = "sha256:c2e6837bb2492556b81604eb0a8945c0393234fd018690cb4820b68a7a5c147e"},
-    {file = "gllm_pipeline_binary-0.2.17-cp311-cp311-manylinux_2_31_x86_64.whl", hash = "sha256:29e83a99c87842deda3bb73d362a2b8d992b66517d0cda3197139cc72bd546a3"},
-    {file = "gllm_pipeline_binary-0.2.17-cp311-cp311-win_amd64.whl", hash = "sha256:64b8b8db768158f03cafa96f0fd55dfeb8a03a1c4120b8cca368399012acdcef"},
-    {file = "gllm_pipeline_binary-0.2.17-cp312-cp312-macosx_13_0_x86_64.whl", hash = "sha256:3b29d3cbdc34de1c1cd6235286c019f1675ab5d96beee855a176cd9927c7ee0c"},
-    {file = "gllm_pipeline_binary-0.2.17-cp312-cp312-macosx_14_0_arm64.whl", hash = "sha256:efd6f1a2af42534dcdee3391544677c50a5dc328c48d7a7c85969193bbe8120f"},
-    {file = "gllm_pipeline_binary-0.2.17-cp312-cp312-manylinux_2_31_x86_64.whl", hash = "sha256:19dda72afbdb11d1be022e3199f005fc5d9b88385d7c99d056d98f422a1195f1"},
-    {file = "gllm_pipeline_binary-0.2.17-cp312-cp312-win_amd64.whl", hash = "sha256:33b9f3a855bb4a06f8d79852dfed75df843f967a9477a21d195c7dd937a941f5"},
-]
+python-versions = ">=3.11,<3.13"
+files = []
+develop = false
 
 [package.dependencies]
-gllm-core-binary = {version = "*", extras = ["elasticsearch"]}
-gllm-datastore-binary = "*"
-langgraph = ">=0.2.16,<0.3.0"
+gllm-core = {git = "ssh://git@github.com/GDP-ADMIN/gen-ai-internal.git", rev = "gllm_core-v0.2.17", subdirectory = "libs/gllm-core"}
+gllm-datastore = {git = "ssh://git@github.com/GDP-ADMIN/gen-ai-internal.git", rev = "gllm_datastore-v0.0.23", subdirectory = "libs/gllm-datastore"}
+langgraph = "^0.2.16"
+virtualenv = "20.30.0"
+
+[package.source]
+type = "git"
+url = "ssh://git@github.com/GDP-ADMIN/gen-ai-internal.git"
+reference = "gllm_pipeline-v0.2.20"
+resolved_reference = "cd5b76bbad1498a4157a15445db1e82c859f380f"
+subdirectory = "libs/gllm-pipeline"
 
 [[package]]
 name = "google"
@@ -3777,4 +3840,4 @@ flair = []
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.11,<3.13"
-content-hash = "9139d6b7c2336a822816902e90eabd69d9e378e0369835d6cef766798e02d420"
+content-hash = "977ea274c5dd827328c49f936173ed15a9d1ab0d375271c73ee5a30212d84801"

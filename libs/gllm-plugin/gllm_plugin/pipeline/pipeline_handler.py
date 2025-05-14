@@ -164,19 +164,14 @@ class PipelineHandler(PluginHandler):
                 pass
 
     @classmethod
-    async def acleanup_plugin(cls, instance: "PipelineHandler", plugin: Plugin) -> None:
-        """Cleanup plugin.
+    async def acleanup_plugins(cls, instance: "PipelineHandler") -> None:
+        """Cleanup all plugins.
         
         Args:
             instance (PipelineHandler): The handler instance.
-            plugin (Plugin): The pipeline builder plugin instance.
         """
-        pipeline_type = plugin.name
-
-        if pipeline_type not in instance._activated_configs:
-            return
-
-        await plugin.cleanup()
+        for plugin in instance._builders.values():
+            await plugin.cleanup()
 
     def get_pipeline_builder(self, chatbot_id: str) -> Plugin:
         """Get a pipeline builder instance for the given chatbot.

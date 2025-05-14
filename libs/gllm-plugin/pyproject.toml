@@ -25,8 +25,7 @@ langchain-core = ">=0.3.51"
 gllm-core-binary = { version = "*" }
 gllm-inference-binary = { version = "*" }
 gllm-pipeline-binary = { version = "*" }
-#TODO change back: bosa-core-binary = { version = "*" }
-bosa-core = { git = "ssh://git@github.com/GDP-ADMIN/bosa.git", rev = "20f5305ac3760316c6290e8553b62b3d3ecd7180", subdirectory = "python/bosa-core" }
+bosa-core-binary = { version = "0.2.3" }
 
 [tool.poetry.extras]
 flair= ["flair"]

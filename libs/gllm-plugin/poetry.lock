@@ -291,45 +291,46 @@ html5lib = ["html5lib"]
 lxml = ["lxml"]
 
 [[package]]
-name = "bosa-core"
-version = "0.0.0"
+name = "bosa-core-binary"
+version = "0.2.3"
 description = "BOSA Core Library"
 optional = false
-python-versions = ">=3.11,<3.13"
-files = []
-develop = false
+python-versions = "<3.13,>=3.11"
+files = [
+    {file = "bosa_core_binary-0.2.3-cp311-cp311-macosx_13_0_x86_64.whl", hash = "sha256:16e075d5de09263f67dce64d564f64f3efe10efa4a550b148f60033f90035d18"},
+    {file = "bosa_core_binary-0.2.3-cp311-cp311-macosx_14_0_arm64.whl", hash = "sha256:1292a106d858e0885b68f8071d6c838b15950d8c73d2e8e98ffa1325bce50960"},
+    {file = "bosa_core_binary-0.2.3-cp311-cp311-manylinux_2_31_x86_64.whl", hash = "sha256:b06f29e87ad6221fcf9dd0d3bffd5fb7209557227d04f383249b0e56cb4ac2fa"},
+    {file = "bosa_core_binary-0.2.3-cp311-cp311-win_amd64.whl", hash = "sha256:2c9aaa6957067e69a9feef4669069abadb32b5316769bc0448ea40c48af39dac"},
+    {file = "bosa_core_binary-0.2.3-cp312-cp312-macosx_13_0_x86_64.whl", hash = "sha256:972d5c5193c0abc8a392ac40db4d6d08ea108a8f958fa73357793ff46e1051ea"},
+    {file = "bosa_core_binary-0.2.3-cp312-cp312-macosx_14_0_arm64.whl", hash = "sha256:9c0f6893d89fd2eec043bef28334ab469252542658efd0725c3e430f0cea3369"},
+    {file = "bosa_core_binary-0.2.3-cp312-cp312-manylinux_2_31_x86_64.whl", hash = "sha256:5c347c678cb2d5d425503660bf0415520d020bf4e73a6e6ffb99025e401a3717"},
+    {file = "bosa_core_binary-0.2.3-cp312-cp312-win_amd64.whl", hash = "sha256:4122fef6e47989c149d76960e646ce7f99cf227e630ea2eee971f9ec38024612"},
+]
 
 [package.dependencies]
-alembic = "^1.15.1"
-argon2-cffi = "^23.1.0"
-fastapi = "^0.115.6"
+alembic = ">=1.15.1,<2.0.0"
+argon2-cffi = ">=23.1.0,<24.0.0"
+fastapi = ">=0.115.6,<0.116.0"
 opentelemetry-api = "*"
 opentelemetry-exporter-otlp-proto-grpc = "*"
 opentelemetry-exporter-otlp-proto-http = "*"
 opentelemetry-instrumentation-fastapi = "*"
 opentelemetry-instrumentation-langchain = "*"
 opentelemetry-sdk = "*"
-passlib = "^1.7.4"
-psycopg2-binary = "^2.9.10"
-pydantic = "^2.9.2"
-pydantic-settings = "^2.7.1"
-python-dotenv = "^1.0.0"
-python-jose = "^3.3.0"
+passlib = ">=1.7.4,<2.0.0"
+psycopg2-binary = ">=2.9.10,<3.0.0"
+pydantic = ">=2.9.2,<3.0.0"
+pydantic-settings = ">=2.7.1,<3.0.0"
+python-dotenv = ">=1.0.0,<2.0.0"
+python-jose = ">=3.3.0,<4.0.0"
 python-multipart = ">=0.0.6,<0.1.0"
-requests = "^2.31.0"
-sentry-sdk = {version = "^2.20.0", extras = ["fastapi", "langchain-core", "langchain-openai"]}
-sqlalchemy = "^2.0.38"
+requests = ">=2.31.0,<3.0.0"
+sentry-sdk = {version = ">=2.20.0,<3.0.0", extras = ["fastapi", "langchain-core", "langchain-openai"]}
+sqlalchemy = ">=2.0.38,<3.0.0"
 
 [package.extras]
 all = ["redis (>=5.2.1,<6.0.0)"]
 cache = ["redis (>=5.2.1,<6.0.0)"]
-
-[package.source]
-type = "git"
-url = "ssh://git@github.com/GDP-ADMIN/bosa.git"
-reference = "20f5305ac3760316c6290e8553b62b3d3ecd7180"
-resolved_reference = "20f5305ac3760316c6290e8553b62b3d3ecd7180"
-subdirectory = "python/bosa-core"
 
 [[package]]
 name = "cachetools"
@@ -3776,4 +3777,4 @@ flair = []
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.11,<3.13"
-content-hash = "4d13a8665d94011add2ae2b7382b3c778209093be29fd457c52a22adc60cea7f"
+content-hash = "9139d6b7c2336a822816902e90eabd69d9e378e0369835d6cef766798e02d420"

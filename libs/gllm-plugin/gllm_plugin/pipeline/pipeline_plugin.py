@@ -93,8 +93,15 @@ class PipelineBuilderPlugin(Plugin, Generic[PipelineState, PipelinePresetConfig]
         """
         pass
 
-    async def cleanup(self):
-        """Cleanup a pipeline instance, if needed."""
+    async def cleanup(
+        self,
+        pipeline_config: dict[str, Any],
+    ):
+        """Cleanup a pipeline instance, if needed.
+        
+        Args:
+            pipeline_config (dict[str, Any]): Pipeline configuration including model name and other settings.
+        """
         pass
 
     def build_additional_runtime_config(

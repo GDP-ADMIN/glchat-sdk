@@ -128,23 +128,27 @@ class PipelineHandler(PluginHandler):
         active_config = instance._activated_configs[pipeline_type]
 
         for chatbot_id, preset in active_config.chatbot_preset_map.items():
-            if pipeline_type != instance._chatbot_configs[chatbot_id].pipeline_type:
-                continue
+            try:
+                if pipeline_type != instance._chatbot_configs[chatbot_id].pipeline_type:
+                    continue
 
-            for model_name_str in preset.supported_models:
-                model_name = ModelName.from_string(model_name_str)
-                pipeline_config = instance._chatbot_configs[chatbot_id].pipeline_config.copy()
-                pipeline_config["model_name"] = model_name
-                provider = model_name.provider
-                api_key = MODEL_KEY_MAP.get(provider)
-                if api_key:
-                    pipeline_config["api_key"] = api_key
+                for model_name_str in preset.supported_models:
+                    model_name = ModelName.from_string(model_name_str)
+                    pipeline_config = instance._chatbot_configs[chatbot_id].pipeline_config.copy()
+                    pipeline_config["model_name"] = model_name
+                    provider = model_name.provider
+                    api_key = MODEL_KEY_MAP.get(provider)
+                    if api_key:
+                        pipeline_config["api_key"] = api_key
 
-                plugin.prompt_builder_catalogs = instance._chatbot_configs[chatbot_id].prompt_builder_catalogs
-                plugin.lmrp_catalogs = instance._chatbot_configs[chatbot_id].lmrp_catalogs
-                pipeline = plugin.build(pipeline_config)
-                instance._builders[chatbot_id] = plugin
-                instance._pipeline_cache[(chatbot_id, str(model_name))] = pipeline
+                    plugin.prompt_builder_catalogs = instance._chatbot_configs[chatbot_id].prompt_builder_catalogs
+                    plugin.lmrp_catalogs = instance._chatbot_configs[chatbot_id].lmrp_catalogs
+                    pipeline = plugin.build(pipeline_config)
+                    instance._builders[chatbot_id] = plugin
+                    instance._pipeline_cache[(chatbot_id, str(model_name))] = pipeline
+            except Exception:
+                logger.error(f"Error initializing plugin for chatbot `{chatbot_id}`")
+                pass
 
     def get_pipeline_builder(self, chatbot_id: str) -> Plugin:
         """Get a pipeline builder instance for the given chatbot.

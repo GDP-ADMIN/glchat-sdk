@@ -187,7 +187,7 @@ class PipelineHandler(PluginHandler):
                     model_name = ModelName.from_string(model_name_str)
                     pipeline_config = instance._chatbot_configs[chatbot_id].pipeline_config.copy()
                     pipeline_config["model_name"] = model_name
-                    pipeline = instance._pipeline_cache[(chatbot_id, str(model_name))]
+                    pipeline = instance._pipeline_cache.get((chatbot_id, str(model_name)))
                     if pipeline:
                         await plugin.cleanup(pipeline_config)
             except Exception as e:

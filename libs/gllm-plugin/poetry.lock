@@ -327,8 +327,8 @@ cache = ["redis (>=5.2.1,<6.0.0)"]
 [package.source]
 type = "git"
 url = "ssh://git@github.com/GDP-ADMIN/bosa.git"
-reference = "2e402082a9b9d59a408c03bfdd6820803e290b6b"
-resolved_reference = "2e402082a9b9d59a408c03bfdd6820803e290b6b"
+reference = "20f5305ac3760316c6290e8553b62b3d3ecd7180"
+resolved_reference = "20f5305ac3760316c6290e8553b62b3d3ecd7180"
 subdirectory = "python/bosa-core"
 
 [[package]]
@@ -3776,4 +3776,4 @@ flair = []
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.11,<3.13"
-content-hash = "2af7af5b07fb149ee1407188015fa2a0f63f38443cafc88ab8c9385ba35d3785"
+content-hash = "4d13a8665d94011add2ae2b7382b3c778209093be29fd457c52a22adc60cea7f"

@@ -110,7 +110,7 @@ class PipelineHandler(PluginHandler):
         }
 
     @classmethod
-    def initialize_plugin(cls, instance: "PipelineHandler", plugin: Plugin) -> None:
+    async def ainitialize_plugin(cls, instance: "PipelineHandler", plugin: Plugin) -> None:
         """Initialize plugin-specific resources.
 
         This method is called after plugin creation and service injection.
@@ -143,7 +143,7 @@ class PipelineHandler(PluginHandler):
 
                     plugin.prompt_builder_catalogs = instance._chatbot_configs[chatbot_id].prompt_builder_catalogs
                     plugin.lmrp_catalogs = instance._chatbot_configs[chatbot_id].lmrp_catalogs
-                    pipeline = plugin.build(pipeline_config)
+                    pipeline = await plugin.build(pipeline_config)
                     instance._builders[chatbot_id] = plugin
                     instance._pipeline_cache[(chatbot_id, str(model_name))] = pipeline
             except Exception:

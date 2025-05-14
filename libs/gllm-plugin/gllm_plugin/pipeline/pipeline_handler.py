@@ -110,6 +110,19 @@ class PipelineHandler(PluginHandler):
         }
 
     @classmethod
+    def initialize_plugin(cls, instance: "PipelineHandler", plugin: Plugin) -> None:
+        """Initialize plugin-specific resources.
+
+        This method is called after plugin creation and service injection.
+        For each pipeline builder plugin, we build pipelines for all supported models and cache them.
+
+        Args:
+            instance (PipelineHandler): The handler instance.
+            plugin (Plugin): The pipeline builder plugin instance.
+        """
+        pass
+
+    @classmethod
     async def ainitialize_plugin(cls, instance: "PipelineHandler", plugin: Plugin) -> None:
         """Initialize plugin-specific resources.
 

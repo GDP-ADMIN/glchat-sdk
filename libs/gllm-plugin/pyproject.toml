@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "gllm-plugin"
 # NOTE: CICD pipeline uses git tag name as package version. Read VERSIONING.md.
-version = "0.0.8"
+version = "0.0.9"
 description = ""
 authors = ["GenAI SDK Team <gat-sdk@gdplabs.id>"]
 readme = "README.md"

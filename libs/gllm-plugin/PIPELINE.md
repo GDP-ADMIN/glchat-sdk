@@ -55,33 +55,38 @@ This example will guide you through creating new pipeline classes from an extern
         - `lmrp_worksheet_id`
     - `user_chatbots`: The list of user chatbots.
 
-6. **Register the new pipeline to GLLM Backend using API.**
+6. **Define the Pipeline Environment**
 
-    Sample curl request:
-    ```sh
-    curl --request POST \
-    --url http://localhost:8000/register-pipeline-plugin \
-    --header 'Content-Type: application/json' \
-    --data '{
-        "folder_name": "simple_pipeline",
-        "path": "/Users/username/Downloads/simple-pipeline"
-    }'
-    ```
+    Create a new file `.env` and define the env key value for your pipeline.
+    Add prefix to all env keys to prevent clash with other pipelines.
+
+7. **Register the new pipeline to GLLM Backend using API.**
 
     The project structure will be as follows:
     ```
     - simple-pipeline [git folder]
     - pyproject.toml [depends on gllm-plugin]
     - simple_pipeline
+        - .env
         - config.yaml
         - pipeline.py
         - preset_config.py
         - state.py
     ```
 
+    Zip the project and register it to GLChat.
+
+    Sample curl request:
+    ```sh
+    curl --request POST \
+    --url http://localhost:8000/register-pipeline-plugin \
+    --header 'Content-Type: multipart/form-data' \
+    --form 'zip_file=@/path_to_pipeline/simple-pipeline.zip'
+    ```
+
     After following these steps, you can now use the new pipeline in GLChat.
 
-7. **Testing the New Pipeline in GLChat**
+8. **Testing the New Pipeline in GLChat**
 
     After registering the new pipeline, follow these steps to verify that it is active:
 
@@ -162,7 +167,7 @@ class SimplePipelineBuilder(PipelineBuilderPlugin[SimpleState, SimplePresetConfi
         """Initialize the Simple Pipeline Builder."""
         super().__init__()
 
-    def build(self, pipeline_config: dict[str, Any]) -> Pipeline:
+    async def build(self, pipeline_config: dict[str, Any]) -> Pipeline:
         """Build the pipeline.
 
         Args:
@@ -275,4 +280,10 @@ user_chatbots:
   - user_id: user-new-2
     chatbot_ids:
       - "*"
+```
+
+`.env`
+```
+SIMPLE_PIPELINE_ENV_KEY_1=value1
+SIMPLE_PIPELINE_ENV_KEY_2=value2
 ```

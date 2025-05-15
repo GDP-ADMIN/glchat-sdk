@@ -79,7 +79,7 @@ class PipelineBuilderPlugin(Plugin, Generic[PipelineState, PipelinePresetConfig]
         pass
 
     @abstractmethod
-    def build(
+    async def build(
         self,
         pipeline_config: dict[str, Any],
     ) -> Pipeline:
@@ -91,6 +91,10 @@ class PipelineBuilderPlugin(Plugin, Generic[PipelineState, PipelinePresetConfig]
         Returns:
             Pipeline: Built pipeline instance.
         """
+        pass
+
+    async def cleanup(self):
+        """Cleanup the pipeline resources, if needed."""
         pass
 
     def build_additional_runtime_config(

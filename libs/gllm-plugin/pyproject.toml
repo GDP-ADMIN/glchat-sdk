@@ -24,7 +24,7 @@ langchain = "^0.3.0"
 langchain-core = ">=0.3.51"
 gllm-core-binary = { version = "*" }
 gllm-inference-binary = { version = "*" }
-gllm-pipeline = {git = "ssh://git@github.com/GDP-ADMIN/gen-ai-internal.git", subdirectory = "libs/gllm-pipeline", rev = "gllm_pipeline-v0.2.20"}
+gllm-pipeline-binary = { version = "*" }
 bosa-core-binary = { version = "0.2.3" }
 
 [tool.poetry.extras]

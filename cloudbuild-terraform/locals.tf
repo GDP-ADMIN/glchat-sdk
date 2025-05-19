@@ -1,6 +1,6 @@
 locals {
   repository = {
-    name  = "gen-ai-external"
+    name  = "glchat-sdk"
     owner = "GDP-ADMIN"
     host-asia-southeast2 = "GDP-ADMIN3"
   }

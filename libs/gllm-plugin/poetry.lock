@@ -250,7 +250,7 @@ name = "bosa-core-binary"
 version = "0.2.3"
 description = "BOSA Core Library"
 optional = false
-python-versions = ">=3.11,<3.13"
+python-versions = "<3.13,>=3.11"
 groups = ["main"]
 files = [
     {file = "bosa_core_binary-0.2.3-cp311-cp311-macosx_13_0_x86_64.whl", hash = "sha256:16e075d5de09263f67dce64d564f64f3efe10efa4a550b148f60033f90035d18"},
@@ -287,11 +287,6 @@ sqlalchemy = ">=2.0.38,<3.0.0"
 [package.extras]
 all = ["redis (>=5.2.1,<6.0.0)"]
 cache = ["redis (>=5.2.1,<6.0.0)"]
-
-[package.source]
-type = "legacy"
-url = "https://asia-southeast2-python.pkg.dev/gdp-labs/gen-ai/simple"
-reference = "gen-ai"
 
 [[package]]
 name = "build"
@@ -1141,24 +1136,24 @@ files = [
 
 [[package]]
 name = "gllm-core-binary"
-version = "0.3.0"
+version = "0.3.0.post1"
 description = "A library containing core components for Gen AI applications."
 optional = false
-python-versions = ">=3.11,<3.14"
+python-versions = "<3.14,>=3.11"
 groups = ["main"]
 files = [
-    {file = "gllm_core_binary-0.3.0-cp311-cp311-macosx_13_0_x86_64.whl", hash = "sha256:75db9c62e01d9bfd6b0d1068b6b108af8c1597a75d4b42c55c74a4ef991f7487"},
-    {file = "gllm_core_binary-0.3.0-cp311-cp311-macosx_14_0_arm64.whl", hash = "sha256:bfd32bafe72c594a5ab58b36cc4088bb5678a03d9355853062bdcaa09ca60ff9"},
-    {file = "gllm_core_binary-0.3.0-cp311-cp311-manylinux_2_31_x86_64.whl", hash = "sha256:7eb7d808d368321c9630fe6720a48f73e7ac30c552b4e421623cfb67db07a041"},
-    {file = "gllm_core_binary-0.3.0-cp311-cp311-win_amd64.whl", hash = "sha256:6420d0cfd9f476c61d6aff8069db2d32f3f9490109f3b5a63a73dbeefe9238c3"},
-    {file = "gllm_core_binary-0.3.0-cp312-cp312-macosx_13_0_x86_64.whl", hash = "sha256:745ef04a8b85cce168c08d6e5482d48af84249550aeef7a996cea85258d3275d"},
-    {file = "gllm_core_binary-0.3.0-cp312-cp312-macosx_14_0_arm64.whl", hash = "sha256:dc5c45952df5e13a9b8d9bec2f3dc7785885999da6fefec3ad36bcc20ec27c03"},
-    {file = "gllm_core_binary-0.3.0-cp312-cp312-manylinux_2_31_x86_64.whl", hash = "sha256:608f1d7450c977457d48ad18d3f439be2c64d5774c9dd7e656170cb2fa68ce8f"},
-    {file = "gllm_core_binary-0.3.0-cp312-cp312-win_amd64.whl", hash = "sha256:78811b907bc5bb94cb74b94f5ef3901a8896c380ab223092fdd3d840a7a63005"},
-    {file = "gllm_core_binary-0.3.0-cp313-cp313-macosx_13_0_x86_64.whl", hash = "sha256:55e40a0fb320a4b02658831a27ec00d3712d1f919036b180ac068251db63c11b"},
-    {file = "gllm_core_binary-0.3.0-cp313-cp313-macosx_14_0_arm64.whl", hash = "sha256:b86f909bde54ec70de4ab7615b903fd4d60adda0dc4e855046f3743e5fbeeb2d"},
-    {file = "gllm_core_binary-0.3.0-cp313-cp313-manylinux_2_31_x86_64.whl", hash = "sha256:88ba4f15c7c3eadf0cb18c79482be264ca0a6d44698e8c7813c00587dc22b83d"},
-    {file = "gllm_core_binary-0.3.0-cp313-cp313-win_amd64.whl", hash = "sha256:32f084d636261061c0a355e471d0c3bfa02decc9fe41a50f50900ddfb0037c0a"},
+    {file = "gllm_core_binary-0.3.0.post1-cp311-cp311-macosx_13_0_x86_64.whl", hash = "sha256:d489a102cb6e991febc8b684d9946f69263994a0cefc52738d68a5901671b9ce"},
+    {file = "gllm_core_binary-0.3.0.post1-cp311-cp311-macosx_14_0_arm64.whl", hash = "sha256:89c5677979c5eb34fc4b567248e12e32a55c661a0a7c66eab32d0ec3f5d307b9"},
+    {file = "gllm_core_binary-0.3.0.post1-cp311-cp311-manylinux_2_31_x86_64.whl", hash = "sha256:3dfec4960ba1ee827915770747e93e67c5e5852c8ccdea2fe0ed282dfd3d4163"},
+    {file = "gllm_core_binary-0.3.0.post1-cp311-cp311-win_amd64.whl", hash = "sha256:30e553970941bf1067831a90353612561b7f3c73ce3f914b92a58c6292754b99"},
+    {file = "gllm_core_binary-0.3.0.post1-cp312-cp312-macosx_13_0_x86_64.whl", hash = "sha256:432849ede2eb87513b071ce9766ee6858391e6f92adcef457b1af8a5c3b33679"},
+    {file = "gllm_core_binary-0.3.0.post1-cp312-cp312-macosx_14_0_arm64.whl", hash = "sha256:d3fcb5743c75889c25d1ceb40a3fc631150c336b12a10c8b7666ea4226a0d2c1"},
+    {file = "gllm_core_binary-0.3.0.post1-cp312-cp312-manylinux_2_31_x86_64.whl", hash = "sha256:28734daa17ca548c2dcfb6cc543b9dd3e411fcc03b6fcf5523ea38d6ce1dbc8d"},
+    {file = "gllm_core_binary-0.3.0.post1-cp312-cp312-win_amd64.whl", hash = "sha256:bd314427e7e31b32b26d93613381dff375a31cd938e8ddb679069ce526eee7be"},
+    {file = "gllm_core_binary-0.3.0.post1-cp313-cp313-macosx_13_0_x86_64.whl", hash = "sha256:38558347653309a2b5484fce14a30039c1e03364158d63ea07f7f4ed1d038344"},
+    {file = "gllm_core_binary-0.3.0.post1-cp313-cp313-macosx_14_0_arm64.whl", hash = "sha256:d51be8012c1bc9507e0e1cd6a8866a38dbb60b77bb0ab850a71d9af72aa383f5"},
+    {file = "gllm_core_binary-0.3.0.post1-cp313-cp313-manylinux_2_31_x86_64.whl", hash = "sha256:facf060534a8dfe972ee909e38d6ad0f1256069496724811e4dfb20dc210fe18"},
+    {file = "gllm_core_binary-0.3.0.post1-cp313-cp313-win_amd64.whl", hash = "sha256:621f4133f374a819ac89b63e431787b7039bee9e1d88f36accb218bef30e03b3"},
 ]
 
 [package.dependencies]
@@ -1175,11 +1170,6 @@ poetry = ">=2.1.3,<3.0.0"
 pydantic = ">=2.11.4,<3.0.0"
 scipy = ">=1.15.1,<2.0.0"
 virtualenv = "20.30.0"
-
-[package.source]
-type = "legacy"
-url = "https://asia-southeast2-python.pkg.dev/gdp-labs/gen-ai/simple"
-reference = "gen-ai"
 
 [[package]]
 name = "gllm-datastore-binary"
@@ -1226,24 +1216,24 @@ reference = "gen-ai"
 
 [[package]]
 name = "gllm-inference-binary"
-version = "0.3.0"
+version = "0.3.0.post1"
 description = "A library containing components related to model inferences in Gen AI applications."
 optional = false
-python-versions = ">=3.11,<3.14"
+python-versions = "<3.14,>=3.11"
 groups = ["main"]
 files = [
-    {file = "gllm_inference_binary-0.3.0-cp311-cp311-macosx_13_0_x86_64.whl", hash = "sha256:0fcb52fd2b40ebcdce401a8cfc0e361b7b06ee1fda42d6482fecab93b13df7bf"},
-    {file = "gllm_inference_binary-0.3.0-cp311-cp311-macosx_14_0_arm64.whl", hash = "sha256:ff222e78798a95eec96c23d5947423de3c22c2b304ed5c570ddd3e423204dbe8"},
-    {file = "gllm_inference_binary-0.3.0-cp311-cp311-manylinux_2_31_x86_64.whl", hash = "sha256:3aa90b0d7082939e319d603719cbf5de1e3b866d43d1d89f6d14a8ffc6f3e3e3"},
-    {file = "gllm_inference_binary-0.3.0-cp311-cp311-win_amd64.whl", hash = "sha256:44ec5fd51431c65dbb82819400fda956468018b928db5b4c909712e024cf22a2"},
-    {file = "gllm_inference_binary-0.3.0-cp312-cp312-macosx_13_0_x86_64.whl", hash = "sha256:43b3efc5f49585b547edfecaf39bccd90641f516d5e4e3e48cb53903d54eea14"},
-    {file = "gllm_inference_binary-0.3.0-cp312-cp312-macosx_14_0_arm64.whl", hash = "sha256:4f2b51e5ce306e02e512e7b8f3e0d1fa4cbf729940115960b181fb7000ed51d7"},
-    {file = "gllm_inference_binary-0.3.0-cp312-cp312-manylinux_2_31_x86_64.whl", hash = "sha256:64f63c5b90f498f9daf32010342a4811e459f31fea4db0d715287d247dbdeaf3"},
-    {file = "gllm_inference_binary-0.3.0-cp312-cp312-win_amd64.whl", hash = "sha256:f9af6ba3d9af4fdaec83ab818ce150b45e81bf5554ed3f6124951330573d5673"},
-    {file = "gllm_inference_binary-0.3.0-cp313-cp313-macosx_13_0_x86_64.whl", hash = "sha256:f6c7eba270b8b5aaf23b028c4a7087cbef8ee3c3c01cdf85f2b7689ed715750d"},
-    {file = "gllm_inference_binary-0.3.0-cp313-cp313-macosx_14_0_arm64.whl", hash = "sha256:2077d55d7ba479c61c049d50f53840a2e9c5a9c94ea4c1e6a34c1b39171754e8"},
-    {file = "gllm_inference_binary-0.3.0-cp313-cp313-manylinux_2_31_x86_64.whl", hash = "sha256:706a7e73b19a8075a23132e085f6c0a959fb25fc0d7d18af96de58deb13c69a0"},
-    {file = "gllm_inference_binary-0.3.0-cp313-cp313-win_amd64.whl", hash = "sha256:51b061a770e385951596b062a4dc855bfeb96178eed7a05605e8e1294b8607a5"},
+    {file = "gllm_inference_binary-0.3.0.post1-cp311-cp311-macosx_13_0_x86_64.whl", hash = "sha256:bc7ecc552bbfd4b8424cba7ef90e92e62db4ee1b1befdd3c01c694a2e2b71890"},
+    {file = "gllm_inference_binary-0.3.0.post1-cp311-cp311-macosx_14_0_arm64.whl", hash = "sha256:87999fde26dba9c9981d54dcd62bc5e204140c194d815a1e0c5e96a9c04587b8"},
+    {file = "gllm_inference_binary-0.3.0.post1-cp311-cp311-manylinux_2_31_x86_64.whl", hash = "sha256:6ba86eef64cfaa815495c2fd1b32488d2e5d12debdc4c47b45d367524c673a23"},
+    {file = "gllm_inference_binary-0.3.0.post1-cp311-cp311-win_amd64.whl", hash = "sha256:96d191986a7314ae43b6a48518a146c60548d99bfcb83b771737d0bce5fb851e"},
+    {file = "gllm_inference_binary-0.3.0.post1-cp312-cp312-macosx_13_0_x86_64.whl", hash = "sha256:40f07109bb2a0b4ff883cc7420731a01213ce9e79186f4acc5dd14bb2e2819f6"},
+    {file = "gllm_inference_binary-0.3.0.post1-cp312-cp312-macosx_14_0_arm64.whl", hash = "sha256:fa521397e15a98f2eb03407835b197ca14d2aeff07aa212f1b75a97255ec670c"},
+    {file = "gllm_inference_binary-0.3.0.post1-cp312-cp312-manylinux_2_31_x86_64.whl", hash = "sha256:44625ddd0d6ef79940763b7d4b0e3fd71519bc259b01b8c220a327e722676c35"},
+    {file = "gllm_inference_binary-0.3.0.post1-cp312-cp312-win_amd64.whl", hash = "sha256:596872dbc54924ca51a14031f2ed8facde942083531ab5442fc6bc6044394ffe"},
+    {file = "gllm_inference_binary-0.3.0.post1-cp313-cp313-macosx_13_0_x86_64.whl", hash = "sha256:e64bd9446dbc821228e58a157190e82431acadc88bec2f23ff40da87a9f6119c"},
+    {file = "gllm_inference_binary-0.3.0.post1-cp313-cp313-macosx_14_0_arm64.whl", hash = "sha256:5514ed53d6f941e661f43184c4fe09b34b9e9562b56926669b930bad6c16c76e"},
+    {file = "gllm_inference_binary-0.3.0.post1-cp313-cp313-manylinux_2_31_x86_64.whl", hash = "sha256:9fd5883716e075cfa97f2fd859eee5308a2b6c239d89c829cfd1f9dbb73fd935"},
+    {file = "gllm_inference_binary-0.3.0.post1-cp313-cp313-win_amd64.whl", hash = "sha256:1a8a3f63ffec384edf96af36a4b97277356df68ba83d27c27d4868a4bbfc6b31"},
 ]
 
 [package.dependencies]
@@ -1267,27 +1257,22 @@ huggingface = ["huggingface-hub (>=0.26.2,<0.27.0)", "transformers (==4.46.1)"]
 openai = ["langchain-openai (>=0.3.12,<0.4.0)", "openai (>=1.74.0,<2.0.0)"]
 twelvelabs = ["twelvelabs (>=0.4.4,<0.5.0)"]
 
-[package.source]
-type = "legacy"
-url = "https://asia-southeast2-python.pkg.dev/gdp-labs/gen-ai/simple"
-reference = "gen-ai"
-
 [[package]]
 name = "gllm-pipeline-binary"
-version = "0.3.0"
+version = "0.3.0.post1"
 description = "A library containing components related to Gen AI applications pipeline orchestration."
 optional = false
-python-versions = ">=3.11,<3.13"
+python-versions = "<3.13,>=3.11"
 groups = ["main"]
 files = [
-    {file = "gllm_pipeline_binary-0.3.0-cp311-cp311-macosx_13_0_x86_64.whl", hash = "sha256:11b18372f8826f81eba252eac15e6e4f9235f10cccbe4a5b5418d10e65149d44"},
-    {file = "gllm_pipeline_binary-0.3.0-cp311-cp311-macosx_14_0_arm64.whl", hash = "sha256:1942f2f73835bd306ae641ece9d23535135482d9e4e63d2d64d89aba02e38237"},
-    {file = "gllm_pipeline_binary-0.3.0-cp311-cp311-manylinux_2_31_x86_64.whl", hash = "sha256:a1353f1ca18f396ff42de0d47ee5df0b4203c7bf505cc6aa685b4f28fb3c0524"},
-    {file = "gllm_pipeline_binary-0.3.0-cp311-cp311-win_amd64.whl", hash = "sha256:24fa96c2bc1d14de02528200341bcb5ff03f0e0a54194e97cd142b1b6ba8fd39"},
-    {file = "gllm_pipeline_binary-0.3.0-cp312-cp312-macosx_13_0_x86_64.whl", hash = "sha256:97324ea2a5fc64ef1b350ff55a457c49287c6b8c90b84f565691eb3fccbd5e35"},
-    {file = "gllm_pipeline_binary-0.3.0-cp312-cp312-macosx_14_0_arm64.whl", hash = "sha256:b4e9c601c0a0d29abedacee06fc0ca51acde1c60f9a26903aca9dc7c0bfd8cd0"},
-    {file = "gllm_pipeline_binary-0.3.0-cp312-cp312-manylinux_2_31_x86_64.whl", hash = "sha256:9105c1aae930f7b1fcdc861d8f22502015b42daada28830b5843f1aef118ca02"},
-    {file = "gllm_pipeline_binary-0.3.0-cp312-cp312-win_amd64.whl", hash = "sha256:d79063ecbdfa10b8d40c942afa74784976c5ffc1b9ef3f0d9b845211bf83d1ad"},
+    {file = "gllm_pipeline_binary-0.3.0.post1-cp311-cp311-macosx_13_0_x86_64.whl", hash = "sha256:73fd545975e6747870a3e76cadf33d8e8a5bbc5e514a354d0cf919c5bbadeb20"},
+    {file = "gllm_pipeline_binary-0.3.0.post1-cp311-cp311-macosx_14_0_arm64.whl", hash = "sha256:fab05e5aec37babb24f9cc1805d055fc8f273d6a1eaa29e170d4e9aa32feb201"},
+    {file = "gllm_pipeline_binary-0.3.0.post1-cp311-cp311-manylinux_2_31_x86_64.whl", hash = "sha256:7c7bd790f6f8be0bf7cfe6bbb050a1d7ebef06f8f5e8aa8d94600ae1a8afeca9"},
+    {file = "gllm_pipeline_binary-0.3.0.post1-cp311-cp311-win_amd64.whl", hash = "sha256:867d50cd8cb4ae8708e905d19213353fa3bc4b39c59639a69ac81ec3155b6c60"},
+    {file = "gllm_pipeline_binary-0.3.0.post1-cp312-cp312-macosx_13_0_x86_64.whl", hash = "sha256:6653ec28340c1f638c35a4cdb963ab20746233f01980443b1cba58e387850826"},
+    {file = "gllm_pipeline_binary-0.3.0.post1-cp312-cp312-macosx_14_0_arm64.whl", hash = "sha256:8b95315768991ca4b5f596351679779cd9488089c1e3518e91fe031bb3a29a39"},
+    {file = "gllm_pipeline_binary-0.3.0.post1-cp312-cp312-manylinux_2_31_x86_64.whl", hash = "sha256:acb89991dfa713f408af3d3c997489c1a77ea31796bd52fd78aef34e19477808"},
+    {file = "gllm_pipeline_binary-0.3.0.post1-cp312-cp312-win_amd64.whl", hash = "sha256:85f125f1bd1b40b787cb1ec586f85e47256abd61128e4f04ee4735b3f1892773"},
 ]
 
 [package.dependencies]
@@ -1295,11 +1280,6 @@ gllm-core-binary = ">=0.3,<0.4"
 gllm-datastore-binary = {version = ">=0.1,<0.2", extras = ["chroma"]}
 langgraph = ">=0.2.16,<0.3.0"
 poetry = ">=2.1.3,<3.0.0"
-
-[package.source]
-type = "legacy"
-url = "https://asia-southeast2-python.pkg.dev/gdp-labs/gen-ai/simple"
-reference = "gen-ai"
 
 [[package]]
 name = "google"
@@ -2090,14 +2070,14 @@ numpy = {version = ">=1.26.0", markers = "python_version < \"3.13\""}
 
 [[package]]
 name = "langchain-core"
-version = "0.3.60"
+version = "0.3.61"
 description = "Building applications with LLMs through composability"
 optional = false
 python-versions = ">=3.9"
 groups = ["main"]
 files = [
-    {file = "langchain_core-0.3.60-py3-none-any.whl", hash = "sha256:2ccdf06b12e699b1b0962bc02837056c075b4981c3d13f82a4d4c30bb22ea3dc"},
-    {file = "langchain_core-0.3.60.tar.gz", hash = "sha256:63dd1bdf7939816115399522661ca85a2f3686a61440f2f46ebd86d1b028595b"},
+    {file = "langchain_core-0.3.61-py3-none-any.whl", hash = "sha256:62cddbda7fb6085b6096bb4f3ad69642ebb0585bde7b210edc61dd0af33f2ea4"},
+    {file = "langchain_core-0.3.61.tar.gz", hash = "sha256:67ba08d4cf58616050047ef3a07887a72607fea9b6b4522dff9e7579a1adbe75"},
 ]
 
 [package.dependencies]
@@ -3533,14 +3513,14 @@ files = [
 
 [[package]]
 name = "posthog"
-version = "4.0.1"
+version = "4.1.0"
 description = "Integrate PostHog into any python application."
 optional = false
 python-versions = "*"
 groups = ["main"]
 files = [
-    {file = "posthog-4.0.1-py2.py3-none-any.whl", hash = "sha256:0c76cbab3e5ab0096c4f591c0b536465478357270f926d11ff833c97984659d8"},
-    {file = "posthog-4.0.1.tar.gz", hash = "sha256:77e7ebfc6086972db421d3e05c91d5431b2b964865d33a9a32e55dd88da4bff8"},
+    {file = "posthog-4.1.0-py2.py3-none-any.whl", hash = "sha256:942460323a1dc85e9111248a4946276f99268883182aaa7f6c9db135c84cf613"},
+    {file = "posthog-4.1.0.tar.gz", hash = "sha256:d9c7a7ed72ee2b20e76fca04180f18e00a23cb7270c1404b6212bdb2cc651b2d"},
 ]
 
 [package.dependencies]
@@ -3715,14 +3695,14 @@ files = [
 
 [[package]]
 name = "pydantic"
-version = "2.11.4"
+version = "2.11.5"
 description = "Data validation using Python type hints"
 optional = false
 python-versions = ">=3.9"
 groups = ["main"]
 files = [
-    {file = "pydantic-2.11.4-py3-none-any.whl", hash = "sha256:d9615eaa9ac5a063471da949c8fc16376a84afb5024688b3ff885693506764eb"},
-    {file = "pydantic-2.11.4.tar.gz", hash = "sha256:32738d19d63a226a52eed76645a98ee07c1f410ee41d93b4afbfa85ed8111c2d"},
+    {file = "pydantic-2.11.5-py3-none-any.whl", hash = "sha256:f9c26ba06f9747749ca1e5c94d6a85cb84254577553c8785576fd38fa64dc0f7"},
+    {file = "pydantic-2.11.5.tar.gz", hash = "sha256:7f853db3d0ce78ce8bbb148c401c2cdd6431b3473c0cdff2755c7690952a7b7a"},
 ]
 
 [package.dependencies]
@@ -5596,4 +5576,4 @@ flair = []
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.11,<3.13"
-content-hash = "ca01d5824e2c43d537a836c6541de723723158cb6478dbe376067e34e1f13a25"
+content-hash = "ff89240983bd9a34a75445bf30aa7727a4e540600a977e6bd6ea4e594595254a"

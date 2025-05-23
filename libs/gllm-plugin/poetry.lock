@@ -247,20 +247,20 @@ lxml = ["lxml"]
 
 [[package]]
 name = "bosa-core-binary"
-version = "0.2.3"
+version = "0.3.1"
 description = "BOSA Core Library"
 optional = false
 python-versions = "<3.13,>=3.11"
 groups = ["main"]
 files = [
-    {file = "bosa_core_binary-0.2.3-cp311-cp311-macosx_13_0_x86_64.whl", hash = "sha256:16e075d5de09263f67dce64d564f64f3efe10efa4a550b148f60033f90035d18"},
-    {file = "bosa_core_binary-0.2.3-cp311-cp311-macosx_14_0_arm64.whl", hash = "sha256:1292a106d858e0885b68f8071d6c838b15950d8c73d2e8e98ffa1325bce50960"},
-    {file = "bosa_core_binary-0.2.3-cp311-cp311-manylinux_2_31_x86_64.whl", hash = "sha256:b06f29e87ad6221fcf9dd0d3bffd5fb7209557227d04f383249b0e56cb4ac2fa"},
-    {file = "bosa_core_binary-0.2.3-cp311-cp311-win_amd64.whl", hash = "sha256:2c9aaa6957067e69a9feef4669069abadb32b5316769bc0448ea40c48af39dac"},
-    {file = "bosa_core_binary-0.2.3-cp312-cp312-macosx_13_0_x86_64.whl", hash = "sha256:972d5c5193c0abc8a392ac40db4d6d08ea108a8f958fa73357793ff46e1051ea"},
-    {file = "bosa_core_binary-0.2.3-cp312-cp312-macosx_14_0_arm64.whl", hash = "sha256:9c0f6893d89fd2eec043bef28334ab469252542658efd0725c3e430f0cea3369"},
-    {file = "bosa_core_binary-0.2.3-cp312-cp312-manylinux_2_31_x86_64.whl", hash = "sha256:5c347c678cb2d5d425503660bf0415520d020bf4e73a6e6ffb99025e401a3717"},
-    {file = "bosa_core_binary-0.2.3-cp312-cp312-win_amd64.whl", hash = "sha256:4122fef6e47989c149d76960e646ce7f99cf227e630ea2eee971f9ec38024612"},
+    {file = "bosa_core_binary-0.3.1-cp311-cp311-macosx_13_0_x86_64.whl", hash = "sha256:101e1d7c6545aa47fdc34b5abd1b182ec67a8be8d809ff0062355156d4dcc1eb"},
+    {file = "bosa_core_binary-0.3.1-cp311-cp311-macosx_14_0_arm64.whl", hash = "sha256:7a7e8c8745f5ea13d70409602fffc43a3524d3605eebcb41d9f462eae986e1e3"},
+    {file = "bosa_core_binary-0.3.1-cp311-cp311-manylinux_2_31_x86_64.whl", hash = "sha256:8c499213cb9accd55c727750c2483d68774d4b5610b85486c56cf18436c0eccd"},
+    {file = "bosa_core_binary-0.3.1-cp311-cp311-win_amd64.whl", hash = "sha256:f747c8cd89a83b7c420b82c7374506015e797879863471688dc2b7ddd4e6c0c1"},
+    {file = "bosa_core_binary-0.3.1-cp312-cp312-macosx_13_0_x86_64.whl", hash = "sha256:407230641463691798d4eb7bd05b3f275e0b35c21e40eab21d7097dc58d1911c"},
+    {file = "bosa_core_binary-0.3.1-cp312-cp312-macosx_14_0_arm64.whl", hash = "sha256:249dcd5cf884cc9a9f3e0584092ffa2b52139d123d8b979b02de75c35211a215"},
+    {file = "bosa_core_binary-0.3.1-cp312-cp312-manylinux_2_31_x86_64.whl", hash = "sha256:032de2052066753c56f98f938f57fe37d8245ba6f3199630143909657af510bc"},
+    {file = "bosa_core_binary-0.3.1-cp312-cp312-win_amd64.whl", hash = "sha256:48ba23b1d922efd63f7962d2db11f5a42775067dcf303ef32d67c2cbddd5ec9b"},
 ]
 
 [package.dependencies]
@@ -5576,4 +5576,4 @@ flair = []
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.11,<3.13"
-content-hash = "232857710069eb470bf78f236dff4b3c60c115b40eb89f72663547123b96a2a1"
+content-hash = "9567b22504f1a03dba543a15cc209c90eaa1ce59bd10fb0aaebcc4cc7efe7783"

@@ -21,10 +21,10 @@ exclude = ["**/*"]
 python = ">=3.11,<3.13"
 poetry = "^2.1.3"
 
-bosa-core-binary = {version = "^0.2.3", source = "gen-ai"}
-gllm-core-binary = {version = "^0.3.0", source = "gen-ai"}
-gllm-inference-binary = {version = "^0.3.0", source = "gen-ai"}
-gllm-pipeline-binary = {version = "^0.3.0", source = "gen-ai"}
+bosa-core-binary = { version = "^0.2.3", source = "gen-ai" }
+gllm-core-binary = { version = "^0.3.0", source = "gen-ai" }
+gllm-inference-binary = { version = "^0.3.0", source = "gen-ai" }
+gllm-pipeline-binary = { version = "^0.3.0", source = "gen-ai" }
 
 langchain = "^0.3.0"
 langchain-core = "^0.3.0"

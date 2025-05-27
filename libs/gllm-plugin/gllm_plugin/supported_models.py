@@ -64,8 +64,8 @@ class AzureOpenAIModel(StrEnum):
 class AnthropicModel(StrEnum):
     """Supported Anthropic models."""
 
-    CLAUDE_4_OPUS = "claude-opus-4"
-    CLAUDE_4_SONNET = "claude-sonnet-4"
+    CLAUDE_4_OPUS = "claude-opus-4-0"
+    CLAUDE_4_SONNET = "claude-sonnet-4-0"
     CLAUDE_3_7_SONNET = "claude-3-7-sonnet"
     CLAUDE_3_5_SONNET = "claude-3-5-sonnet"
     CLAUDE_3_5_HAIKU = "claude-3-5-haiku"

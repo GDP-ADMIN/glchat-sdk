@@ -114,6 +114,7 @@ class DeepInfraModel(StrEnum):
     """Supported DeepInfra models."""
 
     QWEN_2_5_72B_INSTRUCT = "Qwen/Qwen2.5-72B-Instruct"
+    QWEN_3_30B_A3B = "Qwen/Qwen3-30B-A3B"
     DEEPSEEK_R1_DISTILL_QWEN_32B = "deepseek-ai/DeepSeek-R1-Distill-Qwen-32B"
     DEEPSEEK_R1 = "deepseek-ai/DeepSeek-R1"
     DEEPSEEK_V3 = "deepseek-ai/DeepSeek-V3"
@@ -199,6 +200,7 @@ UNIMODAL_MODELS = {
     DeepInfraModel.DEEPSEEK_R1_DISTILL_QWEN_32B,
     DeepInfraModel.DEEPSEEK_V3,
     DeepInfraModel.QWEN_2_5_72B_INSTRUCT,
+    DeepInfraModel.QWEN_3_30B_A3B,
     RoutableModel.DEEPSEEK,
     DeepSeekModel.DEEPSEEK_CHAT,
     DeepSeekModel.DEEPSEEK_REASONER,

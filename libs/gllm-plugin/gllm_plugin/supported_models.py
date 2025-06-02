@@ -19,6 +19,7 @@ class Provider(StrEnum):
 
     ANTHROPIC = "anthropic"
     AZURE_OPENAI = "azure-openai"
+    BEDROCK = "bedrock"
     DEEPSEEK = "deepseek"
     GOOGLE = "google"
     OPENAI = "openai"
@@ -70,6 +71,13 @@ class AnthropicModel(StrEnum):
     CLAUDE_3_5_SONNET = "claude-3-5-sonnet"
     CLAUDE_3_5_HAIKU = "claude-3-5-haiku"
     CLAUDE_3_OPUS = "claude-3-opus"
+
+
+class BedrockModel(StrEnum):
+    """Supported Bedrock models."""
+
+    NOVA_LITE = "amazon.nova-lite-v1:0"
+    NOVA_PRO = "amazon.nova-pro-v1:0"
 
 
 class GoogleModel(StrEnum):
@@ -160,6 +168,7 @@ MODEL_MAP = {
     Provider.ROUTABLE: RoutableModel,
     Provider.VOYAGE: VoyageModel,
     Provider.AZURE_OPENAI: AzureOpenAIModel,
+    Provider.BEDROCK: BedrockModel,
 }
 
 MODEL_KEY_MAP = {
@@ -175,7 +184,8 @@ MODEL_KEY_MAP = {
     Provider.TOGETHER_AI: "TOGETHER_API_KEY",
     Provider.DEEPINFRA: "DEEPINFRA_API_KEY",
     Provider.VOYAGE: "VOYAGE_API_KEY",
-    Provider.ROUTABLE: ""
+    Provider.ROUTABLE: "",
+    Provider.BEDROCK: "",
 }
 
 DEFAULT_VERSION_MAP = {
@@ -192,6 +202,7 @@ DEFAULT_VERSION_MAP = {
     Provider.ROUTABLE: None,
     Provider.VOYAGE: None,
     Provider.AZURE_OPENAI: None,
+    Provider.BEDROCK: None,
 }
 
 UNIMODAL_PROVIDERS = {Provider.TGI, Provider.VLLM}

@@ -159,8 +159,8 @@ class PipelineHandler(PluginHandler):
                     pipeline = await plugin.build(pipeline_config)
                     instance._builders[chatbot_id] = plugin
                     instance._pipeline_cache[(chatbot_id, str(model_name))] = pipeline
-            except Exception:
-                logger.error(f"Error initializing plugin for chatbot `{chatbot_id}`")
+            except Exception as e:
+                logger.error(f"Error initializing plugin for chatbot `{chatbot_id}`: {e}")
                 pass
 
     @classmethod

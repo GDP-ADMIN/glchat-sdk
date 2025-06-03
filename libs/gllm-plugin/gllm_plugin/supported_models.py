@@ -19,6 +19,7 @@ class Provider(StrEnum):
 
     ANTHROPIC = "anthropic"
     AZURE_OPENAI = "azure-openai"
+    BEDROCK = "bedrock"
     DEEPSEEK = "deepseek"
     GOOGLE = "google"
     OPENAI = "openai"
@@ -70,6 +71,38 @@ class AnthropicModel(StrEnum):
     CLAUDE_3_5_SONNET = "claude-3-5-sonnet"
     CLAUDE_3_5_HAIKU = "claude-3-5-haiku"
     CLAUDE_3_OPUS = "claude-3-opus"
+
+
+class BedrockModel(StrEnum):
+    """Supported Bedrock models."""
+
+    AMAZON_NOVA_MICRO = "amazon.nova-micro"
+    AMAZON_NOVA_LITE = "amazon.nova-lite"
+    AMAZON_NOVA_PRO = "amazon.nova-pro"
+    AMAZON_RERANK = "amazon.rerank"
+    AMAZON_TITAN_EMBED_TEXT = "amazon.titan-embed-text"
+    CLAUDE_3_5_HAIKU = "anthropic.claude-3-5-haiku"
+    CLAUDE_3_5_SONNET = "anthropic.claude-3-5-sonnet"
+    CLAUDE_3_7_SONNET = "anthropic.claude-3-7-sonnet"
+    CLAUDE_4_OPUS = "anthropic.claude-opus-4"
+    CLAUDE_4_SONNET = "anthropic.claude-sonnet-4"
+    COHERE_EMBED_ENGLISH = "cohere.embed-english"
+    COHERE_EMBED_MULTILINGUAL = "cohere.embed-multilingual"
+    COHERE_RERANK = "cohere.rerank"
+    META_LLAMA_3_1_8B_INSTRUCT = "meta.llama3-1-8b-instruct"
+    META_LLAMA_3_1_70B_INSTRUCT = "meta.llama3-1-70b-instruct"
+    META_LLAMA_3_1_405B_INSTRUCT = "meta.llama3-1-405b-instruct"
+    META_LLAMA_3_2_1B_INSTRUCT = "meta.llama3-2-1b-instruct"
+    META_LLAMA_3_2_3B_INSTRUCT = "meta.llama3-2-3b-instruct"
+    META_LLAMA_3_2_11B_INSTRUCT = "meta.llama3-2-11b-instruct"
+    META_LLAMA_3_2_90B_INSTRUCT = "meta.llama3-2-90b-instruct"
+    META_LLAMA_3_3_70B_INSTRUCT = "meta.llama3-3-70b-instruct"
+    META_LLAMA_4_MAVERICK_17B_INSTRUCT = "meta.llama4-maverick-17b-instruct"
+    META_LLAMA_4_SCOUT_17B_INSTRUCT = "meta.llama4-scout-17b-instruct"
+    MISTRAL_7B_INSTRUCT = "mistral.mistral-7b-instruct"
+    MISTRAL_LARGE = "mistral.mistral-large"
+    MISTRAL_SMALL = "mistral.mistral-small"
+    MIXTRAL_8_7B = "mistral.mixtral-8-7b-instruct"
 
 
 class GoogleModel(StrEnum):
@@ -160,6 +193,7 @@ MODEL_MAP = {
     Provider.ROUTABLE: RoutableModel,
     Provider.VOYAGE: VoyageModel,
     Provider.AZURE_OPENAI: AzureOpenAIModel,
+    Provider.BEDROCK: BedrockModel,
 }
 
 MODEL_KEY_MAP = {
@@ -175,7 +209,8 @@ MODEL_KEY_MAP = {
     Provider.TOGETHER_AI: "TOGETHER_API_KEY",
     Provider.DEEPINFRA: "DEEPINFRA_API_KEY",
     Provider.VOYAGE: "VOYAGE_API_KEY",
-    Provider.ROUTABLE: ""
+    Provider.ROUTABLE: "",
+    Provider.BEDROCK: "",
 }
 
 DEFAULT_VERSION_MAP = {
@@ -192,6 +227,7 @@ DEFAULT_VERSION_MAP = {
     Provider.ROUTABLE: None,
     Provider.VOYAGE: None,
     Provider.AZURE_OPENAI: None,
+    Provider.BEDROCK: "v1:0",
 }
 
 UNIMODAL_PROVIDERS = {Provider.TGI, Provider.VLLM}
@@ -209,6 +245,8 @@ UNIMODAL_MODELS = {
     GroqModel.LLAMA_3_2_1B_PREVIEW,
     TogetherAIModel.DEEPSEEK_V3,
 }
+
+BEDROCK_REGION_PREFIXES = {"us", "eu", "ap"}
 
 
 def validate_model_name(model_name: str, provider: Provider) -> str:
@@ -273,6 +311,7 @@ class ModelName(BaseModel):
     model_config = ConfigDict(frozen=True)
 
     provider: Provider
+    prefix: str | None = None
     name: Annotated[
         str,
         BeforeValidator(lambda v, info: validate_model_name(v, info.data.get("provider"))),
@@ -289,6 +328,7 @@ class ModelName(BaseModel):
 
         Format varies by provider:
         - Cloud providers: 'provider/model-name[-version]'
+        - Bedrock: 'bedrock/[prefix].model-name[-version]' (e.g., 'bedrock/us.meta.llama4-maverick-17b-instruct-v1:0')
         - TGI: 'tgi/[base64-encoded-url]'
         - TEI: 'tei/[base64-encoded-url]'
         - VLLM: 'vllm/[model-name]@[base64-encoded-url]'
@@ -331,6 +371,10 @@ class ModelName(BaseModel):
             except Exception as e:
                 raise ValueError(f"Invalid base64-encoded URL: {str(e)}") from e
 
+        prefix = None
+        if provider == Provider.BEDROCK:
+            prefix, model_str = cls._extract_bedrock_prefix(model_str)
+
         model_enum = MODEL_MAP[provider]
         matching_model = None
         version = None
@@ -351,7 +395,7 @@ class ModelName(BaseModel):
                 f"Valid models are: {valid_models}"
             )
 
-        return cls(provider=provider, name=matching_model, version=version)
+        return cls(provider=provider, prefix=prefix, name=matching_model, version=version)
 
     def __str__(self) -> str:
         """Return the standard provider/model[-version] format as a string.
@@ -392,6 +436,30 @@ class ModelName(BaseModel):
             encoded_url = base64.b64encode(str(self.url).encode()).decode()
             return f"{self.name}@{encoded_url}"
 
+        if self.provider == Provider.BEDROCK:
+            full_name = self.name
+            if self.prefix:
+                full_name = f"{self.prefix}.{self.name}"
+            if self.version:
+                full_name = f"{full_name}-{self.version}"
+            return full_name
+
         if self.version:
             return f"{self.name}-{self.version}"
         return self.name
+
+    @classmethod
+    def _extract_bedrock_prefix(cls, model_str: str) -> tuple[str | None, str]:
+        """Extract the prefix and model name from a Bedrock model string.
+
+        Args:
+            model_str (str): The model string to extract the prefix from.
+
+        Returns:
+            tuple[str | None, str]: A tuple containing the prefix and model name.
+        """
+        if "." in model_str:
+            prefix, model_name = model_str.split(".", 1)
+            if prefix in BEDROCK_REGION_PREFIXES:
+                return prefix, model_name
+        return None, model_str

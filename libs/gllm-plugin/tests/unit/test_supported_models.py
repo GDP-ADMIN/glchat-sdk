@@ -2,7 +2,7 @@ import base64
 
 import pytest
 
-from gllm_plugin.supported_models import ModelName, Provider
+from gllm_plugin.supported_models import BEDROCK_REGION_PREFIXES, ModelName, Provider
 
 
 def test_invalid_model_name_for_provider() -> None:
@@ -91,6 +91,24 @@ def test_from_string_invalid_model(invalid_string: str) -> None:
         ("google/gemini-1.5-pro-preview", Provider.GOOGLE, "gemini-1.5-pro", "preview"),
         ("openai/gpt-4o-mini", Provider.OPENAI, "gpt-4o-mini", None),
         ("openai/gpt-4o-mini-0125", Provider.OPENAI, "gpt-4o-mini", "0125"),
+        # Bedrock models without region prefix
+        ("bedrock/mistral.mistral-7b-instruct", Provider.BEDROCK, "mistral.mistral-7b-instruct", "v1:0"),
+        ("bedrock/meta.llama4-maverick-17b-instruct", Provider.BEDROCK, "meta.llama4-maverick-17b-instruct", "v1:0"),
+        ("bedrock/cohere.embed-multilingual", Provider.BEDROCK, "cohere.embed-multilingual", "v1:0"),
+        # Bedrock models with explicit version
+        ("bedrock/mistral.mistral-7b-instruct-v0:2", Provider.BEDROCK, "mistral.mistral-7b-instruct", "v0:2"),
+        # Bedrock models with region prefix
+        ("bedrock/us.meta.llama4-maverick-17b-instruct", Provider.BEDROCK, "meta.llama4-maverick-17b-instruct", "v1:0"),
+        ("bedrock/eu.cohere.embed-multilingual", Provider.BEDROCK, "cohere.embed-multilingual", "v1:0"),
+        ("bedrock/ap.mistral.mistral-7b-instruct", Provider.BEDROCK, "mistral.mistral-7b-instruct", "v1:0"),
+        # Bedrock models with region prefix and explicit version
+        (
+            "bedrock/us.meta.llama4-maverick-17b-instruct-v1:0",
+            Provider.BEDROCK,
+            "meta.llama4-maverick-17b-instruct",
+            "v1:0",
+        ),
+        ("bedrock/eu.cohere.embed-multilingual-v3", Provider.BEDROCK, "cohere.embed-multilingual", "v3"),
     ],
 )
 def test_from_string_valid_cases(
@@ -119,6 +137,7 @@ def test_from_string_valid_cases(
         ("gpt-4o", Provider.OPENAI, None, "openai/gpt-4o"),
         ("claude-3-opus", Provider.ANTHROPIC, "latest", "anthropic/claude-3-opus-latest"),
         ("gemini-1.5-pro", Provider.GOOGLE, "preview", "google/gemini-1.5-pro-preview"),
+        ("mistral.mistral-7b-instruct", Provider.BEDROCK, "v1:0", "bedrock/mistral.mistral-7b-instruct-v1:0"),
     ],
 )
 def test_to_string(model_name: str, provider: Provider, version: str | None, expected_str: str) -> None:
@@ -140,6 +159,7 @@ def test_to_string(model_name: str, provider: Provider, version: str | None, exp
         ("gpt-4o", Provider.OPENAI, None, "gpt-4o"),
         ("claude-3-opus", Provider.ANTHROPIC, "latest", "claude-3-opus-latest"),
         ("gemini-1.5-pro", Provider.GOOGLE, "preview", "gemini-1.5-pro-preview"),
+        ("mistral.mistral-7b-instruct", Provider.BEDROCK, "v1:0", "mistral.mistral-7b-instruct-v1:0"),
     ],
 )
 def test_get_full_name(model_name: str, provider: Provider, version: str | None, expected_name: str) -> None:
@@ -318,3 +338,103 @@ def test_vllm_model_missing_url() -> None:
         model.get_full_name()
 
     assert "URL is required for VLLM models" in str(exc_info.value)
+
+
+@pytest.mark.parametrize(
+    "prefix,expected_result",
+    [
+        ("us", True),
+        ("eu", True),
+        ("ap", True),
+        ("invalid", False),
+        ("usa", False),
+        ("EUR", False),
+    ],
+)
+def test_bedrock_region_prefixes(prefix: str, expected_result: bool) -> None:
+    """
+    Condition:
+    Check if a string is a valid Bedrock region prefix.
+
+    Expected:
+    Should return True for valid prefixes (us, eu, ap) and False for invalid ones.
+    """
+    assert (prefix in BEDROCK_REGION_PREFIXES) == expected_result
+
+
+@pytest.mark.parametrize(
+    "model_string",
+    [
+        "bedrock/invalid.model",  # Invalid model name
+        "bedrock/unknown.mistral-7b-instruct",  # Invalid prefix (not a region)
+    ],
+)
+def test_bedrock_invalid_model(model_string: str) -> None:
+    """
+    Condition:
+    Attempt to create a ModelName from a string with valid provider but invalid Bedrock model.
+
+    Expected:
+    Should raise ValueError with message about invalid model name.
+    """
+    with pytest.raises(ValueError) as exc_info:
+        ModelName.from_string(model_string)
+
+    assert "Could not match model name" in str(exc_info.value) or "Invalid model name" in str(exc_info.value)
+
+
+@pytest.mark.parametrize(
+    "model_name,prefix,version,expected_full_name",
+    [
+        ("mistral.mistral-7b-instruct", None, "v1:0", "mistral.mistral-7b-instruct-v1:0"),
+        ("meta.llama4-maverick-17b-instruct", "us", "v1:0", "us.meta.llama4-maverick-17b-instruct-v1:0"),
+        ("cohere.embed-multilingual", "eu", "v3", "eu.cohere.embed-multilingual-v3"),
+        ("anthropic.claude-3-5-sonnet", "ap", None, "ap.anthropic.claude-3-5-sonnet-v1:0"),  # Default version
+    ],
+)
+def test_bedrock_get_full_name(model_name: str, prefix: str, version: str, expected_full_name: str) -> None:
+    """
+    Condition:
+    Create Bedrock ModelName instances with different prefixes and versions and get their full names.
+
+    Expected:
+    Should return the complete model name with prefix and version correctly formatted.
+    """
+    model = ModelName(provider=Provider.BEDROCK, name=model_name, prefix=prefix, version=version)
+    assert model.get_full_name() == expected_full_name
+
+
+@pytest.mark.parametrize(
+    "input_str,expected_provider,expected_prefix,expected_model,expected_version",
+    [
+        ("bedrock/mistral.mistral-7b-instruct", Provider.BEDROCK, None, "mistral.mistral-7b-instruct", "v1:0"),
+        (
+            "bedrock/us.meta.llama4-maverick-17b-instruct-v1:0",
+            Provider.BEDROCK,
+            "us",
+            "meta.llama4-maverick-17b-instruct",
+            "v1:0",
+        ),
+        ("bedrock/eu.cohere.embed-multilingual-v3", Provider.BEDROCK, "eu", "cohere.embed-multilingual", "v3"),
+        ("bedrock/ap.mistral.mistral-7b-instruct", Provider.BEDROCK, "ap", "mistral.mistral-7b-instruct", "v1:0"),
+    ],
+)
+def test_bedrock_from_string_with_prefix(
+    input_str: str,
+    expected_provider: Provider,
+    expected_prefix: str,
+    expected_model: str,
+    expected_version: str,
+) -> None:
+    """
+    Condition:
+    Parse various valid Bedrock model strings with different region prefixes and versions.
+
+    Expected:
+    Should correctly parse provider, region prefix, model name, and version.
+    """
+    model = ModelName.from_string(input_str)
+    assert model.provider == expected_provider
+    assert model.prefix == expected_prefix
+    assert model.name == expected_model
+    assert model.version == expected_version

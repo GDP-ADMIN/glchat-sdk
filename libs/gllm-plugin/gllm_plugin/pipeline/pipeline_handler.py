@@ -77,6 +77,7 @@ class PipelineHandler(PluginHandler):
         _chatbot_configs (dict[str, ChatbotConfig]): Mapping of chatbot IDs to their configurations.
         _builders (dict[str, Plugin]): Mapping of chatbot IDs to their pipeline builder plugins.
         _pipeline_cache (dict[tuple[str, str], Pipeline]): Cache mapping (chatbot_id, model_name) to Pipeline instances.
+        _chatbot_pipeline_keys (dict[str, set[str]]): Mapping of chatbot IDs to their pipeline keys.
     """
 
     app_config: AppConfig
@@ -84,6 +85,7 @@ class PipelineHandler(PluginHandler):
     _chatbot_configs: dict[str, ChatbotConfig] = {}
     _builders: dict[str, Plugin] = {}
     _pipeline_cache: dict[tuple[str, str], Pipeline] = {}
+    _chatbot_pipeline_keys: dict[str, set[str]] = {}
 
     def __init__(self, app_config: AppConfig, chat_history_storage: BaseChatHistoryStorage):
         """Initialize the pipeline handler.
@@ -147,6 +149,7 @@ class PipelineHandler(PluginHandler):
                 if pipeline_type != instance._chatbot_configs[chatbot_id].pipeline_type:
                     continue
 
+                instance._builders[chatbot_id] = plugin
                 for model_name_str in preset.supported_models:
                     model_name = ModelName.from_string(model_name_str)
                     pipeline_config = instance._chatbot_configs[chatbot_id].pipeline_config.copy()
@@ -156,11 +159,10 @@ class PipelineHandler(PluginHandler):
                     if api_key:
                         pipeline_config["api_key"] = api_key
 
-                    plugin.prompt_builder_catalogs = instance._chatbot_configs[chatbot_id].prompt_builder_catalogs
-                    plugin.lmrp_catalogs = instance._chatbot_configs[chatbot_id].lmrp_catalogs
                     pipeline = await plugin.build(pipeline_config)
-                    instance._builders[chatbot_id] = plugin
-                    instance._pipeline_cache[(chatbot_id, str(model_name))] = pipeline
+                    pipeline_key = (chatbot_id, str(model_name))
+                    instance._chatbot_pipeline_keys.setdefault(chatbot_id, set()).add(pipeline_key)
+                    instance._pipeline_cache[pipeline_key] = pipeline
             except Exception as e:
                 logger.error(f"Error initializing plugin for chatbot `{chatbot_id}`: {e}")
                 pass
@@ -263,44 +265,100 @@ class PipelineHandler(PluginHandler):
         config = self._chatbot_configs[chatbot_id].pipeline_config
         return config.get("max_file_size")
 
-    async def update_presets(self, app_config: AppConfig, preset_ids: list[str]) -> None:
-        """Update the preset for the given chatbot.
+    async def create_chatbot(self, app_config: AppConfig, chatbot_id: str, plugin: Plugin) -> None:
+        """Create a new chatbot.
 
         Args:
             app_config (AppConfig): The application configuration.
-            preset_ids (list[str]): The updated preset IDs.
+            chatbot_id (str): The ID of the chatbot.
+            plugin (Plugin): The plugin to use for the chatbot.
         """
-        self.app_config = app_config
-        pipeline_types: set[str] = set()
-        chatbot_preset_map: dict[str, PipelinePresetConfig] = {}
-        for chatbot_id, chatbot_info in self.app_config.chatbots.items():
+        chatbot_info = app_config.chatbots.get(chatbot_id)
+
+        if not chatbot_info or not chatbot_info.pipeline:
+            logger.warning(f"Pipeline config not found for chatbot `{chatbot_id}`")
+            return
+
+        pipeline_info = chatbot_info.pipeline
+        pipeline_type = pipeline_info["type"]
+
+        logger.info(f"Storing pipeline config for chatbot `{chatbot_id}`")
+        self._chatbot_configs[chatbot_id] = ChatbotConfig(
+            pipeline_type=pipeline_type,
+            pipeline_config=pipeline_info["config"],
+            prompt_builder_catalogs=pipeline_info["prompt_builder_catalogs"],
+            lmrp_catalogs=pipeline_info["lmrp_catalogs"],
+        )
+        self._builders[chatbot_id] = plugin
+
+        supported_models = list(pipeline_info["config"]["supported_models"].keys())
+        for model_name_str in supported_models:
+            model_name = ModelName.from_string(model_name_str)
+            pipeline_config = self._chatbot_configs[chatbot_id].pipeline_config.copy()
+            pipeline_config["model_name"] = model_name
+            provider = model_name.provider
+            api_key = MODEL_KEY_MAP.get(provider)
+            if api_key:
+                pipeline_config["api_key"] = api_key
+
+            pipeline = await plugin.build(pipeline_config)
+            pipeline_key = (chatbot_id, str(model_name))
+            self._chatbot_pipeline_keys.setdefault(chatbot_id, set()).add(pipeline_key)
+            self._pipeline_cache[pipeline_key] = pipeline
+
+    async def delete_chatbot(self, chatbot_id: str) -> None:
+        """Delete a chatbot.
+
+        Args:
+            chatbot_id (str): The ID of the chatbot.
+        """
+        for pipeline_keys in self._chatbot_pipeline_keys.get(chatbot_id, set()):
+            for pipeline_key in pipeline_keys:
+                self._pipeline_cache.pop(pipeline_key, None)
+
+        self._chatbot_pipeline_keys.pop(chatbot_id, None)
+        self._chatbot_configs.pop(chatbot_id, None)
+        self._builders.pop(chatbot_id, None)
+
+    async def update_chatbots(self, app_config: AppConfig, chatbot_ids: list[str]) -> None:
+        """Update the chatbots.
+
+        Args:
+            app_config (AppConfig): The application configuration.
+            chatbot_ids (list[str]): The updated chatbot IDs.
+        """
+        for chatbot_id in chatbot_ids:
             try:
-                if not chatbot_info.pipeline:
+                chatbot_info = app_config.chatbots.get(chatbot_id)
+                if not chatbot_info or not chatbot_info.pipeline:
                     logger.warning(f"Pipeline config not found for chatbot `{chatbot_id}`")
                     continue
 
                 pipeline_info = chatbot_info.pipeline
-                preset_id = pipeline_info["config"]["pipeline_preset_id"]
-                if preset_id not in preset_ids:
-                    continue
-
                 pipeline_type = pipeline_info["type"]
+
                 supported_models = list(pipeline_info["config"]["supported_models"].keys())
 
-                chatbot_preset_map[chatbot_id] = PipelinePresetConfig(
-                    preset_id=preset_id,
-                    supported_models=supported_models,
-                )
-
                 logger.info(f"Storing pipeline config for chatbot `{chatbot_id}`")
+                self._chatbot_configs.pop(chatbot_id, None)
                 self._chatbot_configs[chatbot_id] = ChatbotConfig(
                     pipeline_type=pipeline_type,
                     pipeline_config=pipeline_info["config"],
                     prompt_builder_catalogs=pipeline_info["prompt_builder_catalogs"],
                     lmrp_catalogs=pipeline_info["lmrp_catalogs"],
                 )
-                pipeline_types.add(pipeline_type)
 
+                new_pipeline_keys = set()
+                for model_name_str in supported_models:
+                    model_name = ModelName.from_string(model_name_str)
+                    new_pipeline_key = (chatbot_id, str(model_name))
+                    new_pipeline_keys.add(new_pipeline_key)
+
+                for pipeline_key in self._chatbot_pipeline_keys.get(chatbot_id, set()):
+                    if pipeline_key not in new_pipeline_keys:
+                        self._pipeline_cache.pop(pipeline_key, None)
+
+                self._chatbot_pipeline_keys[chatbot_id] = new_pipeline_keys
                 plugin = self._builders[chatbot_id]
                 for model_name_str in supported_models:
                     model_name = ModelName.from_string(model_name_str)
@@ -311,10 +369,11 @@ class PipelineHandler(PluginHandler):
                     if api_key:
                         pipeline_config["api_key"] = api_key
 
-                    plugin.prompt_builder_catalogs = self._chatbot_configs[chatbot_id].prompt_builder_catalogs
-                    plugin.lmrp_catalogs = self._chatbot_configs[chatbot_id].lmrp_catalogs
                     pipeline = await plugin.build(pipeline_config)
-                    self._pipeline_cache[(chatbot_id, str(model_name))] = pipeline
+
+                    pipeline_key = (chatbot_id, str(model_name))
+                    self._pipeline_cache.pop(pipeline_key, None)
+                    self._pipeline_cache[pipeline_key] = pipeline
             except Exception as e:
                 logger.error(f"Error initializing plugin for chatbot `{chatbot_id}`: {e}")
                 pass

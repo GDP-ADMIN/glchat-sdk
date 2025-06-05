@@ -145,7 +145,7 @@ class PipelineHandler(PluginHandler):
             return
 
         active_config = instance._activated_configs[pipeline_type]
-        instance._plugins[pipeline_type] = plugin.copy()
+        instance._plugins[pipeline_type] = plugin
 
         for chatbot_id, preset in active_config.chatbot_preset_map.items():
             try:
@@ -282,7 +282,7 @@ class PipelineHandler(PluginHandler):
 
         pipeline_info = chatbot_info.pipeline
         pipeline_type = pipeline_info["type"]
-        plugin = self._plugins[pipeline_type].copy()
+        plugin = self._plugins[pipeline_type]
 
         logger.info(f"Storing pipeline config for chatbot `{chatbot_id}`")
         self._chatbot_configs[chatbot_id] = ChatbotConfig(

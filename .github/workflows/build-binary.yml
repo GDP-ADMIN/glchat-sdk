@@ -94,7 +94,6 @@ jobs:
   pypi-publish:
     name: Upload Package To Pypi Registry
     needs: [Set-Python-Version-Matrix, Setup-SDK-Binary]
-    if: always() && contains(fromJSON('["gllm-agents", "gllm-core", "gllm-inference", "gllm-pipeline"]'), needs.Setup-SDK-Binary.outputs.module)
     runs-on: ubuntu-latest
     strategy:
       matrix:

@@ -15,7 +15,7 @@ jobs:
       - name: Set matrix
         id: set-matrix
         run: |
-          echo 'matrix=["3.11.0", "3.12.0", "3.13.3"]' >> $GITHUB_OUTPUT
+          echo 'matrix=["3.11.0", "3.12.0"]' >> $GITHUB_OUTPUT
         env:
           GITHUB_REF_NAME: ${{ github.ref_name }}
 

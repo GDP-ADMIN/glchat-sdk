@@ -28,7 +28,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-latest, macos-sh-arm64, macos-sh-x64]
+        os: [macos-sh-arm64, macos-sh-x64]
         python-version: ${{ fromJson(needs.Set-Python-Version-Matrix.outputs.matrix) }}
     continue-on-error: true
     steps:
@@ -98,7 +98,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        os: [windows-latest, macos-sh-arm64, macos-sh-x64]
+        os: [macos-sh-arm64, macos-sh-x64]
         python-version: ${{ fromJson(needs.Set-Python-Version-Matrix.outputs.matrix) }}
     permissions:
       id-token: write

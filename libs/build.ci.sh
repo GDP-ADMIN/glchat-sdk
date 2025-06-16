@@ -12,7 +12,7 @@ if [ "$#" -le 0 ]; then
   echo "  https://peps.python.org/pep-0440/"
   echo "- Available package_name options:"
   echo "---"
-  echo "$(echo "$(ls)" | grep gllm-)"
+  printPackages "gllm-"
   echo "---"
   exit 1
 fi
@@ -48,5 +48,3 @@ run_tests
 
 # Build the package
 build_with_nuitka "$MODULE_DIR"
-
-cd ..

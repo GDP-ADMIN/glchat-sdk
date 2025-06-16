@@ -30,6 +30,7 @@ class Provider(StrEnum):
     TOGETHER_AI = "together-ai"
     DEEPINFRA = "deepinfra"
     VOYAGE = "voyage"
+    CUSTOM = "custom"
 
     ROUTABLE = "routable"
 
@@ -209,6 +210,7 @@ MODEL_KEY_MAP = {
     Provider.TOGETHER_AI: "TOGETHER_API_KEY",
     Provider.DEEPINFRA: "DEEPINFRA_API_KEY",
     Provider.VOYAGE: "VOYAGE_API_KEY",
+    Provider.CUSTOM: "CUSTOM_API_KEY",
     Provider.ROUTABLE: "",
     Provider.BEDROCK: "",
 }
@@ -226,6 +228,7 @@ DEFAULT_VERSION_MAP = {
     Provider.DEEPINFRA: None,
     Provider.ROUTABLE: None,
     Provider.VOYAGE: None,
+    Provider.CUSTOM: None,
     Provider.AZURE_OPENAI: None,
     Provider.BEDROCK: "v1:0",
 }
@@ -269,9 +272,9 @@ def validate_model_name(model_name: str, provider: Provider) -> str:
         except ValidationError as e:
             raise ValueError(f"Invalid URL for TGI provider: {str(e)}") from e
 
-    if provider == Provider.VLLM:
+    if provider in {Provider.VLLM, Provider.CUSTOM}:
         if not model_name:
-            raise ValueError("Model name cannot be empty for VLLM provider")
+            raise ValueError(f"Model name cannot be empty for {provider} provider")
         return model_name
 
     model_enum = MODEL_MAP[provider]
@@ -291,6 +294,7 @@ class ModelName(BaseModel):
     - For cloud providers: 'provider/model-name[-version]'
     - For TGI: 'tgi/[base64-encoded-url]'
     - For VLLM: 'vllm/[model-name]@[base64-encoded-url]'
+    - For CUSTOM: 'custom/[model-name]@[base64-encoded-url]'
 
     Args:
         provider (Provider): The provider of the model.
@@ -332,6 +336,7 @@ class ModelName(BaseModel):
         - TGI: 'tgi/[base64-encoded-url]'
         - TEI: 'tei/[base64-encoded-url]'
         - VLLM: 'vllm/[model-name]@[base64-encoded-url]'
+        - CUSTOM: 'custom/[model-name]@[base64-encoded-url]'
 
         Args:
             provider_model_string (str): The provider/model string.
@@ -360,9 +365,11 @@ class ModelName(BaseModel):
             except (ValidationError, UnicodeDecodeError) as e:
                 raise ValueError(f"Invalid base64-encoded URL: {str(e)}") from e
 
-        if provider == Provider.VLLM:
+        if provider in {Provider.VLLM, Provider.CUSTOM}:
             if "@" not in model_str:
-                raise ValueError("Invalid format for VLLM model. Expected: vllm/model-name@base64-encoded-url")
+                raise ValueError(
+                    f"Invalid format for {provider} model. Expected: {provider}/model-name@base64-encoded-url"
+                )
 
             model_name, encoded_url = model_str.split("@", 1)
             try:
@@ -420,6 +427,7 @@ class ModelName(BaseModel):
         For TGI: base64-encoded-url
         For TEI: base64-encoded-url
         For VLLM: model-name@base64-encoded-url
+        For CUSTOM: model-name@base64-encoded-url
 
         Returns:
             str: The complete model identifier.
@@ -430,9 +438,9 @@ class ModelName(BaseModel):
         if self.provider in {Provider.TGI, Provider.TEI}:
             return base64.b64encode(self.name.encode()).decode()
 
-        if self.provider == Provider.VLLM:
+        if self.provider in {Provider.VLLM, Provider.CUSTOM}:
             if not self.url:
-                raise ValueError("URL is required for VLLM models")
+                raise ValueError(f"URL is required for {self.provider} models")
             encoded_url = base64.b64encode(str(self.url).encode()).decode()
             return f"{self.name}@{encoded_url}"
 

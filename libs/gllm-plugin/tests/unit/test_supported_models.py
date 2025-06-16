@@ -319,7 +319,7 @@ def test_vllm_model_invalid_inputs(invalid_input: str) -> None:
     assert any(
         msg in error_msg
         for msg in [
-            "Invalid format for VLLM model",
+            "Invalid format for vllm model",
             "Invalid base64-encoded URL",
         ]
     )
@@ -337,7 +337,7 @@ def test_vllm_model_missing_url() -> None:
     with pytest.raises(ValueError) as exc_info:
         model.get_full_name()
 
-    assert "URL is required for VLLM models" in str(exc_info.value)
+    assert "URL is required for vllm models" in str(exc_info.value)
 
 
 @pytest.mark.parametrize(

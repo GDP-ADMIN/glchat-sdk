@@ -4,9 +4,11 @@ const client = new GLChat();
 
 void (async () => {
   const result = await client.message.create({
-    chatbotId: 'general-purpose',
+    chatbot_id: 'general-purpose',
     message: 'hello!',
   });
 
-  console.log(result);
+  for await (const chunk of result) {
+    console.log(chunk);
+  }
 })();

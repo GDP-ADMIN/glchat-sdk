@@ -13,8 +13,8 @@
 
 import type { GLChatConfiguration } from '../../config';
 import { glchatFetch } from '../fetch';
-import { camelToSnakeCase } from '../lib';
-import type { CreateMessagePayload } from './types';
+import { camelToSnakeCase, processGLChatChunk } from '../lib';
+import type { CreateMessagePayload, MessageGenerationChunk } from './types';
 
 export class MessageAPI {
   public constructor(private readonly configuration: GLChatConfiguration) {}
@@ -23,11 +23,13 @@ export class MessageAPI {
    * Create a new message in an existing chatbot.
    *
    * @param {CreateMessagePayload} payload Message payload
-   * @returns {Promise<>} A promise neverland
+   * @returns {Promise<>} A promised neverland
    */
-  public async create(payload: CreateMessagePayload) {
+  public async create(
+    payload: CreateMessagePayload,
+  ): Promise<AsyncIterable<MessageGenerationChunk>> {
     const form = new FormData();
-    const { files = [], additionalData = {}, ...rest } = payload;
+    const { files = [], additional_data: additionalData = {}, ...rest } = payload;
 
     for (const [key, value] of Object.entries(additionalData)) {
       form.set(key, value);
@@ -46,12 +48,33 @@ export class MessageAPI {
       );
     }
 
-    return glchatFetch('/message', this.configuration, {
+    const response = await glchatFetch('/message', this.configuration, {
       method: 'POST',
       headers: {
-        Accept: 'application/json',
+        Accept: 'text/event-stream',
       },
       body: form,
     });
+
+    const reader = response.body?.getReader();
+    const decoder = new TextDecoder();
+
+    return {
+      async* [Symbol.asyncIterator]() {
+        if (!reader) throw new Error('No response body');
+
+        try {
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+
+            const rawChunk = decoder.decode(value, { stream: true });
+            yield processGLChatChunk(rawChunk);
+          }
+        } finally {
+          reader.releaseLock();
+        }
+      },
+    };
   }
 }

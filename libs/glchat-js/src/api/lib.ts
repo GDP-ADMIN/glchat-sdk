@@ -12,15 +12,13 @@
  * Copyright (c) GDP LABS. All rights reserved.
  */
 
-/**
- * Transform camel-cased string to snake_cased one.
- *
- * Used to transform payload keys to snake_cased keys
- * that the API understands.
- *
- * @param {string} camelString A camelCase string
- * @returns {string} Snake_cased variant of the input string.
- */
-export function camelToSnakeCase(camelString: string): string {
-  return camelString.replace(/([a-z0-9])([A-Z])/g, '$1_$2').toLowerCase();
+import type { MessageGenerationChunk } from './message/types';
+
+export function processGLChatChunk(value: unknown): MessageGenerationChunk {
+  if (typeof value !== 'string') {
+    throw new Error('Chunk is corrupted!');
+  }
+
+  const stringChunk = value.replace(/^data:/, '');
+  return JSON.parse(stringChunk) as MessageGenerationChunk;
 }

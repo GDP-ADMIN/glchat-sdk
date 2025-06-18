@@ -27,7 +27,7 @@ export interface CreateMessagePayload {
   /**
    * The chatbot identifier where this message is created.
    */
-  chatbotId: string;
+  chatbot_id: string;
   /**
    * Actual message contents
    */
@@ -43,7 +43,7 @@ export interface CreateMessagePayload {
    *  2. If this message is a new message based on regenerate or edit,
    *     this value should be the source message ID.
    */
-  parentId?: string;
+  parent_id?: string;
   /**
    * The intended source of the resulting assistant message.
    *
@@ -56,26 +56,26 @@ export interface CreateMessagePayload {
    *
    * Should be `undefined` in incognito mode
    */
-  userId?: string;
+  user_id?: string;
   /**
    * The conversation identifier where this message is created.
    *
    * Should be `undefined` in incognito mode as incognito
    * doesn't have the capability to initiate a new conversation.
    */
-  conversationId?: string;
+  conversation_id?: string;
   /**
    * TODO: write documentation for this
    */
-  userMessageId?: string;
+  user_message_id?: string;
   /**
    * TODO: write documentation for this
    */
-  assistantMessageId?: string;
+  assistant_message_id?: string;
   /**
    * TODO: write documentation for this
    */
-  chatHistory?: [];
+  chat_history?: [];
   /**
    * List of uploaded files that should be included in message.
    *
@@ -92,21 +92,21 @@ export interface CreateMessagePayload {
    * Useful for stop generation. If not provided, this value will be
    * automatically generated and returned later.
    */
-  streamId?: string;
+  stream_id?: string;
   /**
    * Model name that will be used to respond to this messsage.
    */
-  modelName?: `${string}/${string}`;
+  model_name?: `${string}/${string}`;
   /**
    * Determines whether the message should be anonymized before
    * the message is forwarded to the embedding model.
    */
-  anonymizeEm?: boolean;
+  anonymize_em?: boolean;
   /**
    * Determines whether the message should be anonymized before
    * the message is forwarded to the language model.
    */
-  anonymizeLm?: boolean;
+  anonymize_lm?: boolean;
   /**
    * Determines whether this message should use cache.
    *
@@ -114,12 +114,12 @@ export interface CreateMessagePayload {
    * this message if similar query
    * has been asked before.
    */
-  useCache?: boolean;
+  use_cache?: boolean;
   /**
    * Search mode of this message that determines the base source
    * of the reasoning.
    */
-  searchType?: SearchType;
+  search_type?: SearchType;
   /**
    * A collection of miscellaneous data that doesn't fit
    * with existing keys but don't warrant for additional keys
@@ -133,7 +133,7 @@ export interface CreateMessagePayload {
    *
    * The key should not conflict with other preserved keys.
    */
-  additionalData?: Record<string, string | Blob | null | undefined>;
+  additional_data?: Record<string, string | Blob | null | undefined>;
 };
 
 /**
@@ -148,4 +148,17 @@ interface MessageMetadata {
    * Useful if you want to narrow down the context to specific phrases.
    */
   quote?: string;
+}
+
+export interface GLChatMessageGenerationChunk {
+  conversation_id: string | null;
+  user_message_id: string | null;
+  assistant_message_id: string | null;
+  created_date: number;
+  status: 'data' | 'response';
+  messsage: GLChatMessageChunk;
+}
+
+export interface GLChatMessageChunk {
+  data_type: string;
 }

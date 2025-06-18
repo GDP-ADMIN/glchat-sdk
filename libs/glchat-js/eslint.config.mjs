@@ -40,6 +40,10 @@ export default tseslint.config(
         },
       ],
       '@stylistic/max-len': ['error', { code: 80 }],
+      '@typescript-eslint/no-unnecessary-condition': [
+        'error',
+        { allowConstantLoopConditions: 'only-allowed-literals' },
+      ],
     },
   },
   tseslint.configs.stylisticTypeChecked,

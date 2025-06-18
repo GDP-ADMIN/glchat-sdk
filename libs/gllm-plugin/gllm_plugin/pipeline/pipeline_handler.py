@@ -188,9 +188,12 @@ class PipelineHandler(PluginHandler):
             model_name = model.get("name")
             pipeline_config = instance._chatbot_configs[chatbot_id].pipeline_config.copy()
             pipeline_config["model_name"] = model_name
-            api_key = model.get("api_key")
-            if api_key:
-                pipeline_config["api_key"] = api_key
+            pipeline_config["model_kwargs"] = model.get("model_kwargs", {})
+            print(pipeline_config["model_kwargs"])
+            # for backward compatibility
+            credentials = pipeline_config["model_kwargs"].get("credentials")
+            if credentials:
+                pipeline_config["api_key"] = credentials
 
             pipeline = await plugin.build(pipeline_config)
             pipeline_key = (chatbot_id, str(model_name))

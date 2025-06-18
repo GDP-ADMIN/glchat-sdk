@@ -190,8 +190,10 @@ class PipelineHandler(PluginHandler):
             pipeline_config["model_name"] = model_name
             pipeline_config["model_kwargs"] = model.get("model_kwargs", {})
             print(pipeline_config["model_kwargs"])
+            pipeline_config["model_env_kwargs"] = model.get("model_env_kwargs", {})
+            print(pipeline_config["model_env_kwargs"])
             # for backward compatibility
-            credentials = pipeline_config["model_kwargs"].get("credentials")
+            credentials = pipeline_config["model_env_kwargs"].get("credentials")
             if credentials:
                 pipeline_config["api_key"] = credentials
 

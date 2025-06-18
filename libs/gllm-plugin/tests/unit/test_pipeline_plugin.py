@@ -15,7 +15,6 @@ from pydantic import BaseModel
 
 from gllm_plugin.config.app_config import AppConfig
 from gllm_plugin.pipeline.pipeline_plugin import PipelineBuilderPlugin
-from gllm_plugin.supported_models import Provider
 
 
 class TestPipelineState:

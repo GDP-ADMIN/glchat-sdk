@@ -18,7 +18,6 @@ from pydantic import BaseModel, ConfigDict
 
 from gllm_plugin.config.app_config import AppConfig
 from gllm_plugin.storage.base_chat_history_storage import BaseChatHistoryStorage
-from gllm_plugin.supported_models import MODEL_KEY_MAP, ModelName
 
 
 class ChatbotConfig(BaseModel):
@@ -43,11 +42,11 @@ class PipelinePresetConfig(BaseModel):
 
     Attributes:
         preset_id (str): Unique identifier for the pipeline preset.
-        supported_models (list[str]): List of model names supported by this preset.
+        supported_models (list[dict[str, Any]]): List of models (including config) supported by this preset.
     """
 
     preset_id: str
-    supported_models: list[str]
+    supported_models: list[dict[str, Any]]
 
 
 class ChatbotPresetMapping(BaseModel):
@@ -169,26 +168,27 @@ class PipelineHandler(PluginHandler):
 
     @classmethod
     async def _build_plugin(
-        cls, instance: "PipelineHandler", chatbot_id: str, supported_models: list[str], plugin: Plugin
+        cls, instance: "PipelineHandler", chatbot_id: str, supported_models: list[dict[str, Any]], plugin: Plugin
     ) -> None:
         """Build a plugin for the given chatbot.
 
         Args:
             instance (PipelineHandler): The handler instance.
             chatbot_id (str): The chatbot ID.
-            supported_models (list[str]): List of supported models.
+            supported_models (list[dict[str, Any]]): List of supported models.
             plugin (Plugin): The pipeline builder plugin instance.
         """
         plugin.prompt_builder_catalogs = instance._chatbot_configs[chatbot_id].prompt_builder_catalogs
         plugin.lmrp_catalogs = instance._chatbot_configs[chatbot_id].lmrp_catalogs
         instance._builders[chatbot_id] = plugin
 
-        for model_name_str in supported_models:
-            model_name = ModelName.from_string(model_name_str)
+        print("Build plugin for chatbot: ", chatbot_id)
+        for model in supported_models:
+            print(model)
+            model_name = model.get("name")
             pipeline_config = instance._chatbot_configs[chatbot_id].pipeline_config.copy()
             pipeline_config["model_name"] = model_name
-            provider = model_name.provider
-            api_key = MODEL_KEY_MAP.get(provider)
+            api_key = model.get("api_key")
             if api_key:
                 pipeline_config["api_key"] = api_key
 
@@ -211,12 +211,12 @@ class PipelineHandler(PluginHandler):
         """
         return self._builders[chatbot_id]
 
-    def get_pipeline(self, chatbot_id: str, model_name: ModelName) -> Pipeline:
+    def get_pipeline(self, chatbot_id: str, model_name: str) -> Pipeline:
         """Get a pipeline instance for the given chatbot and model name.
 
         Args:
             chatbot_id (str): The chatbot ID.
-            model_name (ModelName): The model to use for inference.
+            model_name (str): The model to use for inference.
 
         Returns:
             Pipeline: The pipeline instance.
@@ -306,7 +306,7 @@ class PipelineHandler(PluginHandler):
             lmrp_catalogs=pipeline_info["lmrp_catalogs"],
         )
 
-        supported_models = list(pipeline_info["config"]["supported_models"].keys())
+        supported_models = list(pipeline_info["config"]["supported_models"].values())
         await __class__._build_plugin(self, chatbot_id, supported_models, plugin)
 
     async def delete_chatbot(self, chatbot_id: str) -> None:
@@ -340,7 +340,7 @@ class PipelineHandler(PluginHandler):
                 pipeline_info = chatbot_info.pipeline
                 pipeline_type = pipeline_info["type"]
 
-                supported_models = list(pipeline_info["config"]["supported_models"].keys())
+                supported_models = list(pipeline_info["config"]["supported_models"].values())
 
                 logger.info(f"Storing pipeline config for chatbot `{chatbot_id}`")
                 self._chatbot_configs.pop(chatbot_id, None)
@@ -352,8 +352,8 @@ class PipelineHandler(PluginHandler):
                 )
 
                 new_pipeline_keys = set()
-                for model_name_str in supported_models:
-                    model_name = ModelName.from_string(model_name_str)
+                for model in supported_models:
+                    model_name = model.get("name")
                     new_pipeline_key = (chatbot_id, str(model_name))
                     new_pipeline_keys.add(new_pipeline_key)
 
@@ -384,7 +384,7 @@ class PipelineHandler(PluginHandler):
 
             chatbot_preset_map[chatbot_id] = PipelinePresetConfig(
                 preset_id=pipeline_info["config"]["pipeline_preset_id"],
-                supported_models=list(pipeline_info["config"]["supported_models"].keys()),
+                supported_models=list(pipeline_info["config"]["supported_models"].values()),
             )
 
             logger.info(f"Storing pipeline config for chatbot `{chatbot_id}`")

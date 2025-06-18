@@ -161,4 +161,13 @@ export interface GLChatMessageGenerationChunk {
 
 export interface GLChatMessageChunk {
   data_type: string;
+  data_value: string;
+}
+
+export interface GLChatReferenceChunk {
+
+}
+
+export interface GLChatAttachmentChunk {
+
 }

@@ -13,7 +13,7 @@
 
 import type { GLChatConfiguration } from '../../config';
 import { glchatFetch } from '../fetch';
-import { camelToSnakeCase, processGLChatChunk } from '../lib';
+import { processGLChatChunk } from '../lib';
 import type { CreateMessagePayload, MessageGenerationChunk } from './types';
 
 export class MessageAPI {
@@ -29,15 +29,19 @@ export class MessageAPI {
     payload: CreateMessagePayload,
   ): Promise<AsyncIterable<MessageGenerationChunk>> {
     const form = new FormData();
-    const { files = [], additional_data: additionalData = {}, ...rest } = payload;
+    const {
+      files = [],
+      additional_data = {},
+      ...rest
+    } = payload;
 
-    for (const [key, value] of Object.entries(additionalData)) {
+    for (const [key, value] of Object.entries(additional_data)) {
       form.set(key, value);
     }
 
     // Use `set` to prevent duplicate keys
     for (const [key, value] of Object.entries(rest)) {
-      form.set(camelToSnakeCase(key), value);
+      form.set(key, value);
     }
 
     for (const [index, file] of files.entries()) {

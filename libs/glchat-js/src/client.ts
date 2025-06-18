@@ -16,24 +16,23 @@
 
 import { MessageAPI } from './api/message/handler';
 
-import type { AVAILABLE_VERSION, GLChatConfiguration } from './config';
-import { DEFAULT_CONFIG, validateConfiguration } from './config';
+import type { APIVersion, GLChatConfiguration } from './config';
+import { normalizeConfig, validateConfiguration } from './config';
 
 /**
- *
+ * API client that serves as an interface to interact with GLChat
  */
 export class GLChat {
   private configuration: GLChatConfiguration;
 
+  /**
+   * Collection of interfaces to interact with message API of
+   * GLChat.
+   */
   public message: MessageAPI;
 
   public constructor(config: Partial<GLChatConfiguration> = {}) {
-    const normalizedConfig
-      = {
-        ...DEFAULT_CONFIG,
-        ...Object.fromEntries(Object.entries(config).filter(([_, v]) => v)),
-      };
-
+    const normalizedConfig = normalizeConfig(config);
     validateConfiguration(normalizedConfig);
 
     this.configuration = normalizedConfig;
@@ -62,7 +61,7 @@ export class GLChat {
    * @param {string} version API version to be used
    * @throws Error, if the provided version isn't available.
    */
-  public setAPIVersion(version: typeof AVAILABLE_VERSION[number]): void {
+  public setAPIVersion(version: APIVersion): void {
     const newConfig: GLChatConfiguration = {
       ...this.configuration,
       __version: version,

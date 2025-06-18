@@ -6,6 +6,6 @@ export default defineConfig({
   entry: ['src/index.ts'],
   minify: 'terser',
   define: {
-    __packageVersion: packageDef.version,
+    __packageVersion: JSON.stringify(packageDef.version),
   },
 });

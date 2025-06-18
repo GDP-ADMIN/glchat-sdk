@@ -12,11 +12,13 @@
  * Copyright (c) GDP LABS. All rights reserved.
  */
 
-export const AVAILABLE_VERSION = ['v1'] as const;
+const AVAILABLE_VERSION = ['v1'] as const;
 export const DEFAULT_CONFIG: GLChatConfiguration = {
   baseUrl: 'https://stag-gbe-gdplabs-gen-ai-starter.obrol.id',
   __version: 'v1',
 };
+
+export type APIVersion = typeof AVAILABLE_VERSION[number];
 
 export interface GLChatConfiguration {
   /**
@@ -34,6 +36,20 @@ export interface GLChatConfiguration {
    * Currently unused.
    */
   __version: typeof AVAILABLE_VERSION[number];
+}
+
+/**
+ * Normalize user-provided configuration by providing default values
+ * if the field value is nullish.
+ *
+ * @param {Partial<Configuration>} config User-provided configuration
+ * @returns {GLChatConfiguration} A normalized version
+ */
+export function normalizeConfig(config: Partial<GLChatConfiguration>): GLChatConfiguration {
+  return {
+    ...DEFAULT_CONFIG,
+    ...Object.fromEntries(Object.entries(config).filter(([_, v]) => v)),
+  };
 }
 
 /**

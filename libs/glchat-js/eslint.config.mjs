@@ -7,7 +7,7 @@ import stylistic from '@stylistic/eslint-plugin';
 
 export default tseslint.config(
   eslint.configs.recommended,
-  tseslint.configs.strictTypeChecked,
+  tseslint.configs.strict,
   {
     languageOptions: {
       parserOptions: {
@@ -39,11 +39,12 @@ export default tseslint.config(
           ignoreRestSiblings: true,
         },
       ],
-      '@stylistic/max-len': ['error', { code: 80 }],
+      '@stylistic/max-len': ['error', { code: 120 }],
       '@typescript-eslint/no-unnecessary-condition': [
         'error',
         { allowConstantLoopConditions: 'only-allowed-literals' },
       ],
+      '@typescript-eslint/no-unsafe-assignment': 'off',
     },
   },
   tseslint.configs.stylisticTypeChecked,

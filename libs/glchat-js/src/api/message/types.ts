@@ -21,7 +21,61 @@ interface UploadedFile extends Blob {
   readonly name?: string | undefined;
 }
 
-type SearchType = 'normal' | 'web';
+/**
+ * Common chat mode of a message, where the data
+ * is passed directly to LLM with as minimal processing
+ * as possible.
+ */
+type ChatbotMode = 'normal';
+/**
+ * Chat mode of a message where it performs a web
+ * search using search engine to gather additional
+ * contexts before passing through to LLM.
+ */
+type WebSearchMode = 'web';
+/**
+ * Available chat mode for a message.
+ */
+type SearchType = ChatbotMode | WebSearchMode;
+
+/**
+ * Step is currently in progress.
+ */
+type Running = 'running';
+/**
+ * Step has been completed successfully.
+ */
+type Finished = 'finished';
+/**
+ * Step was stopped either prematurely or by user demand.
+ */
+type Stopped = 'stopped';
+/**
+ * Available statuses for a step indicator. Each status corresponds
+ * to a specific visual state in the UI.
+ * */
+export type StepIndicatorStatus = Running | Finished | Stopped;
+
+/**
+ * A chunk where the value contains actual data stored
+ * inside `data_value`.
+ */
+type Data = 'data';
+/**
+ * A chunk where the value contains response from LLM
+ * stored as a string inside `data_value`.
+ */
+type Response = 'response';
+/**
+ * A dummy chunk that indicates the DPO is still processing
+ * user documents.
+ */
+type ProcessingDocument = 'processing_document';
+/**
+ * Available variants for chunks from API. Each type should
+ * be handled separately.
+ */
+export type GLChatMessageStatus = Data | Response | ProcessingDocument;
 
 export interface CreateMessagePayload {
   /**
@@ -150,24 +204,85 @@ interface MessageMetadata {
   quote?: string;
 }
 
-export interface GLChatMessageGenerationChunk {
+interface DeanomymizedData {
+  user_message: DeanonymizedMessage;
+  ai_message: DeanonymizedMessage;
+  deanonymized_mapping: Record<string, string>;
+}
+
+interface DeanonymizedMessage {
+  content: string;
+  deanonymized_content?: string;
+}
+
+interface GLChatProcess {
+  id: string;
+
+  message?: string;
+  status: StepIndicatorStatus;
+  time?: number;
+}
+
+interface GLChatAttachment {
+  id: string;
+  type: string;
+  name: string;
+  size: number;
+
+  url?: string;
+}
+
+export type GLChatMessageChunk = GLChatMessageDataChunk
+  | GLChatMessageResponseChunk
+  | GLChatMessageBaseChunk<ProcessingDocument>;
+
+interface GLChatMessageBaseChunk<T = GLChatMessageStatus> {
   conversation_id: string | null;
   user_message_id: string | null;
   assistant_message_id: string | null;
   created_date: number;
-  status: 'data' | 'response';
-  messsage: GLChatMessageChunk;
+  status: T;
 }
 
-export interface GLChatMessageChunk {
-  data_type: string;
-  data_value: string;
+interface GLChatMessageDataChunk extends GLChatMessageBaseChunk<Data> {
+  message: GLChatReferenceChunk
+    | GLChatAttachmentChunk
+    | GLChatRelatedQuestionChunk
+    | GLChatDeanonymizationChunk
+    | GLChatMediaChunk
+    | GLChatProcessChunk;
+}
+
+interface GLChatMessageResponseChunk extends GLChatMessageBaseChunk<Response> {
+  message: string;
 }
 
 export interface GLChatReferenceChunk {
-
+  data_type: 'reference';
+  data_value: string[];
 }
 
 export interface GLChatAttachmentChunk {
+  data_type: 'attachments';
+  data_value: GLChatAttachment[];
+}
 
+export interface GLChatRelatedQuestionChunk {
+  data_type: 'related';
+  data_value: string[];
+}
+
+export interface GLChatDeanonymizationChunk {
+  data_type: 'deanonymized_data';
+  data_value: DeanomymizedData;
+}
+
+export interface GLChatMediaChunk {
+  data_type: 'media_mapping';
+  data_value: Record<string, string>;
+}
+
+export interface GLChatProcessChunk {
+  data_type: 'process';
+  data_value: GLChatProcess;
 }

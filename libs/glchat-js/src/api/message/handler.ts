@@ -14,7 +14,7 @@
 import type { GLChatConfiguration } from '../../config';
 import { glchatFetch } from '../fetch';
 import { processGLChatChunk } from '../lib';
-import type { CreateMessagePayload, MessageGenerationChunk } from './types';
+import type { CreateMessagePayload, GLChatMessageChunk } from './types';
 
 export class MessageAPI {
   public constructor(private readonly configuration: GLChatConfiguration) {}
@@ -23,11 +23,12 @@ export class MessageAPI {
    * Create a new message in an existing chatbot.
    *
    * @param {CreateMessagePayload} payload Message payload
-   * @returns {Promise<>} A promised neverland
+   * @returns {Promise<AsyncIterable<GLChatMessageChunk>>} A promise that resolves
+   * into a generator that produces message chunks.
    */
   public async create(
     payload: CreateMessagePayload,
-  ): Promise<AsyncIterable<MessageGenerationChunk>> {
+  ): Promise<AsyncIterable<GLChatMessageChunk>> {
     const form = new FormData();
     const {
       files = [],
@@ -35,12 +36,12 @@ export class MessageAPI {
       ...rest
     } = payload;
 
-    for (const [key, value] of Object.entries(additional_data)) {
-      form.set(key, value);
-    }
-
-    // Use `set` to prevent duplicate keys
-    for (const [key, value] of Object.entries(rest)) {
+    // Populate form with additional data and other payload fields
+    const combinedEntries = [
+      ...Object.entries(additional_data),
+      ...Object.entries(rest),
+    ];
+    for (const [key, value] of combinedEntries) {
       form.set(key, value);
     }
 
@@ -72,7 +73,7 @@ export class MessageAPI {
             const { done, value } = await reader.read();
             if (done) break;
 
-            const rawChunk = decoder.decode(value, { stream: true });
+            const rawChunk = decoder.decode(value as ArrayBuffer, { stream: true });
             yield processGLChatChunk(rawChunk);
           }
         } finally {

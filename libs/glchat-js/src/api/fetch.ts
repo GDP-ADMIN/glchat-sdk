@@ -33,9 +33,13 @@ export async function glchatFetch(
       ...options,
       headers: {
         ...normalizeHeaders(options?.headers as Headers),
-        'User-Agent': 'glchat-js-sdk@__packageVersion',
+        'User-Agent': `glchat-js-sdk@${__packageVersion}`,
       },
     });
+
+    if (!response.ok) {
+      throw new Error('Response is not OK');
+    }
 
     return response;
   } catch {

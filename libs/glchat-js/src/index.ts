@@ -1,1 +1,1 @@
-const foo = '';
+export { GLChat } from './client';

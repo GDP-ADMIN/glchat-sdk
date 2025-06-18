@@ -24,5 +24,23 @@ export default tseslint.config(
     quoteProps: 'consistent-as-needed',
     commaDangle: 'always-multiline',
   }),
+  {
+    rules: {
+      'no-unused-vars': 'off',
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          args: 'all',
+          argsIgnorePattern: '^_',
+          caughtErrors: 'all',
+          caughtErrorsIgnorePattern: '^_',
+          destructuredArrayIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+          ignoreRestSiblings: true,
+        },
+      ],
+      '@stylistic/max-len': ['error', { code: 80 }],
+    },
+  },
   tseslint.configs.stylisticTypeChecked,
 );

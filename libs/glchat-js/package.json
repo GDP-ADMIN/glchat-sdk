@@ -3,9 +3,15 @@
   "version": "1.0.0",
   "description": "",
   "license": "MIT",
-  "author": "",
+  "author": {
+    "name": "GDP Labs",
+    "email": "support@gdplabs.id"
+  },
   "type": "module",
   "main": "index.js",
+  "engines": {
+    "node": ""
+  },
   "scripts": {
     "test": "vitest",
     "lint": "eslint ./src/**",
@@ -17,6 +23,7 @@
     "@types/node": "^24.0.3",
     "eslint": "^9.29.0",
     "tsup": "^8.5.0",
+    "tsx": "^4.20.3",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.34.1",
     "vitest": "^3.2.3"

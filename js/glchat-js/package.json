@@ -1,6 +1,6 @@
 {
   "name": "@gdplabs/glchat-js",
-  "version": "0.0.1-b1",
+  "version": "0.0.0",
   "description": "JavaScript SDK for GLChat API",
   "license": "MIT",
   "author": {

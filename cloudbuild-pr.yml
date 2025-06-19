@@ -46,7 +46,7 @@ steps:
   waitFor: ['-']
   args:
     - 'fs'
-    - 'poetry.lock'
+    - 'uv.lock'
     - 'trivy-result.txt'
   env:
     - 'REPOSITORY=${_GITHUB_USER}/${REPO_NAME}'

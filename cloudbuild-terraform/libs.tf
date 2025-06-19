@@ -9,8 +9,9 @@ module "gcb_gen_ai_external_pr_sdk" {
   owner       = local.repository["host-asia-southeast2"]
   repo_name   = local.repository["name"]
   substitutions = {
-    "_MODULE" = each.value.module
-    "_VERSION" = each.value.version
+    "_MODULE"   = each.value.module
+    "_VERSION"  = each.value.version
+    "_LANGUAGE" = "python"
   }
   filename       = "cloudbuild-pr.yml"
   included_files = ["libs/${each.value.module}/**"]
@@ -33,8 +34,9 @@ module "gcb_gen_ai_external_push_sdk" {
   owner       = local.repository["host-asia-southeast2"]
   repo_name   = local.repository["name"]
   substitutions = {
-    "_MODULE" = each.value.module
-    "_VERSION" = each.value.version
+    "_MODULE"   = each.value.module
+    "_VERSION"  = each.value.version
+    "_LANGUAGE" = "python"
   }
   filename       = "cloudbuild.yml"
   included_files = ["libs/${each.value.module}/**"]
@@ -57,8 +59,9 @@ module "gcb_gen_ai_external_push_tag_sdk" {
   owner       = local.repository["host-asia-southeast2"]
   repo_name   = local.repository["name"]
   substitutions = {
-    "_MODULE" = each.value.module
-    "_VERSION" = each.value.version
+    "_MODULE"   = each.value.module
+    "_VERSION"  = each.value.version
+    "_LANGUAGE" = "python"
   }
   filename       = "cloudbuild.yml"
   trigger_config = {

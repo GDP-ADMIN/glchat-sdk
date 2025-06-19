@@ -21,8 +21,6 @@
 
     "declaration": true,
 
-    "lib": ["ESNext"],
-    "types": [
-    ]
+    "lib": ["ES2022"]
   }
 }

@@ -1,3 +1,3 @@
 export type { UploadedFile } from './api/message/types';
-export { GLChat } from './client';
 
+export { GLChat } from './client';

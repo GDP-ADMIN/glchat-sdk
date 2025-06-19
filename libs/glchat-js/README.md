@@ -16,3 +16,187 @@
     <a href="https://github.com/glair-ai/glchat-sdk/releases"><img src="https://img.shields.io/npm/v/@gdplabs/glchat-sdk" alt="Latest Release"></a>
     <a href="https://github.com/glair-ai/glchat-sdk/blob/main/LICENSE"><img src="https://img.shields.io/npm/l/@gdplabs/glchat-sdk" alt="License"></a>
 </p>
+
+This SDK provides convenient access to the GLChat REST API for JavaScript or TypeScript.
+
+This SDK is runtime-agnostic and can be used in NodeJS, Deno, Bun, and Cloudflare Workers (untested).
+
+## Installation
+
+You can install this SDK with your package manager from npm registry
+
+```bash
+# Using npm
+npm install @gdplabs/glchat-sdk
+
+# Using yarn
+yarn add @gdplabs/glchat-sdk
+
+# Using pnpm
+pnpm add @gdplabs/glchat-sdk
+
+# Using bun
+bun add @gdplabs/glchat-sdk
+```
+
+This SDK is also available in JSR
+
+```bash
+npx jsr add @gdplabs/glchat-sdk
+```
+
+After installation, you can verify your installation by trying to import the package from your workspace directory:
+
+```js
+import { GLChat } from '@gdplabs/glchat-sdk';
+```
+
+## Quick Start
+
+The SDK can primarily be interacted through the main `GLChat` client:
+
+```js
+import { GLChat } from '@gdplabs/glchat-sdk';
+
+const client = new GLChat('<YOUR_API_KEY>');
+```
+
+After the client has been initialized, you can start interacting with GLChat API. The primary API to interact with GLChat API is the Message API. You can generate a response with the code below:
+
+```js
+import { GLChat } from '@gdplabs/glchat-sdk';
+
+const client = new GLChat('<YOUR_API_KEY>');
+
+void (async () => {
+  const result = await client.message.create({
+    chatbot_id: 'general-purpose',
+    message: 'hello!',
+  });
+
+  for await (const chunk of result) {
+    console.log(chunk);
+  }
+})();
+```
+
+Sample codes in various JavaScript runtimes are available inside the [examples folder](./examples)
+
+## API Reference
+
+### GLChat
+
+The main client class for interacting with the GLChat API.
+
+#### Initialization
+
+```ts
+import { GLChat } from '@gdplabs/glchat-sdk';
+
+const client = new GLChat('<YOUR_API_KEY>', {
+  baseUrl: 'https://api.glchat.io',
+});
+```
+
+#### Constructor Parameters
+
+| Name       | Type                        | Required? | Description                                 |
+|------------|-----------------------------|----------|---------------------------------------------|
+| `apiKey`     | `string`                    | Yes      | GLChat API key for authentication      |
+| `config`     | `Partial<GLChatConfiguration>` | No       | Optional client configuration.               |
+
+#### `config` Fields
+
+| Name        | Type          | Required? | Description                              |
+|-------------|---------------|----------|------------------------------------------|
+| `baseUrl`     | `string`      | No       | Custom base URL for the GLChat API       |
+| `__version`   | `APIVersion`  | No       | Optional API version to use              |
+
+### Methods
+
+#### `.setBaseUrl(url: string): void`
+
+Sets the base URL to be used for future API calls.
+
+| Name | Type     | Required | Description         |
+|------|----------|----------|---------------------|
+| url  | `string` | Yes      | A valid base API URL |
+
+**Throws:** Error if the URL is invalid.
+
+#### `.setAPIVersion(version: APIVersion): void`
+
+Sets the API version to be used for future requests.
+
+| Name    | Type         | Required | Description                 |
+|---------|--------------|----------|-----------------------------|
+| version | `APIVersion` | Yes      | One of the supported versions |
+
+**Throws:** Error if the version is invalid or unsupported.
+
+### Message API
+
+#### `message.create(payload: CreateMessagePayload): Promise<AsyncIterable<GLChatMessageChunk>>`
+
+Creates a streaming response from the GLChat API for a chatbot message.
+
+```ts
+const stream = await client.message.create({
+  chatbot_id: 'bot-123',
+  message: 'Hello!',
+  conversation_id: 'conv-456',
+  files: [new File(['hello'], 'greeting.txt')],
+});
+```
+
+#### Payload Parameters
+
+| Name                  | Type                         | Required | Description                                                                 |
+|-----------------------|------------------------------|----------|-----------------------------------------------------------------------------|
+| `chatbot_id`            | `string`                     | Yes      | The chatbot identifier where this message is created                        |
+| `message`               | `string`                     | Yes      | The actual user message                                                     |
+| `parent_id`             | `string`                     | No       | ID of the parent message or source message                                  |
+| `source`                | `string`                     | No       | LLM name or agent ID                                                        |
+| `user_id`               | `string`                     | No       | User identifier (optional in incognito)                                     |
+| `conversation_id`       | `string`                     | No       | ID of the conversation (not available in incognito)                         |
+| `user_message_id`       | `string`                     | No       | Custom ID for tracking the user message                                     |
+| `assistant_message_id`  | `string`                     | No       | Custom ID for tracking the assistant message                                |
+| `chat_history`          | `[]`                         | No       | Placeholder for past message history (currently undocumented)               |
+| `files`                 | `UploadedFile[]`             | No       | A list of files (Blob-compatible with optional `name` field)                |
+| `stream_id`             | `string`                     | No       | Custom stream ID for controlling the response stream                        |
+| `model_name`            | ``${string}/${string}``      | No       | Model version override, e.g., `"openai/gpt-4"`                              |
+| `anonymize_em`          | `boolean`                    | No       | Whether to anonymize before embedding                                       |
+| `anonymize_lm`          | `boolean`                    | No       | Whether to anonymize before LLM processing                                  |
+| `use_cache`             | `boolean`                    | No       | Use cached result if available                                              |
+| `search_type`           | `'normal' \| 'web'`          | No       | Selects whether to perform a web-enhanced query                             |
+| `metadata`              | `MessageMetadata`            | No       | Quoted phrase info and other niche metadata                                 |
+| `additional_data`       | `Record<string, string \| Blob \| null \| undefined>` | No | Optional key-value pairs for advanced custom deployment use                 |
+
+#### `MessageMetadata` Fields
+
+| Name   | Type     | Description                                           |
+|--------|----------|-------------------------------------------------------|
+| quote  | `string` | Quoted section of an assistant message (for context)  |
+
+#### Returns
+
+- `Promise<AsyncIterable<GLChatMessageChunk>>`: An asynchronous iterable yielding streamed message chunks.
+
+### Example Usage
+
+```ts
+for await (const chunk of await client.message.create({
+  chatbot_id: 'bot-id',
+  message: 'Tell me a joke!',
+})) {
+  console.log(chunk);
+}
+```
+
+## Contributing
+
+Please refer to the [Contributor Guidelines](./CONTRIBUTING.md)
+
+## License
+
+This project is licensed under the [MIT License](./LICENSE)

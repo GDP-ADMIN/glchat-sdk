@@ -70,7 +70,7 @@ from glchat_python import GLChatClient
 client = GLChatClient(api_key="your-api-key")
 
 # Send a message to the chatbot and receive a streaming response
-for chunk in client.responses.create(
+for chunk in client.message.create(
     chatbot_id="your-chatbot-id",
     message="Hello!"
 ):
@@ -90,7 +90,7 @@ from glchat_python import GLChatClient
 client = GLChatClient(api_key="your-api-key")
 
 # Send message with file attachment
-for chunk in client.responses.create(
+for chunk in client.message.create(
     chatbot_id="your-chatbot-id",
     message="What's in this file?",
     files=[Path("/path/to/your/file.txt")],
@@ -119,7 +119,7 @@ file_obj = io.BytesIO(b"file content")
 file_bytes = b"file content"
 
 # Send with different file types
-for chunk in client.responses.create(
+for chunk in client.message.create(
     chatbot_id="your-chatbot-id",
     message="Process these files",
     files=[file_path, file_obj, file_bytes]
@@ -151,12 +151,12 @@ client = GLChatClient(
 
 #### Methods
 
-##### responses.create
+##### message.create
 
 Creates a streaming response from the GLChat API.
 
 ```python
-response_stream = client.responses.create(
+response_stream = client.message.create(
     chatbot_id: str,
     message: str,
     parent_id: str | None = None,

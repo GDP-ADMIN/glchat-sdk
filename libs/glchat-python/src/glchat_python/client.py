@@ -5,7 +5,7 @@ supporting message sending and file uploads with streaming responses.
 
 Example:
     >>> client = GLChatClient(api_key="your-api-key")
-    >>> for chunk in client.responses.create(
+    >>> for chunk in client.message.create(
     ...     chatbot_id="your-chatbot-id",
     ...     message="Hello!",
     ...     parent_id="msg_123",
@@ -14,7 +14,7 @@ Example:
     ...     print(chunk.decode("utf-8"), end="")
 """
 
-from .responses import Responses
+from .message import MessageAPI
 
 DEFAULT_BASE_URL = "https://stag-gbe-gdplabs-gen-ai-starter.obrol.id"
 
@@ -39,4 +39,4 @@ class GLChatClient:
         self.api_key = api_key
         self.base_url = base_url if base_url else DEFAULT_BASE_URL
         self.timeout = timeout
-        self.responses = Responses(self)
+        self.message = MessageAPI(self)

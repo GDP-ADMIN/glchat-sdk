@@ -27,7 +27,7 @@ def test_send_message_basic(client, mock_response):
     with patch("httpx.Client.stream") as mock_stream:
         mock_stream.return_value.__enter__.return_value = mock_response
 
-        response = client.send_message(chatbot_id="test-bot", message="Hello")
+        response = client.message.create(chatbot_id="test-bot", message="Hello")
 
         # Convert iterator to list to test all chunks
         chunks = list(response)
@@ -45,7 +45,7 @@ def test_send_message_with_file_path(client, mock_response, tmp_path):
     with patch("httpx.Client.stream") as mock_stream:
         mock_stream.return_value.__enter__.return_value = mock_response
 
-        response = client.send_message(
+        response = client.message.create(
             chatbot_id="test-bot", message="Hello", files=[str(test_file)]
         )
 
@@ -61,7 +61,7 @@ def test_send_message_with_bytes(client, mock_response):
     with patch("httpx.Client.stream") as mock_stream:
         mock_stream.return_value.__enter__.return_value = mock_response
 
-        response = client.send_message(
+        response = client.message.create(
             chatbot_id="test-bot", message="Hello", files=[test_bytes]
         )
 
@@ -78,7 +78,7 @@ def test_send_message_with_file_object(client, mock_response):
     with patch("httpx.Client.stream") as mock_stream:
         mock_stream.return_value.__enter__.return_value = mock_response
 
-        response = client.send_message(
+        response = client.message.create(
             chatbot_id="test-bot", message="Hello", files=[file_obj]
         )
 
@@ -91,7 +91,7 @@ def test_send_message_with_invalid_file_type(client):
     """Test sending message with invalid file type."""
     with pytest.raises(ValueError, match="Unsupported file type"):
         list(
-            client.send_message(
+            client.message.create(
                 chatbot_id="test-bot", message="Hello", files=[123]  # Invalid file type
             )
         )
@@ -102,7 +102,7 @@ def test_send_message_with_additional_params(client, mock_response):
     with patch("httpx.Client.stream") as mock_stream:
         mock_stream.return_value.__enter__.return_value = mock_response
 
-        response = client.send_message(
+        response = client.message.create(
             chatbot_id="test-bot",
             message="Hello",
             user_id="test-user",

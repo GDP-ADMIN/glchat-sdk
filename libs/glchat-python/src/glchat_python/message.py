@@ -13,8 +13,8 @@ logger = logging.getLogger(__name__)
 FILE_TYPE = "application/octet-stream"
 
 
-class Responses:
-    """Handles response creation for the GLChat API."""
+class MessageAPI:
+    """Handles message API operations for the GLChat API."""
 
     def __init__(self, client):
         self._client = client

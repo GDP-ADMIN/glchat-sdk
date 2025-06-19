@@ -254,34 +254,83 @@ interface GLChatProcess {
    */
   message?: string;
   /**
-   * THe
+   * Status of the current progress
    */
   status: StepIndicatorStatus;
+  /**
+   * Unix timestamp that denotes when this process is created
+   */
   time?: number;
 }
 
+/**
+ * Attached binary data in form of File inside a message.
+ */
 interface GLChatAttachment {
+  /**
+   * Identifier of the attachment.
+   *
+   * Mainly used to interact with the attachment during edit / refresh flow.
+   */
   id: string;
+  /**
+   * MIME type of the attachment.
+   */
   type: string;
+  /**
+   * Name of the attachment.
+   */
   name: string;
-  size: number;
-
-  url?: string;
+  /**
+   * A public URL of the attachment.
+   */
+  url: string;
 }
 
+/**
+ * Streamed data sent from GLChat API during message manipulation process.
+ */
 export type GLChatMessageChunk = GLChatMessageDataChunk
   | GLChatMessageResponseChunk
   | GLChatMessageBaseChunk<ProcessingDocument>;
 
 interface GLChatMessageBaseChunk<T = GLChatMessageStatus> {
+  /**
+   * Conversation identifier where the message belongs to.
+   */
   conversation_id: string | null;
+  /**
+   * Identifier of the user message.
+   *
+   * If the current message is an assistant message, this value
+   * will be the ID of the user message that triggers the response.
+   */
   user_message_id: string | null;
+  /**
+   * Identifier of the assitant message.
+   *
+   * If the current message is a user message, this value
+   * will be the ID of the assistant message that complements the request.
+   */
   assistant_message_id: string | null;
+  /**
+   * Unix timestamp when the chunk is created.
+   */
   created_date: number;
+  /**
+   * An enum that denotes the type of the chunk.
+   */
   status: T;
 }
 
+/**
+ * A chunk that represents data related to the message manipulation process
+ * that isn't the response itself.
+ */
 interface GLChatMessageDataChunk extends GLChatMessageBaseChunk<Data> {
+  /**
+   * Actual data content of the chunk.
+   */
   message: GLChatReferenceChunk
     | GLChatAttachmentChunk
     | GLChatRelatedQuestionChunk
@@ -290,36 +339,81 @@ interface GLChatMessageDataChunk extends GLChatMessageBaseChunk<Data> {
     | GLChatProcessChunk;
 }
 
+/**
+ * Chunk that represents actual LLM or agent response.
+ */
 interface GLChatMessageResponseChunk extends GLChatMessageBaseChunk<Response> {
+  /**
+   * Response of LLM or agent.
+   */
   message: string;
 }
 
+/**
+ * Chunk that represents references that may exist in the actual response string.
+ */
 export interface GLChatReferenceChunk {
   data_type: 'reference';
+  /**
+   * List of references mentioned in the response string.
+   */
   data_value: string[];
 }
 
+/**
+ * Chunk that represents attachment binary of the message.
+ */
 export interface GLChatAttachmentChunk {
   data_type: 'attachments';
+  /**
+   * List of attachments of the message.
+   */
   data_value: GLChatAttachment[];
 }
 
+/**
+ * Chunk that represents questions related with the query
+ * that triggers the chunk.
+ */
 export interface GLChatRelatedQuestionChunk {
   data_type: 'related';
+  /**
+   * List of related questions.
+   */
   data_value: string[];
 }
 
+/**
+ * Chunk that represents anonymization data of the message.
+ */
 export interface GLChatDeanonymizationChunk {
   data_type: 'deanonymized_data';
+  /**
+   * Anonymization result of the message.
+   */
   data_value: DeanomymizedData;
 }
 
+/**
+ * Chunk that represents key-value of media inside actual contents
+ * represented by `[<media_type>_<id>]` string.
+ */
 export interface GLChatMediaChunk {
   data_type: 'media_mapping';
+  /**
+   * Key-value mapping of media that may exist inside actual contents
+   * of the message.
+   */
   data_value: Record<string, string>;
 }
 
+/**
+ * Chunk that represents process of the message-manipulation request.
+ */
 export interface GLChatProcessChunk {
   data_type: 'process';
+  /**
+   * Current process of the request.
+   */
   data_value: GLChatProcess;
 }

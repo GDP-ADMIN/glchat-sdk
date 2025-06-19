@@ -11,13 +11,23 @@
  * Copyright (c) GDP LABS. All rights reserved.
  */
 
-import type { GLChatConfiguration } from '../../config';
-import { glchatFetch } from '../fetch';
 import { processGLChatChunk } from '../lib';
 import type { CreateMessagePayload, GLChatMessageChunk } from './types';
 
+/**
+ * An API that serves as an interface to GLChat message-related API.
+ *
+ * Not to be used outside the main GLChat interface.
+ */
 export class MessageAPI {
-  public constructor(private readonly configuration: GLChatConfiguration) {}
+  /**
+   * An API that serves as an interface to GLChat message-related API.
+   *
+   * @params {string} apiKey
+   */
+  public constructor(
+    private readonly fetchClient: typeof fetch,
+  ) {}
 
   /**
    * Create a new message in an existing chatbot.
@@ -53,7 +63,7 @@ export class MessageAPI {
       );
     }
 
-    const response = await glchatFetch('/message', this.configuration, {
+    const response = await this.fetchClient('/message', {
       method: 'POST',
       headers: {
         Accept: 'text/event-stream',

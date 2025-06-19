@@ -14,6 +14,7 @@
  * Copyright (c) GDP LABS. All rights reserved.
  */
 
+import { createGLChatFetchClient } from './api/fetch';
 import { MessageAPI } from './api/message/handler';
 
 import type { APIVersion, GLChatConfiguration } from './config';
@@ -23,7 +24,8 @@ import { normalizeConfig, validateConfiguration } from './config';
  * API client that serves as an interface to interact with GLChat
  */
 export class GLChat {
-  private configuration: GLChatConfiguration;
+  private readonly apiKey: string;
+  private readonly configuration: GLChatConfiguration;
 
   /**
    * Collection of interfaces to interact with message API of
@@ -31,12 +33,16 @@ export class GLChat {
    */
   public message: MessageAPI;
 
-  public constructor(config: Partial<GLChatConfiguration> = {}) {
+  public constructor(apiKey: string, config: Partial<GLChatConfiguration> = {}) {
     const normalizedConfig = normalizeConfig(config);
     validateConfiguration(normalizedConfig);
 
+    this.apiKey = apiKey;
     this.configuration = normalizedConfig;
-    this.message = new MessageAPI(this.configuration);
+
+    const fetchClient = createGLChatFetchClient(this.apiKey, this.configuration);
+
+    this.message = new MessageAPI(fetchClient);
   }
 
   /**
@@ -52,7 +58,7 @@ export class GLChat {
     };
     validateConfiguration(newConfig);
 
-    this.configuration = newConfig;
+    this.configuration.baseUrl = url;
   }
 
   /**
@@ -68,6 +74,6 @@ export class GLChat {
     };
     validateConfiguration(newConfig);
 
-    this.configuration = newConfig;
+    this.configuration.__version = version;
   }
 }

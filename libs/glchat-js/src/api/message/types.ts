@@ -17,7 +17,7 @@
  * Mainly made to maintain runtime-compatibility with Bun, since Bun
  * doesn't support `File` natively.
  */
-interface UploadedFile extends Blob {
+export interface UploadedFile extends Blob {
   readonly name?: string | undefined;
 }
 
@@ -204,21 +204,58 @@ interface MessageMetadata {
   quote?: string;
 }
 
+/**
+ * Data wrapper for deanonymized_message chunk.
+ *
+ * Stores both user and assistant plus their actual content mapped
+ * in key-value objects.
+ */
 interface DeanomymizedData {
+  /**
+   * Deanonymization data for user message that triggers the request
+   */
   user_message: DeanonymizedMessage;
+  /**
+   * Deanonymization data for assistant message
+   */
   ai_message: DeanonymizedMessage;
+  /**
+   * Key-value mapping of anonymization for both user and assistant message
+   */
   deanonymized_mapping: Record<string, string>;
 }
 
+/**
+ * Actual message content of the deanonymized_message chunk.
+ */
 interface DeanonymizedMessage {
+  /**
+   * Message contentthat has been anonymized.
+   */
   content: string;
+  /**
+   * Raw message content without anonymization. If the message
+   * isn't going through anonymization step, this value will be `undefined`.
+   */
   deanonymized_content?: string;
 }
 
+/**
+ * Progress report of current message stream
+ */
 interface GLChatProcess {
+  /**
+   * Unique identifier of the process
+   */
   id: string;
 
+  /**
+   * Human-readable message to be associated with the process
+   */
   message?: string;
+  /**
+   * THe
+   */
   status: StepIndicatorStatus;
   time?: number;
 }

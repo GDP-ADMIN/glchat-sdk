@@ -25,14 +25,14 @@ describe('GLChat', () => {
 
   describe('constructor', () => {
     it('should initialize with default configuration when no config provided', () => {
-      new GLChat();
+      new GLChat('');
       expect(config.normalizeConfig).toHaveBeenCalledWith({});
       expect(config.validateConfiguration).toHaveBeenCalled();
     });
 
     it('should initialize with provided configuration', () => {
       const customConfig = { baseUrl: 'https://custom.example.com' };
-      new GLChat(customConfig);
+      new GLChat('', customConfig);
       expect(config.normalizeConfig).toHaveBeenCalledWith(customConfig);
     });
 
@@ -41,13 +41,13 @@ describe('GLChat', () => {
         throw new Error('Invalid config');
       });
 
-      expect(() => new GLChat({})).toThrow('Invalid config');
+      expect(() => new GLChat('', {})).toThrow('Invalid config');
     });
   });
 
   describe('setBaseUrl', () => {
     it('should update the base URL when valid', () => {
-      const client = new GLChat(mockConfig);
+      const client = new GLChat('', mockConfig);
       const newUrl = 'https://new.example.com';
 
       client.setBaseUrl(newUrl);
@@ -61,7 +61,7 @@ describe('GLChat', () => {
 
   describe('setAPIVersion', () => {
     it('should update the API version when valid', () => {
-      const client = new GLChat(mockConfig);
+      const client = new GLChat('', mockConfig);
       const newVersion = 'v1';
 
       client.setAPIVersion(newVersion);

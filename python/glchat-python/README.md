@@ -36,22 +36,11 @@ GLChat Python Client is a Python library that simplifies interaction with the GL
 
 ## Installation
 
-This project uses [uv](https://docs.astral.sh/uv/getting-started/) for dependency management. To install the package:
+To install the package:
 
 ```bash
-# Change to the glchat-python directory
-cd python/glchat-python
-
-# Install dependencies using uv
-uv pip install -e .
+pip install @gdplabs/glchat-sdk
 ```
-
-The `-e` flag installs the package in "editable" mode, which means:
-
-- The package is installed in your Python environment
-- You can import and use it from any directory
-- Changes to the source code will be reflected immediately without needing to reinstall
-- The package is linked to your development directory, making it easier to develop and test
 
 After installation, you can verify it works by trying to import it from any directory:
 

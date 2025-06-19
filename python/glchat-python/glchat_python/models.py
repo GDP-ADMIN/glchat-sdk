@@ -1,10 +1,31 @@
-"""Data models for the GLChat Python client."""
+"""Data models for the GLChat Python client.
 
-from pydantic import BaseModel
+This module contains Pydantic models for request and response data structures
+used in the GLChat Python client library.
+
+Example:
+    >>> request = MessageRequest(
+    ...     chatbot_id="your-chatbot-id",
+    ...     message="Hello!",
+    ...     user_id="user_123"
+    ... )
+    >>> data = request.model_dump()
+
+Authors:
+    Vincent Chuardi (vincent.chuardi@gdplabs.id)
+
+References:
+    None
+"""
+
+from pydantic import BaseModel, ConfigDict
 
 
 class MessageRequest(BaseModel):
     """Request model for sending messages to the GLChat API."""
+
+    # Disable pydantic's protected namespace "model_"
+    model_config = ConfigDict(protected_namespaces=())
 
     chatbot_id: str
     message: str

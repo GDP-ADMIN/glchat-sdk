@@ -1,4 +1,11 @@
-"""Tests for the GLChatClient class."""
+"""Tests for the GLChatClient class.
+
+Authors:
+    Vincent Chuardi (vincent.chuardi@gdplabs.id)
+
+References:
+    None
+"""
 
 import io
 from unittest.mock import Mock, patch

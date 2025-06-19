@@ -12,15 +12,28 @@ Example:
     ...     user_id="user_456"
     ... ):
     ...     print(chunk.decode("utf-8"), end="")
+
+Authors:
+    Vincent Chuardi (vincent.chuardi@gdplabs.id)
+
+References:
+    None
 """
 
-from .message import MessageAPI
+from glchat_python.message import MessageAPI
 
-DEFAULT_BASE_URL = "https://stag-gbe-gdplabs-gen-ai-starter.obrol.id"
+DEFAULT_BASE_URL = "https://stag-chat-ui-gdplabs-gen-ai-starter.obrol.id/api/proxy/"
 
 
 class GLChatClient:
-    """GLChat Backend API Client"""
+    """GLChat Backend API Client.
+
+    Attributes:
+        api_key: API key for authentication
+        base_url: Base URL for the GLChat API
+        timeout: Request timeout in seconds
+        message: MessageAPI instance for message operations
+    """
 
     def __init__(
         self,
@@ -32,9 +45,9 @@ class GLChatClient:
         Initialize GLChat client
 
         Args:
-            api_key: API key for authentication
-            base_url: Base URL for the GLChat API
-            timeout: Request timeout in seconds
+            api_key (str | None): API key for authentication
+            base_url [str | None]: Base URL for the GLChat API
+            timeout [float]: Request timeout in seconds
         """
         self.api_key = api_key
         self.base_url = base_url if base_url else DEFAULT_BASE_URL

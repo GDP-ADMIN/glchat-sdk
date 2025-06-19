@@ -1,7 +1,7 @@
 steps:
 - id: Generate Google Token
   name: gcr.io/cloud-builders/gcloud
-  dir: 'libs/${_MODULE}'
+  dir: '${_LANGUAGE}/${_MODULE}'
   entrypoint: 'bash'
   args:
     - '-c'
@@ -14,7 +14,7 @@ steps:
     - "--file=docker-compose.gcb.yml"
     - "run"
     - "--rm"
-    - "builder"
+    - "builder-${_LANGUAGE}"
   env:
     - 'MODULE=${_MODULE}'
     - 'VERSION=${_VERSION}'
@@ -24,36 +24,24 @@ steps:
   waitFor: ['-']
 
 - id: Upload Packages
-  name: 'asia.gcr.io/gdp-labs/gl-base/poetry:1.8.2-py${_VERSION}.0'
+  name: 'gcr.io/cloud-builders/docker'
   entrypoint: '/bin/bash'
-  dir: 'libs/${_MODULE}'
   args:
     - '-c'
     - |-
-      if [ -n "${TAG_NAME}" ]; then
-        # publish to artifact registry
-        poetry config http-basic.gen-ai-publication oauth2accesstoken "$(cat token.key)"
-        poetry publish --repository gen-ai-publication --skip-existing
-
-        # publish to pypi
-        poetry publish --skip-existing
-      else
-        echo "No release tag detected. Skipping binary upload."
-      fi
+      compose \
+        --file=docker-compose.gcb.yml \
+        run --rm builder-${_LANGUAGE} \
+        -c './publish.sh ${MODULE}'
   secretEnv:
-    - 'POETRY_PYPI_TOKEN_PYPI'
+    - 'PYPI_TOKEN'
 
 - id: Run SCA
   name: 'gcr.io/$PROJECT_ID/secops'
-  dir: 'libs/${_MODULE}'
+  dir: '${_LANGUAGE}/${_MODULE}'
   script: |
     #!/bin/bash
     set -xe
-
-    if [ "${VERSION}" != "3.12" ]; then
-      echo "Skipping SCA step because Python version is not 3.12 (current value: ${VERSION})."
-      exit 0
-    fi
 
     export WORKSPACE=$(pwd)
     bash /opt/sq.sh
@@ -65,6 +53,7 @@ steps:
     - 'VERSION=${_VERSION}'
   secretEnv:
     - 'SCA_TOKEN'
+  waitFor: ['Test & Build']
 
 timeout: 30m
 options:
@@ -84,6 +73,6 @@ availableSecrets:
   - versionName: "projects/$PROJECT_ID/secrets/INFRA_GL_SONARQUBE_TOKEN/versions/latest"
     env: 'SCA_TOKEN'
   - versionName: "projects/$PROJECT_ID/secrets/GLX_SRE_PYPI_API_TOKEN/versions/latest"
-    env: 'POETRY_PYPI_TOKEN_PYPI'
+    env: 'PYPI_TOKEN'
 
 tags: ['gen-ai-external', 'push']

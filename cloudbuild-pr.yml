@@ -1,7 +1,7 @@
 steps:
 - id: Generate Google Token
   name: gcr.io/cloud-builders/gcloud
-  dir: 'libs/${_MODULE}'
+  dir: '${_LANGUAGE}/${_MODULE}'
   entrypoint: 'bash'
   args:
     - '-c'
@@ -15,7 +15,7 @@ steps:
     - "--file=docker-compose.gcb.yml"
     - "run"
     - "--rm"
-    - "builder"
+    - "builder-${_LANGUAGE}"
   env:
     - 'MODULE=${_MODULE}'
     - 'VERSION=${_VERSION}'
@@ -24,15 +24,10 @@ steps:
 
 - id: Run SCA
   name: 'gcr.io/$PROJECT_ID/secops'
-  dir: 'libs/${_MODULE}'
+  dir: '${_LANGUAGE}/${_MODULE}'
   script: |
     #!/bin/bash
     set -xe
-
-    if [ "${VERSION}" != "3.12" ]; then
-      echo "Skipping SCA step because Python version is not 3.12 (current value: ${VERSION})."
-      exit 0
-    fi
 
     export WORKSPACE=$(pwd)
     bash /opt/sq.sh
@@ -46,9 +41,9 @@ steps:
     - 'SCA_TOKEN'
 
 - id: Vulnerability Scanning
-  dir: 'libs/${_MODULE}'
+  dir: '${_LANGUAGE}/${_MODULE}'
   name: 'gcr.io/$PROJECT_ID/trivyhub'
-  waitFor: ['Test & Build']
+  waitFor: ['-']
   args:
     - 'fs'
     - 'poetry.lock'

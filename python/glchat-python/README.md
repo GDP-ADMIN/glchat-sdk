@@ -40,7 +40,7 @@ This project uses `uv` for dependency management. To install the package:
 
 ```bash
 # Change to the glchat-python directory
-cd libs/glchat-python
+cd python/glchat-python
 
 # Install dependencies using uv
 uv pip install -e .

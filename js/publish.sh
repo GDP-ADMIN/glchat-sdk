@@ -18,10 +18,10 @@ if [ -n "${TAG_NAME}" ]; then
     # Check if version contains 'b' (beta)
     if [[ "$TAG_NAME" == *"b"* ]]; then
         echo "Beta version detected: $TAG_NAME, publishing with beta tag"
-        npm publish --tag beta
+        npm publish --access public --tag beta
     else
         echo "Release version detected: $TAG_NAME, publishing to latest"
-        npm publish
+        npm publish --access public
     fi
 else
     echo "No release tag detected. Skipping binary upload."

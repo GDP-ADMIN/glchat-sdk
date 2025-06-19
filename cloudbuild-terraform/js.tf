@@ -13,7 +13,7 @@ module "gcb_gen_ai_external_pr_js_sdk" {
     "_MODULE"   = each.value
   }
   filename       = "cloudbuild-pr.yml"
-  included_files = ["libs/${each.value}/**"]
+  included_files = ["js/${each.value}/**"]
   trigger_config = {
     trigger_type    = "PR"
     branch_regex    = ".*"
@@ -37,7 +37,7 @@ module "gcb_gen_ai_external_push_js_sdk" {
     "_MODULE"   = each.value
   }
   filename       = "cloudbuild.yml"
-  included_files = ["libs/${each.value}/**"]
+  included_files = ["js/${each.value}/**"]
   trigger_config = {
     trigger_type    = "PUSH"
     branch_regex    = "^main$"

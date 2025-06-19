@@ -14,7 +14,7 @@ module "gcb_gen_ai_external_pr_python_sdk" {
     "_VERSION" = each.value.version
   }
   filename       = "cloudbuild-pr.yml"
-  included_files = ["libs/${each.value.module}/**"]
+  included_files = ["python/${each.value.module}/**"]
   trigger_config = {
     trigger_type    = "PR"
     branch_regex    = ".*"
@@ -39,7 +39,7 @@ module "gcb_gen_ai_external_push_python_sdk" {
     "_VERSION" = each.value.version
   }
   filename       = "cloudbuild.yml"
-  included_files = ["libs/${each.value.module}/**"]
+  included_files = ["python/${each.value.module}/**"]
   trigger_config = {
     trigger_type    = "PUSH"
     branch_regex    = "^main$"

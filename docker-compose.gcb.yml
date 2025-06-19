@@ -27,19 +27,17 @@ services:
     command:
       - '-c'
       - './build.ci.sh ${MODULE} $(echo "${TAG_NAME}" | sed -E "s/^.*-v//")'
-    # entrypoint: /bin/sleep
-    # command:
-    #   - infinity
     env_file:
       - 'python/build.ci.env'
     volumes:
       - '.:/workspace'
 
   builder-js:
-    image: node:22-bookworm
+    image: node:24-bookworm
     working_dir: /workspace/js
     environment:
       - MODULE=${MODULE:-notdefined}
+      - NPM_TOKEN=${NPM_TOKEN:-notdefined}
       - TAG_NAME=${TAG_NAME}
     entrypoint: /bin/bash
     command:

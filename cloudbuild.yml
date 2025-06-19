@@ -38,6 +38,7 @@ steps:
     - 'VERSION=${_VERSION}'
     - 'TAG_NAME=${TAG_NAME}'
   secretEnv:
+    - 'NPM_TOKEN'
     - 'PYPI_TOKEN'
 
 - id: Run SCA
@@ -75,9 +76,11 @@ availableSecrets:
   secretManager:
   - versionName: projects/$PROJECT_ID/secrets/INFRA_GL_GITHUB_TOKEN/versions/latest
     env: 'GH_TOKEN'
-  - versionName: "projects/$PROJECT_ID/secrets/INFRA_GL_SONARQUBE_TOKEN/versions/latest"
+  - versionName: projects/$PROJECT_ID/secrets/INFRA_GL_SONARQUBE_TOKEN/versions/latest
     env: 'SCA_TOKEN'
-  - versionName: "projects/$PROJECT_ID/secrets/GLX_SRE_PYPI_API_TOKEN/versions/latest"
+  - versionName: projects/$PROJECT_ID/secrets/GLX_SRE_PYPI_API_TOKEN/versions/latest
     env: 'PYPI_TOKEN'
+  - versionName: projects/$PROJECT_ID/secrets/GLX_SRE_NPM_TOKEN/versions/latest
+    env: 'NPM_TOKEN'
 
 tags: ['gen-ai-external', 'push']

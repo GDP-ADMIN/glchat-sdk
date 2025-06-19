@@ -88,5 +88,5 @@ convert_to_kebab_case() {
 }
 
 build() {
-    uv build
+    uv build --wheel
 }

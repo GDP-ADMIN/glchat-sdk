@@ -63,7 +63,7 @@ export class MessageAPI {
       );
     }
 
-    const response = await this.fetchClient('/message', {
+    const response = await this.fetchClient('message', {
       method: 'POST',
       headers: {
         Accept: 'text/event-stream',

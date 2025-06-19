@@ -14,7 +14,7 @@
 
 const AVAILABLE_VERSION = ['v1'] as const;
 export const DEFAULT_CONFIG: GLChatConfiguration = {
-  baseUrl: 'https://stag-gbe-gdplabs-gen-ai-starter.obrol.id',
+  baseUrl: 'https://stag-chat-ui-gdplabs-gen-ai-starter.obrol.id/api/proxy/',
   __version: 'v1',
 };
 
@@ -27,7 +27,7 @@ export interface GLChatConfiguration {
    * Useful for connecting to custom deployed instance or
    * testing between different environments.
    *
-   * Defaults to `https://stag-gbe-gdplabs-gen-ai-starter.obrol.id`
+   * Defaults to `https://stag-chat-ui-gdplabs-gen-ai-starter.obrol.id/api/proxy/`
    */
   baseUrl: string;
   /**

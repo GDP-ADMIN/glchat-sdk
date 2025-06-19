@@ -2,5 +2,6 @@
 
 from .client import GLChatClient
 from .models import MessageRequest
+from .responses import Responses
 
-__all__ = ["GLChatClient", "MessageRequest"]
+__all__ = ["GLChatClient", "MessageRequest", "Responses"]

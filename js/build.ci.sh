@@ -1,5 +1,5 @@
 #!/bin/bash
-set -xe
+set -e
 
 # shellcheck source=/dev/null
 source ./shared.sh

@@ -11,7 +11,7 @@ module "gcb_gen_ai_external_pr_sdk" {
   substitutions = {
     "_MODULE"   = each.value.module
     "_VERSION"  = each.value.version
-    "_LANGUAGE" = "python"
+    "_LANGUAGE" = "libs"
   }
   filename       = "cloudbuild-pr.yml"
   included_files = ["libs/${each.value.module}/**"]
@@ -36,7 +36,7 @@ module "gcb_gen_ai_external_pr_sdk" {
 #   substitutions = {
 #     "_MODULE"   = each.value.module
 #     "_VERSION"  = each.value.version
-#     "_LANGUAGE" = "python"
+#     "_LANGUAGE" = "libs"
 #   }
 #   filename       = "cloudbuild.yml"
 #   included_files = ["libs/${each.value.module}/**"]
@@ -61,7 +61,7 @@ module "gcb_gen_ai_external_push_tag_sdk" {
   substitutions = {
     "_MODULE"   = each.value.module
     "_VERSION"  = each.value.version
-    "_LANGUAGE" = "python"
+    "_LANGUAGE" = "libs"
   }
   filename       = "cloudbuild.yml"
   trigger_config = {

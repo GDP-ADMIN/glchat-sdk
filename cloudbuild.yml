@@ -32,7 +32,7 @@ steps:
       compose \
         --file=docker-compose.gcb.yml \
         run --rm builder-${_LANGUAGE} \
-        -c './publish.sh ${MODULE}'
+        -c './publish.sh ${_MODULE}'
   secretEnv:
     - 'PYPI_TOKEN'
 

@@ -27,12 +27,12 @@ steps:
   name: 'gcr.io/cloud-builders/docker'
   entrypoint: '/bin/bash'
   args:
-    - '-c'
-    - |-
-      compose \
-        --file=docker-compose.gcb.yml \
-        run --rm builder-${_LANGUAGE} \
-        -c './publish.sh ${_MODULE}'
+    - 'compose'
+    - '--file=docker-compose.gcb.yml'
+    - 'run'
+    - '--rm'
+    - 'builder-${_LANGUAGE}'
+    - "-c './publish.sh ${_MODULE}'"
   secretEnv:
     - 'PYPI_TOKEN'
 

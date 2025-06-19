@@ -58,6 +58,7 @@ steps:
 
 timeout: 30m
 options:
+  machineType: 'E2_MEDIUM'
   env:
     - 'DOCKER_BUILDKIT=1'
     - 'COMPOSE_DOCKER_CLI_BUILD=1'

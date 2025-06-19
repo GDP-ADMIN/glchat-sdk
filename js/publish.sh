@@ -14,8 +14,15 @@ MODULE="$1"
 cd "$MODULE"
 
 if [ -n "${TAG_NAME}" ]; then
-    # Publish to Public NPM Registry (npmjs.com)
-    npm publish
+    TAG_NAME=$(echo "${TAG_NAME}" | sed -E "s/^.*-v//")
+    # Check if version contains 'b' (beta)
+    if [[ "$TAG_NAME" == *"b"* ]]; then
+        echo "Beta version detected: $TAG_NAME, publishing with beta tag"
+        npm publish --tag beta
+    else
+        echo "Release version detected: $TAG_NAME, publishing to latest"
+        npm publish
+    fi
 else
     echo "No release tag detected. Skipping binary upload."
 fi

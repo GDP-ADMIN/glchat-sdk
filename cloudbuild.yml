@@ -25,14 +25,18 @@ steps:
 
 - id: Upload Packages
   name: 'gcr.io/cloud-builders/docker'
-  entrypoint: '/bin/bash'
   args:
     - 'compose'
     - '--file=docker-compose.gcb.yml'
     - 'run'
     - '--rm'
     - 'builder-${_LANGUAGE}'
-    - "-c './publish.sh ${_MODULE}'"
+    - '-c'
+    - './publish.sh ${_MODULE}'
+  env:
+    - 'MODULE=${_MODULE}'
+    - 'VERSION=${_VERSION}'
+    - 'TAG_NAME=${TAG_NAME}'
   secretEnv:
     - 'PYPI_TOKEN'
 

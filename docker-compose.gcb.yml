@@ -23,13 +23,13 @@ services:
       - MODULE=${MODULE:-notdefined}
       - UV_PUBLISH_TOKEN=${PYPI_TOKEN:-notdefined}
       - TAG_NAME=${TAG_NAME}
-    # entrypoint: /bin/bash
-    # command:
-    #   - '-c'
-    #   - './build.ci.sh ${MODULE} $(echo "${TAG_NAME}" | sed -E "s/^.*-v//")'
-    entrypoint: /bin/sleep
+    entrypoint: /bin/bash
     command:
-      - infinity
+      - '-c'
+      - './build.ci.sh ${MODULE} $(echo "${TAG_NAME}" | sed -E "s/^.*-v//")'
+    # entrypoint: /bin/sleep
+    # command:
+    #   - infinity
     env_file:
       - 'python/build.ci.env'
     volumes:

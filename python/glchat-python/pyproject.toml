@@ -1,6 +1,6 @@
 [project]
 name = "glchat-python"
-version = "0.0.1b1"
+version = "0.0.1"
 description = "GLChat Python Client"
 readme = "README.md"
 authors = [

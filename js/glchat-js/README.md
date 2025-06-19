@@ -93,9 +93,7 @@ The main client class for interacting with the GLChat API.
 ```ts
 import { GLChat } from '@gdplabs/glchat-sdk';
 
-const client = new GLChat('<YOUR_API_KEY>', {
-  baseUrl: 'https://api.glchat.io',
-});
+const client = new GLChat('<YOUR_API_KEY>');
 ```
 
 #### Constructor Parameters
@@ -109,8 +107,12 @@ const client = new GLChat('<YOUR_API_KEY>', {
 
 | Name        | Type          | Required? | Description                              |
 |-------------|---------------|----------|------------------------------------------|
-| `baseUrl`     | `string`      | No       | Custom base URL for the GLChat API       |
-| `__version`   | `APIVersion`  | No       | Optional API version to use              |
+| `baseUrl`     | `string`      | No       | Custom base URL for the GLChat API. Defaults to `https://chat.gdplabs.id/api/proxy`       |
+| `__version`   | `APIVersion`  | No       | Optional API version to use. Currently unused.              |
+
+> [!WARN]
+> If your `baseUrl` contains a path, ensure that it ends with a trailing slash! Otherwise, the path will be dropped
+> during request and may cause unexpected errors.
 
 ### Methods
 
@@ -178,6 +180,12 @@ const stream = await client.message.create({
 |--------|----------|-------------------------------------------------------|
 | quote  | `string` | Quoted section of an assistant message (for context)  |
 
+#### `GLChatMessageChunk` Fields
+
+| Name   | Type     | Description                                           |
+|--------|----------|-------------------------------------------------------|
+| quote  | `string` | Quoted section of an assistant message (for context)  |
+
 #### Returns
 
 - `Promise<AsyncIterable<GLChatMessageChunk>>`: An asynchronous iterable yielding streamed message chunks.
@@ -192,6 +200,124 @@ for await (const chunk of await client.message.create({
   console.log(chunk);
 }
 ```
+
+## Message Chunks
+
+GLChat Message API streams the response in form of a structured chunk.
+
+This type is a **discriminated union** and can be one of:
+
+- `GLChatMessageResponseChunk`: The actual assistant or LLM response.
+- `GLChatMessageDataChunk`: Intermediate information, references, metadata, etc.
+
+### Shared Base Fields
+
+All chunk types share these base fields from `GLChatMessageBaseChunk`:
+
+| Field               | Type               | Description                                                                 |
+|--------------------|--------------------|-----------------------------------------------------------------------------|
+| conversation_id     | `string \| null`   | The conversation this chunk belongs to                                      |
+| user_message_id     | `string \| null`   | The ID of the user message that triggered the chunk                         |
+| assistant_message_id| `string \| null`   | The assistant message responding to the user message                        |
+| created_date        | `number`           | Unix timestamp when the chunk was created                                   |
+| status              | `"data" \| "response" \| "processing_document"` | Type of chunk content |
+
+### `GLChatMessageResponseChunk`
+
+Represents the actual streamed response text from the assistant or LLM.
+
+| Field   | Type     | Description                              |
+|---------|----------|------------------------------------------|
+| status  | `"response"` | Indicates this is a response chunk     |
+| message | `string` | A partial or full message response string |
+
+### `GLChatMessageDataChunk`
+
+Encapsulates non-textual information like references, attachments, media, etc.
+
+| Field   | Type                                                                 | Description                                   |
+|---------|----------------------------------------------------------------------|-----------------------------------------------|
+| status  | `"data"`                                                             | Indicates this is a metadata / info chunk       |
+| message | One of:<br/>`GLChatReferenceChunk`<br/>`GLChatAttachmentChunk`<br/>`GLChatRelatedQuestionChunk`<br/>`GLChatDeanonymizationChunk`<br/>`GLChatMediaChunk`<br/>`GLChatProcessChunk` | Actual data content depending on `data_type`  |
+
+### `message.data_type` Variants in `GLChatMessageDataChunk`
+
+#### `GLChatReferenceChunk`
+
+| Field      | Type       | Description                                 |
+|------------|------------|---------------------------------------------|
+| data_type  | `"reference"` | Type discriminator                         |
+| data_value | `string[]` | List of inline references from the response |
+
+#### `GLChatAttachmentChunk`
+
+| Field      | Type               | Description                            |
+|------------|--------------------|----------------------------------------|
+| data_type  | `"attachments"`    | Type discriminator                     |
+| data_value | `GLChatAttachment[]` | List of attachments in the message     |
+
+Each `GLChatAttachment` includes:
+
+| Field | Type   | Description                     |
+|-------|--------|---------------------------------|
+| id    | string | Unique identifier               |
+| type  | string | MIME type of the file           |
+| name  | string | File name                       |
+| url   | string | Public URL to access the file   |
+
+#### `GLChatRelatedQuestionChunk`
+
+| Field      | Type       | Description                          |
+|------------|------------|--------------------------------------|
+| data_type  | `"related"`| Type discriminator                   |
+| data_value | `string[]` | Related questions to the user query  |
+
+#### `GLChatDeanonymizationChunk`
+
+| Field      | Type               | Description                                 |
+|------------|--------------------|---------------------------------------------|
+| data_type  | `"deanonymized_data"` | Type discriminator                         |
+| data_value | `DeanomymizedData` | Contains mapping and raw user/assistant content |
+
+**DeanomymizedData** includes:
+
+| Field               | Type                             | Description                          |
+|--------------------|----------------------------------|--------------------------------------|
+| user_message        | `DeanonymizedMessage`            | Original and deanonymized user input |
+| ai_message          | `DeanonymizedMessage`            | Original and deanonymized assistant output |
+| deanonymized_mapping| `Record<string, string>`         | Mapping of placeholders to originals |
+
+**DeanonymizedMessage** includes:
+
+| Field               | Type      | Description                                |
+|--------------------|-----------|--------------------------------------------|
+| content             | `string` | Anonymized version                         |
+| deanonymized_content| `string` \| `undefined` | Original version if available     |
+
+#### `GLChatMediaChunk`
+
+| Field      | Type                    | Description                                     |
+|------------|-------------------------|-------------------------------------------------|
+| data_type  | `"media_mapping"`       | Type discriminator                              |
+| data_value | `Record<string, string>`| Mapping of media placeholders to public URLs    |
+
+#### `GLChatProcessChunk`
+
+| Field      | Type             | Description                                |
+|------------|------------------|--------------------------------------------|
+| data_type  | `"process"`      | Type discriminator                         |
+| data_value | `GLChatProcess`  | Status of backend message processing       |
+
+**GLChatProcess** includes:
+
+| Field   | Type     | Description                               |
+|---------|----------|-------------------------------------------|
+| id      | `string` | Unique process ID                         |
+| message | `string` \| `undefined` | Optional status message         |
+| status  | `"running" \| "finished" \| "stopped"` | Progress state |
+| time    | `number` \| `undefined` | Unix timestamp (optional)       |
+
+---
 
 ## Contributing
 

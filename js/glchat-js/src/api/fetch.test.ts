@@ -2,9 +2,10 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { GLChatConfiguration } from '../config';
 import { createGLChatFetchClient } from './fetch';
 
-const mockApiKey = 'test-api-key';
 const mockConfig: GLChatConfiguration = {
+  apiKey: 'test-api-key',
   baseUrl: 'https://test.glchat.id/',
+  timeout: 60_000,
   __version: 'v1',
 };
 
@@ -14,7 +15,7 @@ describe('createGLChatFetchClient with MSW', () => {
   });
 
   it('should make successful request with correct headers', async () => {
-    const client = createGLChatFetchClient(mockApiKey, mockConfig);
+    const client = createGLChatFetchClient(mockConfig);
     const response = await client('/fetch/success', {
       headers: {
         Accept: 'text/html',
@@ -28,7 +29,7 @@ describe('createGLChatFetchClient with MSW', () => {
       data: {
         headers: {
           'Accept': 'text/html',
-          'Authorization': `Bearer ${mockApiKey}`,
+          'Authorization': `Bearer ${mockConfig.apiKey}`,
           'User-Agent': 'glchat-js-sdk@dev',
         },
       },
@@ -36,7 +37,7 @@ describe('createGLChatFetchClient with MSW', () => {
   });
 
   it('should make successful request with array headers', async () => {
-    const client = createGLChatFetchClient(mockApiKey, mockConfig);
+    const client = createGLChatFetchClient(mockConfig);
     const response = await client('/fetch/success', {
       headers: new Headers([['Accept', 'text/html']]),
     });
@@ -48,7 +49,7 @@ describe('createGLChatFetchClient with MSW', () => {
       data: {
         headers: {
           'Accept': 'text/html',
-          'Authorization': `Bearer ${mockApiKey}`,
+          'Authorization': `Bearer ${mockConfig.apiKey}`,
           'User-Agent': 'glchat-js-sdk@dev',
         },
       },
@@ -56,7 +57,7 @@ describe('createGLChatFetchClient with MSW', () => {
   });
 
   it('should throw error when the request fails', async () => {
-    const client = createGLChatFetchClient(mockApiKey, mockConfig);
+    const client = createGLChatFetchClient(mockConfig);
 
     await expect(client('/fetch/fail')).rejects.toThrowError('Failed to fetch');
   });

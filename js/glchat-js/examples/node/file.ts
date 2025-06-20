@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 
 import { GLChat } from './../../src/client';
 
-const client = new GLChat('<YOUR_API_KEY>');
+const client = new GLChat();
 
 void (async () => {
   const buffer = readFileSync('examples/fixtures/sample.txt');

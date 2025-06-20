@@ -14,7 +14,7 @@
 
 <p align="center">
     <a href="https://pypi.org/project/glchat-sdk/"><img src="https://img.shields.io/pypi/v/glchat-sdk" alt="PyPI Latest Release"></a>
-    <a href="https://github.com/GDP-ADMIN/glchat-sdk/blob/main/python/glchat-python/LICENSE"><img src="https://img.shields.io/pypi/l/glchat-sdk" alt="License"></a>
+    <a href="https://github.com/GDP-ADMIN/glchat-sdk/blob/main/python/glchat-sdk/LICENSE"><img src="https://img.shields.io/pypi/l/glchat-sdk" alt="License"></a>
 </p>
 
 A lightweight, flexible Python client for interacting with the GLChat Backend API, providing a simple interface to send messages and receive streaming responses. Built with an OpenAI-like API design for familiarity and ease of use.

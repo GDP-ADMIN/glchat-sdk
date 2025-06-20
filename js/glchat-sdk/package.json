@@ -1,11 +1,11 @@
 {
   "name": "glchat-sdk",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "JavaScript SDK for GLChat API",
   "license": "MIT",
   "author": {
     "name": "GDP Labs",
-    "email": "support@gdplabs.id"
+    "email": "jobs@gdplabs.id"
   },
   "type": "module",
   "main": "dist/index.cjs",

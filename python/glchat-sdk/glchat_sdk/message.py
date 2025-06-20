@@ -33,8 +33,8 @@ class MessageAPI:
         """Validate input parameters.
 
         Args:
-            chatbot_id: Chatbot identifier
-            message: User message
+            chatbot_id (str): Chatbot identifier
+            message (str): User message
 
         Raises:
             ValueError: If chatbot_id or message is empty
@@ -67,23 +67,23 @@ class MessageAPI:
         """Prepare request data for the API call.
 
         Args:
-            chatbot_id: Required chatbot identifier
-            message: Required user message
-            parent_id: Parent message ID for threading
-            source: Source identifier for the message
-            quote: Quoted message content
-            user_id: User identifier
-            conversation_id: Conversation identifier
-            user_message_id: User message identifier
-            assistant_message_id: Assistant message identifier
-            chat_history: Chat history context
-            stream_id: Stream identifier
-            metadata: Additional metadata
-            model_name: Model name to use for generation
-            anonymize_em: Whether to anonymize embeddings
-            anonymize_lm: Whether to anonymize language model
-            use_cache: Whether to use cached responses
-            search_type: Type of search to perform
+            chatbot_id (str): Required chatbot identifier
+            message (str): Required user message
+            parent_id (str | None): Parent message ID for threading
+            source (str | None): Source identifier for the message
+            quote (str | None): Quoted message content
+            user_id (str | None): User identifier
+            conversation_id (str | None): Conversation identifier
+            user_message_id (str | None): User message identifier
+            assistant_message_id (str | None): Assistant message identifier
+            chat_history (str | None): Chat history context
+            stream_id (str | None): Stream identifier
+            metadata (str | None): Additional metadata
+            model_name (str | None): Model name to use for generation
+            anonymize_em (bool | None): Whether to anonymize embeddings
+            anonymize_lm (bool | None): Whether to anonymize language model
+            use_cache (bool | None): Whether to use cached responses
+            search_type (str | None): Type of search to perform
 
         Returns:
             Dict containing the prepared request data
@@ -126,7 +126,7 @@ class MessageAPI:
         """Process a single file item and return the file tuple for httpx.
 
         Args:
-            file_item: File item to process (path, bytes, or file-like object)
+            file_item (Union[str, Path, BinaryIO, bytes]): File item to process (path, bytes, or file-like object)
 
         Returns:
             Tuple of (field_name, (filename, file_content, content_type))
@@ -157,7 +157,7 @@ class MessageAPI:
         """Prepare files for upload.
 
         Args:
-            files: List of files to process
+            files (List[Union[str, Path, BinaryIO, bytes]] | None): List of files to process
 
         Returns:
             List of file tuples for httpx or None if no files
@@ -190,10 +190,10 @@ class MessageAPI:
         """Make the streaming HTTP request.
 
         Args:
-            url: API endpoint URL
-            data: Request data
-            files: Prepared files data
-            headers: Request headers
+            url (str): API endpoint URL
+            data (Dict[str, Any]): Request data
+            files (List[Tuple[str, Tuple[str, Union[str, BinaryIO, bytes], str]]] | None): Prepared files data
+            headers (Dict[str, str]): Request headers
 
         Yields:
             bytes: Streaming response chunks
@@ -240,24 +240,25 @@ class MessageAPI:
         Create a streaming response from the GLChat API.
 
         Args:
-            chatbot_id: Required chatbot identifier
-            message: Required user message
-            files: List of files (filepath, binary, file object, or bytes)
-            parent_id: Parent message ID for threading
-            source: Source identifier for the message
-            quote: Quoted message content
-            user_id: User identifier
-            conversation_id: Conversation identifier
-            user_message_id: User message identifier
-            assistant_message_id: Assistant message identifier
-            chat_history: Chat history context
-            stream_id: Stream identifier
-            metadata: Additional metadata
-            model_name: Model name to use for generation
-            anonymize_em: Whether to anonymize embeddings
-            anonymize_lm: Whether to anonymize language model
-            use_cache: Whether to use cached responses
-            search_type: Type of search to perform
+            chatbot_id (str): Required chatbot identifier
+            message (str): Required user message
+            files (List[Union[str, Path, BinaryIO, bytes]] | None): List of files
+                (filepath, binary, file object, or bytes)
+            parent_id (str | None): Parent message ID for threading
+            source (str | None): Source identifier for the message
+            quote (str | None): Quoted message content
+            user_id (str | None): User identifier
+            conversation_id (str | None): Conversation identifier
+            user_message_id (str | None): User message identifier
+            assistant_message_id (str | None): Assistant message identifier
+            chat_history (str | None): Chat history context
+            stream_id (str | None): Stream identifier
+            metadata (str | None): Additional metadata
+            model_name (str | None): Model name to use for generation
+            anonymize_em (bool | None): Whether to anonymize embeddings
+            anonymize_lm (bool | None): Whether to anonymize language model
+            use_cache (bool | None): Whether to use cached responses
+            search_type (str | None): Type of search to perform
 
         Yields:
             bytes: Streaming response chunks

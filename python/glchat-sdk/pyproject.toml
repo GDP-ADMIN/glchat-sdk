@@ -5,7 +5,7 @@ version = "0.0.0"
 description = "GLChat Python Client"
 readme = "README.md"
 authors = [
-    { name = "vincentchuardi", email = "91732545+vincentchuardi@users.noreply.github.com" }
+    { name = "GDP Labs", email = "jobs@gdplabs.id" }
 ]
 requires-python = ">=3.11"
 dependencies = [

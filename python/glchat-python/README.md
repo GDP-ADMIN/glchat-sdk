@@ -25,11 +25,7 @@ GLChat Python Client is a Python library that simplifies interaction with the GL
 
 ## 📋 Requirements
 
-Requirements may vary depending on the runtime. The following table denotes minimum version for various Python runtimes:
-
-| Runtime   | Minimum Version |
-| --------- | --------------- |
-| 🐍 Python | 3.11.x          |
+**Python 3.11.x** or higher is required.
 
 ## ✨ Features
 

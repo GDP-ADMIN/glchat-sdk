@@ -13,7 +13,7 @@
 <p>
 
 <p align="center">
-    <a href="https://github.com/glair-ai/glchat-sdk/releases"><img src="https://img.shields.io/npm/v/glchat-sdk" alt="Latest Release"></a>
+    <a href="https://www.npmjs.com/package/glchat-sdk"><img src="https://img.shields.io/npm/v/glchat-sdk" alt="Latest Release"></a>
     <a href="https://github.com/glair-ai/glchat-sdk/blob/main/LICENSE"><img src="https://img.shields.io/npm/l/glchat-sdk" alt="License"></a>
 </p>
 

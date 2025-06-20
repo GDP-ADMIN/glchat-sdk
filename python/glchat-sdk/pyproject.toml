@@ -1,6 +1,7 @@
 [project]
-name = "glchat-python"
-version = "0.0.1"
+name = "glchat-sdk"
+# NOTE: CI/CD pipeline uses git tag name as package version. Read VERSIONING.md.
+version = "0.0.0"
 description = "GLChat Python Client"
 readme = "README.md"
 authors = [
@@ -29,10 +30,10 @@ dev = [
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = ["test_*.py"]
-addopts = "--cov=glchat_python --cov-report=term-missing"
+addopts = "--cov=glchat_sdk --cov-report=term-missing"
 
 [tool.coverage.run]
-source = ["glchat_python"]
+source = ["glchat_sdk"]
 omit = ["tests/*", "**/__init__.py"]
 
 [tool.ruff]

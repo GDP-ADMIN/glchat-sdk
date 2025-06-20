@@ -11,7 +11,7 @@ import io
 from unittest.mock import Mock, patch
 
 import pytest
-from glchat_python.client import GLChatClient
+from glchat_sdk.client import GLChatClient
 
 
 @pytest.fixture

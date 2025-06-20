@@ -11,3 +11,10 @@ tsconfig.json
 tsup.config.ts
 vitest.config.ts
 vitest.setup.ts
+sonar-project.properties
+*.env*
+*.npmrc*
+lib/*.so
+*.tgz
+*.sh
+*.key

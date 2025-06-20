@@ -166,7 +166,7 @@ wheels = [
 
 [[package]]
 name = "glchat-python"
-version = "0.0.1"
+version = "0.0.1b1"
 source = { editable = "." }
 dependencies = [
     { name = "httpx" },

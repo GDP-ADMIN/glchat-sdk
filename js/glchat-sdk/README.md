@@ -13,8 +13,8 @@
 <p>
 
 <p align="center">
-    <a href="https://github.com/glair-ai/glchat-sdk/releases"><img src="https://img.shields.io/npm/v/@gdplabs/glchat-sdk" alt="Latest Release"></a>
-    <a href="https://github.com/glair-ai/glchat-sdk/blob/main/LICENSE"><img src="https://img.shields.io/npm/l/@gdplabs/glchat-sdk" alt="License"></a>
+    <a href="https://github.com/glair-ai/glchat-sdk/releases"><img src="https://img.shields.io/npm/v/glchat-sdk" alt="Latest Release"></a>
+    <a href="https://github.com/glair-ai/glchat-sdk/blob/main/LICENSE"><img src="https://img.shields.io/npm/l/glchat-sdk" alt="License"></a>
 </p>
 
 This SDK provides convenient access to the GLChat REST API for JavaScript or TypeScript.
@@ -27,28 +27,28 @@ You can install this SDK with your package manager from npm registry
 
 ```bash
 # Using npm
-npm install @gdplabs/glchat-sdk
+npm install glchat-sdk
 
 # Using yarn
-yarn add @gdplabs/glchat-sdk
+yarn add glchat-sdk
 
 # Using pnpm
-pnpm add @gdplabs/glchat-sdk
+pnpm add glchat-sdk
 
 # Using bun
-bun add @gdplabs/glchat-sdk
+bun add glchat-sdk
 ```
 
 This SDK is also available in JSR
 
 ```bash
-npx jsr add @gdplabs/glchat-sdk
+npx jsr add glchat-sdk
 ```
 
 After installation, you can verify your installation by trying to import the package from your workspace directory:
 
 ```js
-import { GLChat } from '@gdplabs/glchat-sdk';
+import { GLChat } from 'glchat-sdk';
 ```
 
 ## Quick Start
@@ -56,7 +56,7 @@ import { GLChat } from '@gdplabs/glchat-sdk';
 The SDK can primarily be interacted through the main `GLChat` client:
 
 ```js
-import { GLChat } from '@gdplabs/glchat-sdk';
+import { GLChat } from 'glchat-sdk';
 
 const client = new GLChat('<YOUR_API_KEY>');
 ```
@@ -64,7 +64,7 @@ const client = new GLChat('<YOUR_API_KEY>');
 After the client has been initialized, you can start interacting with GLChat API. The primary API to interact with GLChat API is the Message API. You can generate a response with the code below:
 
 ```js
-import { GLChat } from '@gdplabs/glchat-sdk';
+import { GLChat } from 'glchat-sdk';
 
 const client = new GLChat('<YOUR_API_KEY>');
 
@@ -91,7 +91,7 @@ The main client class for interacting with the GLChat API.
 #### Initialization
 
 ```ts
-import { GLChat } from '@gdplabs/glchat-sdk';
+import { GLChat } from 'glchat-sdk';
 
 const client = new GLChat('<YOUR_API_KEY>');
 ```

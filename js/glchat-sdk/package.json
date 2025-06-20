@@ -1,6 +1,6 @@
 {
-  "name": "@glair/glchat-sdk",
-  "version": "0.0.1",
+  "name": "glchat-sdk",
+  "version": "0.0.0-b1",
   "description": "JavaScript SDK for GLChat API",
   "license": "MIT",
   "author": {

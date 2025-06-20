@@ -13,8 +13,8 @@
 <p>
 
 <p align="center">
-    <a href="https://github.com/glair-ai/glchat-sdk/releases"><img src="https://img.shields.io/npm/v/@gdplabs/glchat-sdk" alt="Latest Release"></a>
-    <a href="https://github.com/glair-ai/glchat-sdk/blob/main/LICENSE"><img src="https://img.shields.io/npm/l/@gdplabs/glchat-sdk" alt="License"></a>
+    <a href="https://github.com/glair-ai/glchat-sdk/releases"><img src="https://img.shields.io/npm/v/glchat-sdk" alt="Latest Release"></a>
+    <a href="https://github.com/glair-ai/glchat-sdk/blob/main/LICENSE"><img src="https://img.shields.io/npm/l/glchat-sdk" alt="License"></a>
 </p>
 
 A lightweight, flexible Python client for interacting with the GLChat Backend API, providing a simple interface to send messages and receive streaming responses. Built with an OpenAI-like API design for familiarity and ease of use.
@@ -39,7 +39,7 @@ GLChat Python Client is a Python library that simplifies interaction with the GL
 To install the package:
 
 ```bash
-pip install @gdplabs/glchat-sdk
+pip install glchat-sdk
 ```
 
 After installation, you can verify it works by trying to import it from any directory:

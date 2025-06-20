@@ -70,7 +70,7 @@ module "gcb_gen_ai_external_push_tag_python_sdk" {
   trigger_config = {
     trigger_type    = "PUSH"
     branch_regex    = null
-    tag_regex       = "${replace(each.value.module, "-", "_")}-v*"
+    tag_regex       = "python_${replace(each.value.module, "-", "_")}-v*"
     comment_control = null
   }
 }

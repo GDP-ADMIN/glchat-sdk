@@ -78,12 +78,12 @@ export function createGLChatFetchClient(
 
       const response = await fetch(url, {
         ...options,
+        ...(config.timeout > 0 && { signal: AbortSignal.timeout(config.timeout) }),
         headers: {
           ...normalizeHeaders(options?.headers as Headers),
           'Authorization': `Bearer ${config.apiKey}`,
           'User-Agent': getUserAgent(),
         },
-        signal: AbortSignal.timeout(config.timeout),
       });
 
       if (!response.ok) {

@@ -21,7 +21,16 @@
 
 This SDK provides convenient access to the GLChat REST API for JavaScript or TypeScript.
 
-This SDK is runtime-agnostic and can be used in NodeJS, Deno, Bun, and Cloudflare Workers (untested).
+This SDK is runtime-agnostic and can be used in [NodeJS](https://nodejs.org/en), [Deno](https://deno.com/), [Bun](https://bun.sh/), and [Cloudflare Workers](https://workers.cloudflare.com/) (untested).
+
+## Requirements
+
+Requirements may vary depending on the runtime. The following table denotes minimum version for various JavaScript runtimes:
+
+| Runtime | Minimum Version |
+| ------- | --------------- |
+| NodeJS | 18.x |
+| Bun | 1.x |
 
 ## 📦 Installation
 

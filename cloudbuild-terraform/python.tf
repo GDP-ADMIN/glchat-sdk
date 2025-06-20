@@ -4,8 +4,8 @@ module "gcb_gen_ai_external_pr_python_sdk" {
   project_id = local.project_id.gdplabs
   for_each   = { for idx, val in local.python_combined : "${val.module}-${val.version}" => val }
 
-  disabled    = each.value.version == "3.13" && !(each.value.module == "glchat-python")
-  name        = lower(replace("${local.repository["name"]}-pr-${each.value.module}-${each.value.version}", ".", "-"))
+  disabled    = each.value.version == "3.13" && !(each.value.module == "glchat-sdk")
+  name        = lower(replace("${local.repository["name"]}-pr-${each.value.module}-python${each.value.version}", ".", "-"))
   description = "Gen AI External SDK"
   owner       = local.repository["host-asia-southeast2"]
   repo_name   = local.repository["name"]
@@ -56,8 +56,8 @@ module "gcb_gen_ai_external_push_tag_python_sdk" {
   project_id = local.project_id.gdplabs
   for_each   = { for idx, val in local.python_combined : "${val.module}-${val.version}" => val }
 
-  disabled    = each.value.version == "3.13" && !(each.value.module == "glchat-python")
-  name        = lower(replace("${local.repository["name"]}-push-tag-${each.value.module}-${each.value.version}", ".", "-"))
+  disabled    = each.value.version == "3.13" && !(each.value.module == "glchat-sdk")
+  name        = lower(replace("${local.repository["name"]}-push-tag-${each.value.module}-python${each.value.version}", ".", "-"))
   description = "Gen AI External SDK"
   owner       = local.repository["host-asia-southeast2"]
   repo_name   = local.repository["name"]

@@ -4,7 +4,7 @@ module "gcb_gen_ai_external_pr_js_sdk" {
   project_id = local.project_id.gdplabs
   for_each   = toset(local.js_modules_names)
 
-  name        = lower(replace("${local.repository["name"]}-pr-${each.value}", ".", "-"))
+  name        = lower(replace("${local.repository["name"]}-pr-${each.value}-js", ".", "-"))
   description = "Gen AI External SDK"
   owner       = local.repository["host-asia-southeast2"]
   repo_name   = local.repository["name"]
@@ -52,7 +52,7 @@ module "gcb_gen_ai_external_push_tag_js_sdk" {
   project_id = local.project_id.gdplabs
   for_each   = toset(local.js_modules_names)
 
-  name        = lower(replace("${local.repository["name"]}-push-tag-${each.value}", ".", "-"))
+  name        = lower(replace("${local.repository["name"]}-push-tag-${each.value}-js", ".", "-"))
   description = "Gen AI External SDK"
   owner       = local.repository["host-asia-southeast2"]
   repo_name   = local.repository["name"]

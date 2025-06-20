@@ -1,5 +1,5 @@
 [project]
-name = "glchat-python"
+name = "glchat-sdk"
 # NOTE: CI/CD pipeline uses git tag name as package version. Read VERSIONING.md.
 version = "0.0.0"
 description = "GLChat Python Client"

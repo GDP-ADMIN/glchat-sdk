@@ -17,7 +17,7 @@ from glchat_sdk.client import GLChat
 @pytest.fixture
 def client():
     """Create a GLChat instance for testing."""
-    return GLChat(base_url="https://test-api.example.com")
+    return GLChat(api_key="test_api_key", base_url="https://test-api.example.com")
 
 
 @pytest.fixture
@@ -156,5 +156,5 @@ def test_client_environment_variables_priority():
 def test_client_default_base_url():
     """Test that default base URL is used when no environment variable is set."""
     with patch.dict("os.environ", {}, clear=True):
-        client = GLChat()
+        client = GLChat(api_key="test_api_key")
         assert client.base_url == "https://chat.gdplabs.id/api/proxy/"

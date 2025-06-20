@@ -11,6 +11,8 @@
  * Copyright (c) GDP LABS. All rights reserved.
  */
 
+import { z } from 'zod/v4';
+
 /**
  * Custom file type of files for message-related functionality.
  *
@@ -77,6 +79,9 @@ type ProcessingDocument = 'processing_document';
  */
 export type GLChatMessageStatus = Data | Response | ProcessingDocument;
 
+/**
+ * Payload for creating a new message in GLChat
+ */
 export interface CreateMessagePayload {
   /**
    * The chatbot identifier where this message is created.
@@ -204,6 +209,43 @@ interface MessageMetadata {
   quote?: string;
 }
 
+const UploadedFileSchema = z.instanceof(Blob).refine(
+  (file): file is UploadedFile => !('name' in file) || typeof (file as UploadedFile).name === 'string',
+);
+
+const MessageMetadataSchema = z.object({
+  quote: z.string().optional(),
+});
+
+export const CreateMessagePayloadSchema = z.object({
+  chatbot_id: z.string({ error: 'Chatbot ID is required' }),
+  message: z.string({ error: 'Message is required' }),
+  parent_id: z.string().optional(),
+  source: z.string().optional(),
+  user_id: z.string().optional(),
+  conversation_id: z.string().optional(),
+  user_message_id: z.string().optional(),
+  assistant_message_id: z.string().optional(),
+  chat_history: z.array(z.any()).optional(),
+  files: z.array(UploadedFileSchema).optional(),
+  stream_id: z.string().optional(),
+  model_name: z.string().regex(/^.+\/.+$/).optional(),
+  anonymize_em: z.boolean().optional(),
+  anonymize_lm: z.boolean().optional(),
+  use_cache: z.boolean().optional(),
+  search_type: z.enum(['normal', 'web']).optional(),
+  metadata: MessageMetadataSchema.optional(),
+  additional_data: z.record(
+    z.string(),
+    z.union([
+      z.string(),
+      z.instanceof(Blob),
+      z.null(),
+      z.undefined(),
+    ]),
+  ).optional(),
+});
+
 /**
  * Data wrapper for deanonymized_message chunk.
  *
@@ -321,6 +363,8 @@ interface GLChatMessageBaseChunk<T = GLChatMessageStatus> {
    * An enum that denotes the type of the chunk.
    */
   status: T;
+
+  message: unknown;
 }
 
 /**

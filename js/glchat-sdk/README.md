@@ -1,9 +1,9 @@
 <p align="center">
   <a href="https://docs.glair.ai" target="_blank">
     <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="https://glair-chart.s3.ap-southeast-1.amazonaws.com/images/glair-horizontal-logo-blue.png">
-      <source media="(prefers-color-scheme: light)" srcset="https://glair-chart.s3.ap-southeast-1.amazonaws.com/images/glair-horizontal-logo-color.png">
-      <img alt="GLAIR" src="https://glair-chart.s3.ap-southeast-1.amazonaws.com/images/glair-horizontal-logo-color.png" width="180" height="60" style="max-width: 100%;">
+      <source media="(prefers-color-scheme: dark)" srcset="https://assets.analytics.glair.ai/generative/img/glchat-beta-dark.svg">
+      <source media="(prefers-color-scheme: light)" srcset="https://assets.analytics.glair.ai/generative/img/glchat-beta-light.svg">
+      <img alt="GLAIR" src="https://assets.analytics.glair.ai/generative/img/glchat-beta-light.svg" width="180" height="60" style="max-width: 100%;">
     </picture>
   </a>
 </p>
@@ -13,15 +13,26 @@
 <p>
 
 <p align="center">
-    <a href="https://github.com/glair-ai/glchat-sdk/releases"><img src="https://img.shields.io/npm/v/glchat-sdk" alt="Latest Release"></a>
+    <a href="https://www.npmjs.com/package/glchat-sdk"><img src="https://img.shields.io/npm/v/glchat-sdk" alt="Latest Release"></a>
     <a href="https://github.com/glair-ai/glchat-sdk/blob/main/LICENSE"><img src="https://img.shields.io/npm/l/glchat-sdk" alt="License"></a>
 </p>
 
+## 📋 Overview
+
 This SDK provides convenient access to the GLChat REST API for JavaScript or TypeScript.
 
-This SDK is runtime-agnostic and can be used in NodeJS, Deno, Bun, and Cloudflare Workers (untested).
+This SDK is runtime-agnostic and can be used in [NodeJS](https://nodejs.org/en), [Deno](https://deno.com/), [Bun](https://bun.sh/), and [Cloudflare Workers](https://workers.cloudflare.com/) (untested).
 
-## Installation
+## Requirements
+
+Requirements may vary depending on the runtime. The following table denotes minimum version for various JavaScript runtimes:
+
+| Runtime | Minimum Version |
+| ------- | --------------- |
+| NodeJS | 18.x |
+| Bun | 1.x |
+
+## 📦 Installation
 
 You can install this SDK with your package manager from npm registry
 
@@ -51,7 +62,7 @@ After installation, you can verify your installation by trying to import the pac
 import { GLChat } from 'glchat-sdk';
 ```
 
-## Quick Start
+## 🚀 Quick Start
 
 The SDK can primarily be interacted through the main `GLChat` client:
 
@@ -82,7 +93,7 @@ void (async () => {
 
 Sample codes in various JavaScript runtimes are available inside the [examples folder](./examples)
 
-## API Reference
+## 📚 API Reference
 
 ### GLChat
 
@@ -93,22 +104,23 @@ The main client class for interacting with the GLChat API.
 ```ts
 import { GLChat } from 'glchat-sdk';
 
-const client = new GLChat('<YOUR_API_KEY>');
+const client = new GLChat();
 ```
 
 #### Constructor Parameters
 
 | Name       | Type                        | Required? | Description                                 |
 |------------|-----------------------------|----------|---------------------------------------------|
-| `apiKey`     | `string`                    | Yes      | GLChat API key for authentication      |
 | `config`     | `Partial<GLChatConfiguration>` | No       | Optional client configuration.               |
 
 #### `config` Fields
 
 | Name        | Type          | Required? | Description                              |
 |-------------|---------------|----------|------------------------------------------|
-| `baseUrl`     | `string`      | No       | Custom base URL for the GLChat API. Defaults to `https://chat.gdplabs.id/api/proxy`       |
-| `__version`   | `APIVersion`  | No       | Optional API version to use. Currently unused.              |
+| `apiKey`     | `string`     | No      | GLChat API key for authentication. Reads from `process.env.GLCHAT_API_KEY` if not provided. The constructor will throw error if the API key is not available after resolution.      |
+| `baseUrl`     | `string`      | No       | Custom base URL for the GLChat API. Reads from `process.env.GLCHAT_BASE_URL` if not provided. Defaults to `https://chat.gdplabs.id/api/proxy`       |
+| `timeout`   | `number`  | No       | Global timeout when calling GLChat API in milliseconds. Must be a non-negative interger. Reads from `process.env.GLCHAT_TIMEOUT` if not provided. Defaults to `60_000` (60 seconds)              |
+| `__version`   | `APIVersion`  | No       | Optional API version to use. Reads from `process.env.GLCHAT_API_VERSION` if not provided. Currently unused.              |
 
 > [!WARN]
 > If your `baseUrl` contains a path, ensure that it ends with a trailing slash! Otherwise, the path will be dropped
@@ -128,13 +140,21 @@ Sets the base URL to be used for future API calls.
 
 #### `.setAPIVersion(version: APIVersion): void`
 
-Sets the API version to be used for future requests.
+Sets the API version to be used for future requests. Currently doesn't do anything.
 
 | Name    | Type         | Required | Description                 |
 |---------|--------------|----------|-----------------------------|
 | version | `APIVersion` | Yes      | One of the supported versions |
 
-**Throws:** Error if the version is invalid or unsupported.
+#### `.setAPIVersion(version: APIVersion): void`
+
+Sets the global API timeout to be used for future requests.
+
+| Name    | Type         | Required | Description                 |
+|---------|--------------|----------|-----------------------------|
+| timeout | `number` | Yes      | Global timeout when calling GLChat API in milliseconds. Must be a non-negative interger. |
+
+**Throws:** `ZodError` if the timeout is not an integer or negative.
 
 ### Message API
 
@@ -221,6 +241,7 @@ All chunk types share these base fields from `GLChatMessageBaseChunk`:
 | assistant_message_id| `string \| null`   | The assistant message responding to the user message                        |
 | created_date        | `number`           | Unix timestamp when the chunk was created                                   |
 | status              | `"data" \| "response" \| "processing_document"` | Type of chunk content |
+| message              | `unknown` | Actual chunk content. Chunk status must be asserted to have correct typing of this field. |
 
 ### `GLChatMessageResponseChunk`
 
@@ -319,10 +340,10 @@ Each `GLChatAttachment` includes:
 
 ---
 
-## Contributing
+## 👨‍💻 Contributing
 
 Please refer to the [Contributor Guidelines](./CONTRIBUTING.md)
 
-## License
+## 🔑 License
 
 This project is licensed under the [MIT License](./LICENSE)

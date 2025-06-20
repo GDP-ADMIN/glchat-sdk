@@ -12,7 +12,7 @@
  */
 
 import { processGLChatChunk } from '../lib';
-import type { CreateMessagePayload, GLChatMessageChunk } from './types';
+import { CreateMessagePayloadSchema, type CreateMessagePayload, type GLChatMessageChunk } from './types';
 
 /**
  * An API that serves as an interface to GLChat message-related API.
@@ -35,10 +35,13 @@ export class MessageAPI {
    * @param {CreateMessagePayload} payload Message payload
    * @returns {Promise<AsyncIterable<GLChatMessageChunk>>} A promise that resolves
    * into a generator that produces message chunks.
+   * @throws `ZodError` if the payload is invalid.
    */
   public async create(
     payload: CreateMessagePayload,
   ): Promise<AsyncIterable<GLChatMessageChunk>> {
+    CreateMessagePayloadSchema.parse(payload);
+
     const form = new FormData();
     const {
       files = [],

@@ -64,14 +64,12 @@ function normalizeHeaders(headers?: Headers): Record<string, string> {
  * This function simplifies the HTTP request code as it takes care
  * of authorization and footprinting.
  *
- * @param {string} apiKey GLChat API key that will be used to authorization
  * @param {GLChatConfiguration} config GLChat configuration object. Mainly
- * stores baseURL.
+ * stores baseURL and API key.
  * @returns {typeof fetch} A bootstrapped `fetch` function, without having
  * to handle authorization and extra logging.
  */
 export function createGLChatFetchClient(
-  apiKey: string,
   config: GLChatConfiguration,
 ): typeof fetch {
   return async (resource: string | URL | Request, options?: RequestInit) => {
@@ -80,9 +78,10 @@ export function createGLChatFetchClient(
 
       const response = await fetch(url, {
         ...options,
+        ...(config.timeout > 0 && { signal: AbortSignal.timeout(config.timeout) }),
         headers: {
           ...normalizeHeaders(options?.headers as Headers),
-          'Authorization': `Bearer ${apiKey}`,
+          'Authorization': `Bearer ${config.apiKey}`,
           'User-Agent': getUserAgent(),
         },
       });

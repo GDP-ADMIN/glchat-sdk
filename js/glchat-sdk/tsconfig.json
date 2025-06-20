@@ -21,6 +21,10 @@
 
     "declaration": true,
 
-    "lib": ["ES2022"]
+    "lib": ["ES2022"],
+    "baseUrl": ".", // usually the root of your project
+    "paths": {
+      "@/*": ["src/*"]
+    }
   }
 }

@@ -1,6 +1,6 @@
 import { GLChat } from './../../src/client';
 
-const client = new GLChat('<YOUR_API_KEY>');
+const client = new GLChat();
 
 void (async () => {
   // Bun supports faster filesystem using the Bun namespace

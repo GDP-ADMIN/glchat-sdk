@@ -16,10 +16,10 @@ fi
 MODULE="$1"
 VERSION="$2"
 
-PEP440_REGEX='^([0-9]+!)?([0-9]+(\.[0-9]+)*)((a|b|rc)[0-9]+)?(\.post[0-9]+)?(\.dev[0-9]+)?(\+([a-zA-Z0-9]+(\.[a-zA-Z0-9]+)*))?$'
+SEMVER_REGEX='^([0-9]+!)?([0-9]+(\.[0-9]+)*)((a|b|rc)[0-9]+)?(\.post[0-9]+)?(\.dev[0-9]+)?(\+([a-zA-Z0-9]+(\.[a-zA-Z0-9]+)*))?$'
 
 # Perform the regex match
-if [[ "$VERSION" =~ $PEP440_REGEX ]]; then
+if [[ "$VERSION" =~ $SEMVER_REGEX ]]; then
     echo "Valid version: $VERSION"
 else
     echo "Invalid version: $VERSION. Overriding to 0.0.0."

@@ -16,7 +16,7 @@ from typing import Any, BinaryIO, Dict, Iterator, List, Tuple, Union
 from urllib.parse import urljoin
 
 import httpx
-from glchat_python.models import MessageRequest
+from glchat_sdk.models import MessageRequest
 
 logger = logging.getLogger(__name__)
 

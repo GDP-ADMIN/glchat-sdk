@@ -1,19 +1,50 @@
 services:
-  builder:
+  builder-libs:
     image: asia.gcr.io/gdp-labs/gl-base/poetry:1.8.2-py${VERSION}.0
     working_dir: /workspace/libs
-    entrypoint: /bin/bash
     environment:
       - GH_TOKEN=${GH_TOKEN:-notdefined}
       - MODULE=${MODULE:-notdefined}
+      - POETRY_PYPI_TOKEN_PYPI=${PYPI_TOKEN:-notdefined}
+      - TAG_NAME=${TAG_NAME}
+    entrypoint: /bin/bash
     command:
       - '-c'
       - './build.ci.sh ${MODULE} $(echo "${TAG_NAME}" | sed -E "s/^.*-v//")'
     env_file:
       - 'libs/build.ci.env'
-    # entrypoint: /bin/sleep
-    # command:
-    #   - infinity
+    volumes:
+      - '.:/workspace'
+
+  builder-python:
+    image: ghcr.io/astral-sh/uv:python${VERSION}-bookworm
+    working_dir: /workspace/python
+    environment:
+      - MODULE=${MODULE:-notdefined}
+      - UV_PUBLISH_TOKEN=${PYPI_TOKEN:-notdefined}
+      - TAG_NAME=${TAG_NAME}
+    entrypoint: /bin/bash
+    command:
+      - '-c'
+      - './build.ci.sh ${MODULE} $(echo "${TAG_NAME}" | sed -E "s/^.*-v//")'
+    env_file:
+      - 'python/build.ci.env'
+    volumes:
+      - '.:/workspace'
+
+  builder-js:
+    image: node:24-bookworm
+    working_dir: /workspace/js
+    environment:
+      - MODULE=${MODULE:-notdefined}
+      - NPM_TOKEN=${NPM_TOKEN:-notdefined}
+      - TAG_NAME=${TAG_NAME}
+    entrypoint: /bin/bash
+    command:
+      - '-c'
+      - './build.ci.sh ${MODULE} $(echo "${TAG_NAME}" | sed -E "s/^.*-v//")'
+    env_file:
+      - 'js/build.ci.env'
     volumes:
       - '.:/workspace'
 

@@ -22,7 +22,7 @@ References:
 
 import os
 
-from glchat_python.message import MessageAPI
+from glchat_sdk.message import MessageAPI
 
 # Ensure the URL ends with a slash; without the trailing slash, the base path will be incorrect.
 DEFAULT_BASE_URL = "https://chat.gdplabs.id/api/proxy/"

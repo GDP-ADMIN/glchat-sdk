@@ -1,5 +1,5 @@
 {
-  "name": "@gdplabs/glchat-sdk",
+  "name": "glchat-sdk",
   "version": "0.0.0-b1",
   "description": "JavaScript SDK for GLChat API",
   "license": "MIT",

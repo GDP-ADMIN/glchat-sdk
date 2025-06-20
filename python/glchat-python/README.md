@@ -23,6 +23,14 @@ A lightweight, flexible Python client for interacting with the GLChat Backend AP
 
 GLChat Python Client is a Python library that simplifies interaction with the GLChat service. It provides a clean, intuitive API for sending messages, handling file attachments, and processing streaming responses, enabling rapid development of chat applications.
 
+## 📋 Requirements
+
+Requirements may vary depending on the runtime. The following table denotes minimum version for various Python runtimes:
+
+| Runtime   | Minimum Version |
+| --------- | --------------- |
+| 🐍 Python | 3.11.x          |
+
 ## ✨ Features
 
 - **🔌 OpenAI-like API**: Familiar interface following the OpenAI SDK pattern

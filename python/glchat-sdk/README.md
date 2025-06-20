@@ -49,7 +49,7 @@ pip install glchat-sdk
 After installation, you can verify it works by trying to import it from any directory:
 
 ```python
-from glchat_python import GLChat
+from glchat_sdk import GLChat
 ```
 
 ## 🚀 Quick Start
@@ -57,7 +57,7 @@ from glchat_python import GLChat
 Creating a chat client with GLChat is incredibly simple:
 
 ```python
-from glchat_python import GLChat
+from glchat_sdk import GLChat
 
 # Initialize the GLChat client with your API key
 client = GLChat(api_key="your-api-key")
@@ -100,7 +100,7 @@ Load environment variables in your code:
 
 ```python
 from dotenv import load_dotenv
-from glchat_python import GLChat
+from glchat_sdk import GLChat
 
 # Load environment variables from .env file
 load_dotenv()
@@ -119,7 +119,7 @@ export GLCHAT_BASE_URL="https://your-custom-endpoint.com/api/"
 Then initialize the client without parameters:
 
 ```python
-from glchat_python import GLChat
+from glchat_sdk import GLChat
 
 # Will automatically use environment variables
 client = GLChat()
@@ -131,7 +131,7 @@ client = GLChat()
 
 ```python
 from pathlib import Path
-from glchat_python import GLChat
+from glchat_sdk import GLChat
 
 client = GLChat(api_key="your-api-key")
 
@@ -150,7 +150,7 @@ for chunk in client.message.create(
 ### 📁 Using Different File Types
 
 ```python
-from glchat_python import GLChat
+from glchat_sdk import GLChat
 import io
 
 client = GLChat(api_key="your-api-key")
@@ -228,8 +228,22 @@ response_stream = client.message.create(
 
 - `chatbot_id`: Required chatbot identifier 🤖
 - `message`: Required user message 💬
-- `files`: List of files (filepath, binary, file object, or bytes) 📎
-- `**kwargs`: Additional message parameters (see MessageRequest model) ⚙️
+- `parent_id`: Parent message ID for threading (optional) 🧵
+- `source`: Source identifier for the message (optional) 📍
+- `quote`: Quoted message content (optional) 💭
+- `user_id`: User identifier (optional) 👤
+- `conversation_id`: Conversation identifier (optional) 💬
+- `user_message_id`: User message identifier (optional) 🆔
+- `assistant_message_id`: Assistant message identifier (optional) 🤖
+- `chat_history`: Chat history context (optional) 📚
+- `files`: List of files (filepath, binary, file object, or bytes) (optional) 📎
+- `stream_id`: Stream identifier (optional) 🌊
+- `metadata`: Additional metadata (optional) 📋
+- `model_name`: Model name to use for generation (optional) 🧠
+- `anonymize_em`: Whether to anonymize embeddings (optional) 🕵️
+- `anonymize_lm`: Whether to anonymize language model (optional) 🕵️
+- `use_cache`: Whether to use cached responses (optional) 💾
+- `search_type`: Type of search to perform (optional) 🔍
 
 **Returns:**
 
@@ -245,11 +259,55 @@ The client supports various file input types with optimized memory handling:
 
 ## 🔐 Authentication
 
-The client supports API key authentication. When an API key is provided, it's automatically included in the Authorization header for all requests:
+The client supports API key authentication with flexible configuration options. The API key can be provided either as a parameter during initialization or through environment variables.
+
+### 🔑 API Key Configuration
+
+**Option 1: Direct Parameter**
 
 ```python
 client = GLChat(api_key="your-api-key")
+```
+
+**Option 2: Environment Variable**
+
+```bash
+export GLCHAT_API_KEY="your-api-key"
+```
+
+```python
+client = GLChat()  # Automatically uses GLCHAT_API_KEY environment variable
+```
+
+**Option 3: Priority System**
+
+```python
+# Parameter takes priority over environment variable
+client = GLChat(api_key="explicit-api-key")  # Uses explicit key even if env var is set
+```
+
+### 🔒 Authentication Headers
+
+When an API key is provided (via parameter or environment variable), it's automatically included in the Authorization header for all requests:
+
+```python
 # API key is automatically used in requests 🔑
+client = GLChat(api_key="your-api-key")
+for chunk in client.message.create(chatbot_id="your-chatbot-id", message="Hello!"):
+    print(chunk.decode("utf-8"), end="")
+```
+
+### ⚠️ Required Configuration
+
+**API key is required** - you must provide it either:
+
+- As the `api_key` parameter when initializing the client, OR
+- Set the `GLCHAT_API_KEY` environment variable
+
+If neither is provided, the client will raise a `ValueError`:
+
+```python
+client = GLChat()  # Raises ValueError if GLCHAT_API_KEY is not set
 ```
 
 ## ⚠️ Error Handling

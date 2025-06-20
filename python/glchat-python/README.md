@@ -9,32 +9,32 @@
 </p>
 
 <p align="center">
-  GLChat Python SDK
+  🤖 GLChat Python SDK 🐍
 <p>
 
 <p align="center">
-    <a href="https://github.com/glair-ai/glchat-sdk/releases"><img src="https://img.shields.io/npm/v/@gdplabs/glchat-sdk" alt="Latest Release"></a>
-    <a href="https://github.com/glair-ai/glchat-sdk/blob/main/LICENSE"><img src="https://img.shields.io/npm/l/@gdplabs/glchat-sdk" alt="License"></a>
+    <a href="https://pypi.org/project/glchat-python/"><img src="https://img.shields.io/pypi/v/glchat-python" alt="PyPI Latest Release"></a>
+    <a href="https://github.com/glair-ai/glair-web-components/blob/main/LICENSE"><img src="https://img.shields.io/npm/l/@glair/web-components" alt="License"></a>
 </p>
 
 A lightweight, flexible Python client for interacting with the GLChat Backend API, providing a simple interface to send messages and receive streaming responses. Built with an OpenAI-like API design for familiarity and ease of use.
 
-## Overview
+## 📋 Overview
 
 GLChat Python Client is a Python library that simplifies interaction with the GLChat service. It provides a clean, intuitive API for sending messages, handling file attachments, and processing streaming responses, enabling rapid development of chat applications.
 
-## Features
+## ✨ Features
 
-- **OpenAI-like API**: Familiar interface following the OpenAI SDK pattern
-- **Authentication Support**: Built-in API key authentication
-- **Simple API**: Send messages and receive responses with minimal code
-- **Streaming Support**: Process responses in real-time as they arrive
-- **File Integration**: Easily attach and send files with your messages
-- **Type Safety**: Comprehensive type hints for better development experience
-- **Flexible Response Handling**: Choose between streaming or complete text responses
-- **Memory Efficient**: Optimized file handling for large files
+- **🔌 OpenAI-like API**: Familiar interface following the OpenAI SDK pattern
+- **🔐 Authentication Support**: Built-in API key authentication
+- **🚀 Simple API**: Send messages and receive responses with minimal code
+- **⚡ Streaming Support**: Process responses in real-time as they arrive
+- **📎 File Integration**: Easily attach and send files with your messages
+- **🎯 Type Safety**: Comprehensive type hints for better development experience
+- **🔄 Flexible Response Handling**: Choose between streaming or complete text responses
+- **💾 Memory Efficient**: Optimized file handling for large files
 
-## Installation
+## 📦 Installation
 
 To install the package:
 
@@ -45,18 +45,18 @@ pip install @gdplabs/glchat-sdk
 After installation, you can verify it works by trying to import it from any directory:
 
 ```python
-from glchat_python import GLChatClient
+from glchat_python import GLChat
 ```
 
-## Quick Start
+## 🚀 Quick Start
 
 Creating a chat client with GLChat is incredibly simple:
 
 ```python
-from glchat_python import GLChatClient
+from glchat_python import GLChat
 
 # Initialize the GLChat client with your API key
-client = GLChatClient(api_key="your-api-key")
+client = GLChat(api_key="your-api-key")
 
 # Send a message to the chatbot and receive a streaming response
 for chunk in client.message.create(
@@ -68,15 +68,68 @@ for chunk in client.message.create(
 
 Note: Make sure you have the correct chatbot ID and API key before running example.
 
-## Advanced Usage
+### 🔐 Environment Variables
 
-### Sending Messages with Files
+GLChat uses `os.getenv()` to read environment variables. **You are responsible for loading environment variables** in your application before initializing the GLChat client. You can use libraries like `python-dotenv`, `python-decouple`, or set them directly in your shell.
+
+**Available environment variables:**
+
+- `GLCHAT_API_KEY`: Your GLChat API key for authentication
+- `GLCHAT_BASE_URL`: Custom base URL for the GLChat API (optional)
+
+**Example using python-dotenv:**
+
+First, install python-dotenv:
+
+```bash
+pip install python-dotenv
+```
+
+Create a `.env` file:
+
+```bash
+GLCHAT_API_KEY=your-api-key
+GLCHAT_BASE_URL=https://your-custom-endpoint.com/api/
+```
+
+Load environment variables in your code:
+
+```python
+from dotenv import load_dotenv
+from glchat_python import GLChat
+
+# Load environment variables from .env file
+load_dotenv()
+
+# Will automatically use environment variables
+client = GLChat()
+```
+
+**Example using shell export:**
+
+```bash
+export GLCHAT_API_KEY="your-api-key"
+export GLCHAT_BASE_URL="https://your-custom-endpoint.com/api/"
+```
+
+Then initialize the client without parameters:
+
+```python
+from glchat_python import GLChat
+
+# Will automatically use environment variables
+client = GLChat()
+```
+
+## 🔧 Advanced Usage
+
+### 📤 Sending Messages with Files
 
 ```python
 from pathlib import Path
-from glchat_python import GLChatClient
+from glchat_python import GLChat
 
-client = GLChatClient(api_key="your-api-key")
+client = GLChat(api_key="your-api-key")
 
 # Send message with file attachment
 for chunk in client.message.create(
@@ -90,13 +143,13 @@ for chunk in client.message.create(
     print(chunk.decode("utf-8"), end="")
 ```
 
-### Using Different File Types
+### 📁 Using Different File Types
 
 ```python
-from glchat_python import GLChatClient
+from glchat_python import GLChat
 import io
 
-client = GLChatClient(api_key="your-api-key")
+client = GLChat(api_key="your-api-key")
 
 # File path
 file_path = "/path/to/file.txt"
@@ -116,16 +169,16 @@ for chunk in client.message.create(
     print(chunk.decode("utf-8"), end="")
 ```
 
-## API Reference
+## 📚 API Reference
 
-### GLChatClient
+### GLChat
 
 The main client class for interacting with the GLChat API.
 
-#### Initialization
+#### 🔧 Initialization
 
 ```python
-client = GLChatClient(
+client = GLChat(
     api_key: str | None = None,
     base_url: str | None = None,
     timeout: float = 60.0
@@ -134,13 +187,13 @@ client = GLChatClient(
 
 **Parameters:**
 
-- `api_key`: Your GLChat API key for authentication
-- `base_url`: Custom base URL for the GLChat API (optional)
-- `timeout`: Request timeout in seconds (default: 60.0)
+- `api_key`: Your GLChat API key for authentication 🔑 (or set GLCHAT_API_KEY env var)
+- `base_url`: Custom base URL for the GLChat API (optional, or set GLCHAT_BASE_URL env var) 🌐
+- `timeout`: Request timeout in seconds (default: 60.0) ⏱️
 
 #### Methods
 
-##### message.create
+##### 💬 message.create
 
 Creates a streaming response from the GLChat API.
 
@@ -169,32 +222,32 @@ response_stream = client.message.create(
 
 **Parameters:**
 
-- `chatbot_id`: Required chatbot identifier
-- `message`: Required user message
-- `files`: List of files (filepath, binary, file object, or bytes)
-- `**kwargs`: Additional message parameters (see MessageRequest model)
+- `chatbot_id`: Required chatbot identifier 🤖
+- `message`: Required user message 💬
+- `files`: List of files (filepath, binary, file object, or bytes) 📎
+- `**kwargs`: Additional message parameters (see MessageRequest model) ⚙️
 
 **Returns:**
 
-- `Iterator[bytes]`: Streaming response chunks
+- `Iterator[bytes]`: Streaming response chunks 📡
 
-## File Support
+## 📁 File Support
 
 The client supports various file input types with optimized memory handling:
 
-- **File paths** (string or Path object)
-- **Binary data** (bytes)
-- **File-like objects** (with read() method) - passed directly to avoid memory issues
+- **📂 File paths** (string or Path object)
+- **💾 Binary data** (bytes)
+- **📄 File-like objects** (with read() method) - passed directly to avoid memory issues
 
-## Authentication
+## 🔐 Authentication
 
 The client supports API key authentication. When an API key is provided, it's automatically included in the Authorization header for all requests:
 
 ```python
-client = GLChatClient(api_key="your-api-key")
-# API key is automatically used in requests
+client = GLChat(api_key="your-api-key")
+# API key is automatically used in requests 🔑
 ```
 
-## Error Handling
+## ⚠️ Error Handling
 
 The client uses `httpx` for HTTP requests and will raise appropriate exceptions for HTTP errors. Make sure to handle these exceptions in your code.

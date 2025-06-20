@@ -4,7 +4,7 @@ This library provides a simple interface to interact with the GLChat backend,
 supporting message sending and file uploads with streaming responses.
 
 Example:
-    >>> client = GLChatClient(api_key="your-api-key")
+    >>> client = GLChat(api_key="your-api-key")
     >>> for chunk in client.message.create(
     ...     chatbot_id="your-chatbot-id",
     ...     message="Hello!",
@@ -20,13 +20,15 @@ References:
     None
 """
 
+import os
+
 from glchat_python.message import MessageAPI
 
 # Ensure the URL ends with a slash; without the trailing slash, the base path will be incorrect.
-DEFAULT_BASE_URL = "https://stag-chat-ui-gdplabs-gen-ai-starter.obrol.id/api/proxy/"
+DEFAULT_BASE_URL = "https://chat.gdplabs.id/api/proxy/"
 
 
-class GLChatClient:
+class GLChat:
     """GLChat Backend API Client.
 
     Attributes:
@@ -46,11 +48,14 @@ class GLChatClient:
         Initialize GLChat client
 
         Args:
-            api_key (str | None): API key for authentication
-            base_url [str | None]: Base URL for the GLChat API
+            api_key (str | None): API key for authentication. If not provided,
+                will try to get from GLCHAT_API_KEY environment variable
+            base_url [str | None]: Base URL for the GLChat API. If not provided,
+                will try to get from GLCHAT_BASE_URL environment variable,
+                otherwise uses default
             timeout [float]: Request timeout in seconds
         """
-        self.api_key = api_key
-        self.base_url = base_url if base_url else DEFAULT_BASE_URL
+        self.api_key = api_key or os.getenv("GLCHAT_API_KEY")
+        self.base_url = base_url or os.getenv("GLCHAT_BASE_URL") or DEFAULT_BASE_URL
         self.timeout = timeout
         self.message = MessageAPI(self)

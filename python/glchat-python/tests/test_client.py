@@ -1,4 +1,4 @@
-"""Tests for the GLChatClient class.
+"""Tests for the GLChat class.
 
 Authors:
     Vincent Chuardi (vincent.chuardi@gdplabs.id)
@@ -11,13 +11,13 @@ import io
 from unittest.mock import Mock, patch
 
 import pytest
-from glchat_python.client import GLChatClient
+from glchat_python.client import GLChat
 
 
 @pytest.fixture
 def client():
-    """Create a GLChatClient instance for testing."""
-    return GLChatClient(base_url="https://test-api.example.com")
+    """Create a GLChat instance for testing."""
+    return GLChat(base_url="https://test-api.example.com")
 
 
 @pytest.fixture
@@ -120,3 +120,41 @@ def test_send_message_with_additional_params(client, mock_response):
         chunks = list(response)
         assert chunks == [b"Hello", b" ", b"World"]
         mock_stream.assert_called_once()
+
+
+def test_client_with_environment_variables():
+    """Test client initialization with environment variables."""
+    with patch.dict(
+        "os.environ",
+        {
+            "GLCHAT_API_KEY": "test-api-key",
+            "GLCHAT_BASE_URL": "https://env-test.example.com/api/",
+        },
+    ):
+        client = GLChat()
+        assert client.api_key == "test-api-key"
+        assert client.base_url == "https://env-test.example.com/api/"
+
+
+def test_client_environment_variables_priority():
+    """Test that explicit parameters take priority over environment variables."""
+    with patch.dict(
+        "os.environ",
+        {
+            "GLCHAT_API_KEY": "env-api-key",
+            "GLCHAT_BASE_URL": "https://env-test.example.com/api/",
+        },
+    ):
+        client = GLChat(
+            api_key="explicit-api-key",
+            base_url="https://explicit-test.example.com/api/",
+        )
+        assert client.api_key == "explicit-api-key"
+        assert client.base_url == "https://explicit-test.example.com/api/"
+
+
+def test_client_default_base_url():
+    """Test that default base URL is used when no environment variable is set."""
+    with patch.dict("os.environ", {}, clear=True):
+        client = GLChat()
+        assert client.base_url == "https://chat.gdplabs.id/api/proxy/"

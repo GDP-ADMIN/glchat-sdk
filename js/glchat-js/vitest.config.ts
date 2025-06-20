@@ -7,5 +7,8 @@ export default defineConfig({
       include: ['src/**/*.ts'],
       exclude: ['src/index.ts'],
     },
+    env: {
+      GLCHAT_API_KEY: 'test-key',
+    },
   },
 });

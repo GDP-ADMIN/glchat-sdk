@@ -1,6 +1,6 @@
 {
-  "name": "@glair/glchat-sdk",
-  "version": "0.0.1",
+  "name": "glchat-sdk",
+  "version": "0.0.2",
   "description": "JavaScript SDK for GLChat API",
   "license": "MIT",
   "author": {
@@ -46,5 +46,9 @@
     "typescript-eslint": "^8.34.1",
     "vitest": "^3.2.3"
   },
-  "packageManager": "npm@10.9.2"
+  "packageManager": "npm@10.9.2",
+  "dependencies": {
+    "openai": "^5.5.1",
+    "zod": "^3.25.67"
+  }
 }

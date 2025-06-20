@@ -1,15 +1,29 @@
 import { describe, expect, it } from 'vitest';
+import { ZodError } from 'zod/v4';
 import { createGLChatFetchClient } from '../fetch';
 import { MessageAPI } from './handler';
 import type { CreateMessagePayload } from './types';
 
 describe('MessageAPI', () => {
-  const client = createGLChatFetchClient('API-KEY', {
+  const client = createGLChatFetchClient({
+    apiKey: 'API-KEY',
+    timeout: 0,
     baseUrl: 'https://test.glchat.id',
     __version: 'v1',
   });
 
   describe('create', () => {
+    it('should throw a ZodError if the payload is invalid', async () => {
+      const payload = {
+        chatbot_id: 123,
+        message: 'AAAAAAAAA',
+      };
+
+      const handler = new MessageAPI(client);
+
+      await expect(() => handler.create(payload as unknown as CreateMessagePayload)).rejects.toThrow(ZodError);
+    });
+
     it('should stream basic message correctly', async () => {
       const payload: CreateMessagePayload = {
         chatbot_id: 'general-purpose',

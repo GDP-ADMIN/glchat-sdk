@@ -1,6 +1,6 @@
 import { GLChat } from './../../src/client';
 
-const client = new GLChat('<YOUR_API_KEY>');
+const client = new GLChat();
 
 void (async () => {
   // Deno uses custom filesystem API inside the Deno namespace

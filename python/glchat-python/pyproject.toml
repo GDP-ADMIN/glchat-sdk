@@ -1,5 +1,5 @@
 [project]
-name = "glchat-python"
+name = "glchat-sdk"
 version = "0.0.1"
 description = "GLChat Python Client"
 readme = "README.md"

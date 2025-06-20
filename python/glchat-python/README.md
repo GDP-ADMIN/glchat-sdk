@@ -1,9 +1,9 @@
 <p align="center">
   <a href="https://docs.glair.ai" target="_blank">
     <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="https://glair-chart.s3.ap-southeast-1.amazonaws.com/images/glair-horizontal-logo-blue.png">
-      <source media="(prefers-color-scheme: light)" srcset="https://glair-chart.s3.ap-southeast-1.amazonaws.com/images/glair-horizontal-logo-color.png">
-      <img alt="GLAIR" src="https://glair-chart.s3.ap-southeast-1.amazonaws.com/images/glair-horizontal-logo-color.png" width="180" height="60" style="max-width: 100%;">
+      <source media="(prefers-color-scheme: dark)" srcset="https://assets.analytics.glair.ai/generative/img/glchat-beta-dark.svg">
+      <source media="(prefers-color-scheme: light)" srcset="https://assets.analytics.glair.ai/generative/img/glchat-beta-light.svg">
+      <img alt="GLAIR" src="https://assets.analytics.glair.ai/generative/img/glchat-beta-light.svg" width="180" height="60" style="max-width: 100%;">
     </picture>
   </a>
 </p>
@@ -13,8 +13,8 @@
 <p>
 
 <p align="center">
-    <a href="https://pypi.org/project/glchat-python/"><img src="https://img.shields.io/pypi/v/glchat-python" alt="PyPI Latest Release"></a>
-    <a href="https://github.com/glair-ai/glair-web-components/blob/main/LICENSE"><img src="https://img.shields.io/npm/l/@glair/web-components" alt="License"></a>
+    <a href="https://pypi.org/project/glchat-sdk/"><img src="https://img.shields.io/pypi/v/glchat-sdk" alt="PyPI Latest Release"></a>
+    <a href="https://github.com/GDP-ADMIN/glchat-sdk/blob/main/python/glchat-python/LICENSE"><img src="https://img.shields.io/pypi/l/glchat-sdk" alt="License"></a>
 </p>
 
 A lightweight, flexible Python client for interacting with the GLChat Backend API, providing a simple interface to send messages and receive streaming responses. Built with an OpenAI-like API design for familiarity and ease of use.
@@ -39,7 +39,7 @@ GLChat Python Client is a Python library that simplifies interaction with the GL
 To install the package:
 
 ```bash
-pip install @gdplabs/glchat-sdk
+pip install glchat-sdk
 ```
 
 After installation, you can verify it works by trying to import it from any directory:

@@ -255,3 +255,4 @@ zsdoc/data
 *.pyi
 setup.cfg
 setup.py
+*.tgz

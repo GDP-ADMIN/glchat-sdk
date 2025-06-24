@@ -1,0 +1,3 @@
+# Ignore urllib3 vuln due to semantic-router
+CVE-2025-50181 exp:2025-07-19
+CVE-2025-50182 exp:2025-07-19

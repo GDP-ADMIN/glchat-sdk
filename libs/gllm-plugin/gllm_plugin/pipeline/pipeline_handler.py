@@ -179,7 +179,7 @@ class PipelineHandler(PluginHandler):
         Args:
             instance (PipelineHandler): The handler instance.
             chatbot_id (str): The chatbot ID.
-            supported_models (list[dict[str, Any]]): List of supported models.
+            supported_models (list[dict[str, Any]]): List of models (including config).
             plugin (Plugin): The pipeline builder plugin instance.
         """
         plugin.prompt_builder_catalogs = instance._chatbot_configs[chatbot_id].prompt_builder_catalogs

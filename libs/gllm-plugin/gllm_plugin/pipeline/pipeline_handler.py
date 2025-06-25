@@ -330,9 +330,8 @@ class PipelineHandler(PluginHandler):
         Args:
             chatbot_id (str): The ID of the chatbot.
         """
-        for pipeline_keys in self._chatbot_pipeline_keys.get(chatbot_id, set()):
-            for pipeline_key in pipeline_keys:
-                self._pipeline_cache.pop(pipeline_key, None)
+        for pipeline_key in self._chatbot_pipeline_keys.get(chatbot_id, set()):
+            self._pipeline_cache.pop(pipeline_key, None)
 
         self._chatbot_pipeline_keys.pop(chatbot_id, None)
         self._chatbot_configs.pop(chatbot_id, None)

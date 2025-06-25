@@ -18,7 +18,6 @@ from pydantic import BaseModel, ConfigDict
 
 from gllm_plugin.config.app_config import AppConfig
 from gllm_plugin.storage.base_chat_history_storage import BaseChatHistoryStorage
-from gllm_plugin.supported_models import MODEL_KEY_MAP, ModelName
 
 
 class ChatbotConfig(BaseModel):
@@ -43,11 +42,11 @@ class PipelinePresetConfig(BaseModel):
 
     Attributes:
         preset_id (str): Unique identifier for the pipeline preset.
-        supported_models (list[str]): List of model names supported by this preset.
+        supported_models (list[dict[str, Any]]): List of models (including config) supported by this preset.
     """
 
     preset_id: str
-    supported_models: list[str]
+    supported_models: list[dict[str, Any]]
 
 
 class ChatbotPresetMapping(BaseModel):
@@ -165,37 +164,50 @@ class PipelineHandler(PluginHandler):
             instance (PipelineHandler): The handler instance.
         """
         for plugin in instance._plugins.values():
-            await plugin.cleanup()
+            try:
+                await plugin.cleanup()
+            except Exception as e:
+                logger.error(f"Error cleaning up plugin `{plugin.name}`: {e}")
+                pass
 
     @classmethod
     async def _build_plugin(
-        cls, instance: "PipelineHandler", chatbot_id: str, supported_models: list[str], plugin: Plugin
+        cls, instance: "PipelineHandler", chatbot_id: str, supported_models: list[dict[str, Any]], plugin: Plugin
     ) -> None:
         """Build a plugin for the given chatbot.
 
         Args:
             instance (PipelineHandler): The handler instance.
             chatbot_id (str): The chatbot ID.
-            supported_models (list[str]): List of supported models.
+            supported_models (list[dict[str, Any]]): List of models (including config).
             plugin (Plugin): The pipeline builder plugin instance.
         """
         plugin.prompt_builder_catalogs = instance._chatbot_configs[chatbot_id].prompt_builder_catalogs
         plugin.lmrp_catalogs = instance._chatbot_configs[chatbot_id].lmrp_catalogs
         instance._builders[chatbot_id] = plugin
 
-        for model_name_str in supported_models:
-            model_name = ModelName.from_string(model_name_str)
-            pipeline_config = instance._chatbot_configs[chatbot_id].pipeline_config.copy()
-            pipeline_config["model_name"] = model_name
-            provider = model_name.provider
-            api_key = MODEL_KEY_MAP.get(provider)
-            if api_key:
-                pipeline_config["api_key"] = api_key
+        for model in supported_models:
+            try:
+                model_name = model.get("name")
+                if not model_name:
+                    continue
 
-            pipeline = await plugin.build(pipeline_config)
-            pipeline_key = (chatbot_id, str(model_name))
-            instance._chatbot_pipeline_keys.setdefault(chatbot_id, set()).add(pipeline_key)
-            instance._pipeline_cache[pipeline_key] = pipeline
+                pipeline_config = instance._chatbot_configs[chatbot_id].pipeline_config.copy()
+                pipeline_config["model_name"] = model_name
+                pipeline_config["model_kwargs"] = model.get("model_kwargs", {})
+                pipeline_config["model_env_kwargs"] = model.get("model_env_kwargs", {})
+                # for backward compatibility
+                credentials = pipeline_config["model_env_kwargs"].get("credentials")
+                if credentials:
+                    pipeline_config["api_key"] = credentials
+
+                pipeline = await plugin.build(pipeline_config)
+                pipeline_key = (chatbot_id, str(model_name))
+                instance._chatbot_pipeline_keys.setdefault(chatbot_id, set()).add(pipeline_key)
+                instance._pipeline_cache[pipeline_key] = pipeline
+            except Exception as e:
+                logger.error(f"Error building pipeline for chatbot `{chatbot_id}` model `{model_name}`: {e}")
+                pass
 
     def get_pipeline_builder(self, chatbot_id: str) -> Plugin:
         """Get a pipeline builder instance for the given chatbot.
@@ -211,12 +223,12 @@ class PipelineHandler(PluginHandler):
         """
         return self._builders[chatbot_id]
 
-    def get_pipeline(self, chatbot_id: str, model_name: ModelName) -> Pipeline:
+    def get_pipeline(self, chatbot_id: str, model_name: str) -> Pipeline:
         """Get a pipeline instance for the given chatbot and model name.
 
         Args:
             chatbot_id (str): The chatbot ID.
-            model_name (ModelName): The model to use for inference.
+            model_name (str): The model to use for inference.
 
         Returns:
             Pipeline: The pipeline instance.
@@ -296,7 +308,10 @@ class PipelineHandler(PluginHandler):
 
         pipeline_info = chatbot_info.pipeline
         pipeline_type = pipeline_info["type"]
-        plugin = self._plugins[pipeline_type]
+        plugin = self._plugins.get(pipeline_type)
+        if not plugin:
+            logger.warning(f"Pipeline plugin not found for chatbot `{chatbot_id}`")
+            return
 
         logger.info(f"Storing pipeline config for chatbot `{chatbot_id}`")
         self._chatbot_configs[chatbot_id] = ChatbotConfig(
@@ -306,7 +321,7 @@ class PipelineHandler(PluginHandler):
             lmrp_catalogs=pipeline_info["lmrp_catalogs"],
         )
 
-        supported_models = list(pipeline_info["config"]["supported_models"].keys())
+        supported_models = list(pipeline_info["config"].get("supported_models", {}).values())
         await __class__._build_plugin(self, chatbot_id, supported_models, plugin)
 
     async def delete_chatbot(self, chatbot_id: str) -> None:
@@ -315,9 +330,8 @@ class PipelineHandler(PluginHandler):
         Args:
             chatbot_id (str): The ID of the chatbot.
         """
-        for pipeline_keys in self._chatbot_pipeline_keys.get(chatbot_id, set()):
-            for pipeline_key in pipeline_keys:
-                self._pipeline_cache.pop(pipeline_key, None)
+        for pipeline_key in self._chatbot_pipeline_keys.get(chatbot_id, set()):
+            self._pipeline_cache.pop(pipeline_key, None)
 
         self._chatbot_pipeline_keys.pop(chatbot_id, None)
         self._chatbot_configs.pop(chatbot_id, None)
@@ -340,7 +354,7 @@ class PipelineHandler(PluginHandler):
                 pipeline_info = chatbot_info.pipeline
                 pipeline_type = pipeline_info["type"]
 
-                supported_models = list(pipeline_info["config"]["supported_models"].keys())
+                supported_models = list(pipeline_info["config"].get("supported_models", {}).values())
 
                 logger.info(f"Storing pipeline config for chatbot `{chatbot_id}`")
                 self._chatbot_configs.pop(chatbot_id, None)
@@ -352,8 +366,8 @@ class PipelineHandler(PluginHandler):
                 )
 
                 new_pipeline_keys = set()
-                for model_name_str in supported_models:
-                    model_name = ModelName.from_string(model_name_str)
+                for model in supported_models:
+                    model_name = model.get("name")
                     new_pipeline_key = (chatbot_id, str(model_name))
                     new_pipeline_keys.add(new_pipeline_key)
 
@@ -363,11 +377,17 @@ class PipelineHandler(PluginHandler):
 
                 self._chatbot_pipeline_keys[chatbot_id] = set()
 
-                plugin = self._builders[chatbot_id]
+                plugin = self._plugins.get(pipeline_type)
+                if not plugin:
+                    logger.warning(f"Pipeline plugin not found for chatbot `{chatbot_id}`")
+                    continue
+
+                self._builders.pop(chatbot_id, None)
+                self._builders[chatbot_id] = plugin
 
                 await __class__._build_plugin(self, chatbot_id, supported_models, plugin)
             except Exception as e:
-                logger.error(f"Error initializing plugin for chatbot `{chatbot_id}`: {e}")
+                logger.error(f"Error updating chatbot `{chatbot_id}`: {e}")
                 pass
 
     def _prepare_pipelines(self) -> None:
@@ -384,7 +404,7 @@ class PipelineHandler(PluginHandler):
 
             chatbot_preset_map[chatbot_id] = PipelinePresetConfig(
                 preset_id=pipeline_info["config"]["pipeline_preset_id"],
-                supported_models=list(pipeline_info["config"]["supported_models"].keys()),
+                supported_models=list(pipeline_info["config"].get("supported_models", {}).values()),
             )
 
             logger.info(f"Storing pipeline config for chatbot `{chatbot_id}`")

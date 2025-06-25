@@ -321,7 +321,7 @@ class PipelineHandler(PluginHandler):
             lmrp_catalogs=pipeline_info["lmrp_catalogs"],
         )
 
-        supported_models = list(pipeline_info["config"].get("supported_models", []).values())
+        supported_models = list(pipeline_info["config"].get("supported_models", {}).values())
         await __class__._build_plugin(self, chatbot_id, supported_models, plugin)
 
     async def delete_chatbot(self, chatbot_id: str) -> None:
@@ -354,7 +354,7 @@ class PipelineHandler(PluginHandler):
                 pipeline_info = chatbot_info.pipeline
                 pipeline_type = pipeline_info["type"]
 
-                supported_models = list(pipeline_info["config"].get("supported_models", []).values())
+                supported_models = list(pipeline_info["config"].get("supported_models", {}).values())
 
                 logger.info(f"Storing pipeline config for chatbot `{chatbot_id}`")
                 self._chatbot_configs.pop(chatbot_id, None)
@@ -404,7 +404,7 @@ class PipelineHandler(PluginHandler):
 
             chatbot_preset_map[chatbot_id] = PipelinePresetConfig(
                 preset_id=pipeline_info["config"]["pipeline_preset_id"],
-                supported_models=list(pipeline_info["config"].get("supported_models", []).values()),
+                supported_models=list(pipeline_info["config"].get("supported_models", {}).values()),
             )
 
             logger.info(f"Storing pipeline config for chatbot `{chatbot_id}`")

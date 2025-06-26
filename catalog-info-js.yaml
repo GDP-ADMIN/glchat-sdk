@@ -1,0 +1,30 @@
+---
+apiVersion: backstage.io/v1alpha1
+kind: System
+metadata:
+  name: gen-ai-external-js
+  links:
+    - title: npmjs Page
+      url: https://www.npmjs.com/~glx-sre
+spec:
+  owner: group:default/dev
+  lifecycle: production
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: gen-ai-external-js-glchat-sdk
+  links:
+    - title: npmjs Page
+      url: https://www.npmjs.com/package/glchat-sdk
+  annotations:
+    google.com/cloudbuild-project-slug: 'gdp-labs'
+    google.com/cloudbuild-repo-name: 'gen-ai-external'
+    google.com/cloudbuild-location: 'asia-southeast2'
+    sonarqube.org/project-key: default/glchat-js
+    gdplabs/project-email: "gat@gdplabs.id"
+spec:
+  type: library
+  owner: group:default/dev
+  system: gen-ai-external-js
+  lifecycle: production

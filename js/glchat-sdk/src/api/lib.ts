@@ -12,6 +12,7 @@
  * Copyright (c) GDP LABS. All rights reserved.
  */
 
+import { GeneralError } from '@/error';
 import type { GLChatMessageChunk, GLChatMessageStatus } from './message/types';
 
 /**
@@ -19,13 +20,13 @@ import type { GLChatMessageChunk, GLChatMessageStatus } from './message/types';
  *
  * @param {unknown} value Raw chunk from API.
  * @returns {GLChatMessageChunk} Message chunk in object format.
- * @throws Error, if the chunk is not a string.
+ * @throws GeneralError, if the chunk is not a string.
  */
 export function processGLChatChunk(
   value: unknown,
 ): GLChatMessageChunk {
   if (typeof value !== 'string') {
-    throw new Error('Chunk is corrupted!');
+    throw new GeneralError('Chunk is not a string!');
   }
 
   const stringChunk = value.replace(/^data:/, '');

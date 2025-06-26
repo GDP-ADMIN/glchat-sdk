@@ -14,11 +14,13 @@
  * Copyright (c) GDP LABS. All rights reserved.
  */
 
+import { ZodError } from 'zod/v4';
 import { createGLChatFetchClient } from './api/fetch';
 import { MessageAPI } from './api/message/handler';
 
 import type { APIVersion, GLChatConfiguration } from './config';
 import { GLChatConfigurationSchema } from './config';
+import { GeneralError, ValidationError } from './error';
 
 /**
  * API client that serves as an interface to interact with GLChat
@@ -39,44 +41,83 @@ export class GLChat {
    * API client that serves as an interface to interact with GLChat.
    *
    * @param {Partial<GLChatConfiguration>} config GLChat configuration object
-   * @throws `ZodError` if the provided configuration isn't valid.
+   * @throws `ValidationError` if the provided configuration isn't valid.
    */
   public constructor(config: Partial<GLChatConfiguration> = {}) {
-    this.configuration = GLChatConfigurationSchema.parse(config);
+    try {
+      this.configuration = GLChatConfigurationSchema.parse(config);
 
-    const fetchClient = createGLChatFetchClient(this.configuration);
+      const fetchClient = createGLChatFetchClient(this.configuration);
 
-    this.message = new MessageAPI(fetchClient);
+      this.message = new MessageAPI(fetchClient);
+    } catch (err) {
+      const error = err as Error;
+
+      if (error instanceof ZodError) {
+        throw new ValidationError(
+          'configuration',
+          error.issues.map(
+            issue => ({ path: issue.path as string[], message: issue.message })));
+      }
+
+      throw new GeneralError(error.message);
+    }
   }
 
   /**
    * Sets the base URL that will be used for API calls.
    *
    * @param {string} url Base URL to be used
-   * @throws `ZodError` if the provided base URL isn't valid.
+   * @throws `ValidationError` if the provided base URL isn't valid.
    */
   public setBaseUrl(url: string): void {
-    GLChatConfigurationSchema.parse({
-      ...this.configuration,
-      baseUrl: url,
-    });
+    try {
+      GLChatConfigurationSchema.parse({
+        ...this.configuration,
+        baseUrl: url,
+      });
 
-    this.configuration.baseUrl = url;
+      this.configuration.baseUrl = url;
+    } catch (err) {
+      const error = err as Error;
+
+      if (error instanceof ZodError) {
+        throw new ValidationError(
+          'configuration',
+          error.issues.map(
+            issue => ({ path: issue.path as string[], message: issue.message })));
+      }
+
+      throw new GeneralError(error.message);
+    }
   }
 
   /**
    * Sets the API version that will be used for API calls.
    *
    * @param {string} version API version to be used
-   * @throws `ZodError` if the provided version isn't valid.
+   * @throws `ValidationError` if the provided version isn't valid.
    */
   public setAPIVersion(version: APIVersion): void {
-    GLChatConfigurationSchema.parse({
-      ...this.configuration,
-      __version: version,
-    });
+    try {
+      GLChatConfigurationSchema.parse({
+        ...this.configuration,
+        __version: version,
+      });
 
-    this.configuration.__version = version;
+      this.configuration.__version = version;
+    } catch (err) {
+      const error = err as Error;
+
+      if (error instanceof ZodError) {
+        throw new ValidationError(
+          'configuration',
+          error.issues.map(
+            issue => ({ path: issue.path as string[], message: issue.message })));
+      }
+
+      throw new GeneralError(error.message);
+    }
   }
 
   /**
@@ -85,14 +126,27 @@ export class GLChat {
    * Set to `0` to disable timeout.
    *
    * @param {number} timeout Timeout value in milliseconds.
-   * @throws `ZodError` if the provided timeout isn't valid.
+   * @throws `ValidationError` if the provided timeout isn't valid.
    */
   public setTimeout(timeout: number): void {
-    GLChatConfigurationSchema.parse({
-      ...this.configuration,
-      timeout,
-    });
+    try {
+      GLChatConfigurationSchema.parse({
+        ...this.configuration,
+        timeout,
+      });
 
-    this.configuration.timeout = timeout;
+      this.configuration.timeout = timeout;
+    } catch (err) {
+      const error = err as Error;
+
+      if (error instanceof ZodError) {
+        throw new ValidationError(
+          'configuration',
+          error.issues.map(
+            issue => ({ path: issue.path as string[], message: issue.message })));
+      }
+
+      throw new GeneralError(error.message);
+    }
   }
 }

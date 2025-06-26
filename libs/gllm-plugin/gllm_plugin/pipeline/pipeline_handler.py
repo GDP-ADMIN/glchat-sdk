@@ -7,6 +7,7 @@ Authors:
     Hermes Vincentius Gani (hermes.v.gani@gdplabs.id)
 """
 
+import asyncio
 from typing import Any, Type
 
 from bosa_core import Plugin
@@ -77,6 +78,9 @@ class PipelineHandler(PluginHandler):
         _builders (dict[str, Plugin]): Mapping of chatbot IDs to their pipeline builder plugins.
         _plugins (dict[str, Plugin]): Mapping of pipeline types to their plugins.
         _pipeline_cache (dict[tuple[str, str], Pipeline]): Cache mapping (chatbot_id, model_name) to Pipeline instances.
+        _pipeline_error (dict[tuple[str, str], Exception]): Error mapping (chatbot_id, model_name)
+            to Exception instances.
+        _retryable_errors (set[type[Exception]]): Set of retryable errors.
         _chatbot_pipeline_keys (dict[str, set[tuple[str, str]]]): Mapping of chatbot IDs to their pipeline keys.
     """
 
@@ -86,17 +90,27 @@ class PipelineHandler(PluginHandler):
     _builders: dict[str, Plugin] = {}
     _plugins: dict[str, Plugin] = {}
     _pipeline_cache: dict[tuple[str, str], Pipeline] = {}
+    _pipeline_error: dict[tuple[str, str], Exception] = {}
     _chatbot_pipeline_keys: dict[str, set[tuple[str, str]]] = {}
+    _retryable_errors: set[type[Exception]] = {}
 
-    def __init__(self, app_config: AppConfig, chat_history_storage: BaseChatHistoryStorage):
+    def __init__(
+        self,
+        app_config: AppConfig,
+        chat_history_storage: BaseChatHistoryStorage,
+        retryable_errors: set[type[Exception]] | None = None,
+    ):
         """Initialize the pipeline handler.
 
         Args:
             app_config (AppConfig): Application configuration.
             chat_history_storage (BaseChatHistoryStorage): Chat history storage.
+            retryable_errors (set[type[Exception]] | None): Set of retryable errors.
+                If empty, defaults to {ConnectionError, TimeoutError}.
         """
         self.app_config = app_config
         self.chat_history_storage = chat_history_storage
+        self._retryable_errors = retryable_errors or {ConnectionError, TimeoutError}
         self._prepare_pipelines()
 
     @classmethod
@@ -154,7 +168,6 @@ class PipelineHandler(PluginHandler):
                 await cls._build_plugin(instance, chatbot_id, preset.supported_models, plugin)
             except Exception as e:
                 logger.error(f"Error initializing plugin for chatbot `{chatbot_id}`: {e}")
-                pass
 
     @classmethod
     async def acleanup_plugins(cls, instance: "PipelineHandler") -> None:
@@ -168,7 +181,6 @@ class PipelineHandler(PluginHandler):
                 await plugin.cleanup()
             except Exception as e:
                 logger.error(f"Error cleaning up plugin `{plugin.name}`: {e}")
-                pass
 
     @classmethod
     async def _build_plugin(
@@ -187,27 +199,41 @@ class PipelineHandler(PluginHandler):
         instance._builders[chatbot_id] = plugin
 
         for model in supported_models:
-            try:
-                model_name = model.get("name")
-                if not model_name:
-                    continue
+            await cls._build_plugin_chatbot_model(instance, chatbot_id, model, plugin)
 
-                pipeline_config = instance._chatbot_configs[chatbot_id].pipeline_config.copy()
-                pipeline_config["model_name"] = model_name
-                pipeline_config["model_kwargs"] = model.get("model_kwargs", {})
-                pipeline_config["model_env_kwargs"] = model.get("model_env_kwargs", {})
-                # for backward compatibility
-                credentials = pipeline_config["model_env_kwargs"].get("credentials")
-                if credentials:
-                    pipeline_config["api_key"] = credentials
+    @classmethod
+    async def _build_plugin_chatbot_model(
+        cls, instance: "PipelineHandler", chatbot_id: str, model: dict[str, Any], plugin: Plugin
+    ) -> None:
+        """Build a plugin for the given chatbot and model.
 
-                pipeline = await plugin.build(pipeline_config)
-                pipeline_key = (chatbot_id, str(model_name))
-                instance._chatbot_pipeline_keys.setdefault(chatbot_id, set()).add(pipeline_key)
-                instance._pipeline_cache[pipeline_key] = pipeline
-            except Exception as e:
-                logger.error(f"Error building pipeline for chatbot `{chatbot_id}` model `{model_name}`: {e}")
-                pass
+        Args:
+            instance (PipelineHandler): The handler instance.
+            chatbot_id (str): The chatbot ID.
+            model (dict[str, Any]): The model (including config).
+            plugin (Plugin): The pipeline builder plugin instance.
+        """
+        try:
+            model_name = model.get("name")
+            if not model_name:
+                return
+
+            pipeline_config = instance._chatbot_configs[chatbot_id].pipeline_config.copy()
+            pipeline_config["model_name"] = model_name
+            pipeline_config["model_kwargs"] = model.get("model_kwargs", {})
+            pipeline_config["model_env_kwargs"] = model.get("model_env_kwargs", {})
+            # for backward compatibility
+            credentials = pipeline_config["model_env_kwargs"].get("credentials")
+            if credentials:
+                pipeline_config["api_key"] = credentials
+
+            pipeline = await plugin.build(pipeline_config)
+            pipeline_key = (chatbot_id, str(model_name))
+            instance._chatbot_pipeline_keys.setdefault(chatbot_id, set()).add(pipeline_key)
+            instance._pipeline_cache[pipeline_key] = pipeline
+        except Exception as e:
+            instance._pipeline_error[(chatbot_id, str(model_name))] = e
+            logger.error(f"Error building pipeline for chatbot `{chatbot_id}` model `{model_name}`: {e}")
 
     def get_pipeline_builder(self, chatbot_id: str) -> Plugin:
         """Get a pipeline builder instance for the given chatbot.
@@ -236,7 +262,50 @@ class PipelineHandler(PluginHandler):
         Raises:
             ValueError: If the chatbot ID is invalid.
         """
-        return self._pipeline_cache[(chatbot_id, str(model_name))]
+        pipeline_key = (chatbot_id, str(model_name))
+        pipeline = self._pipeline_cache.get(pipeline_key)
+        if pipeline:
+            return pipeline
+
+        err = self._pipeline_error.get(pipeline_key)
+        if err and not any(isinstance(err, error_type) for error_type in self._retryable_errors):
+            # raise non-retryable error directly
+            raise err
+
+        # retry build
+        chatbot_config = self._chatbot_configs.get(chatbot_id)
+        if not chatbot_config:
+            logger.warning(f"Chatbot config not found for chatbot `{chatbot_id}`")
+            raise ValueError(f"Chatbot config not found for chatbot `{chatbot_id}`")
+
+        plugin = self._plugins.get(chatbot_config.pipeline_type)
+        if not plugin:
+            logger.warning(f"Pipeline plugin not found for chatbot `{chatbot_id}`")
+            raise ValueError(f"Pipeline plugin not found for chatbot `{chatbot_id}`")
+
+        supported_models = list(chatbot_config.pipeline_config.get("supported_models", {}).values())
+        model = next((model for model in supported_models if model.get("name", "") == model_name), None)
+        if not model:
+            logger.warning(f"Model `{model_name}` not found for chatbot `{chatbot_id}`")
+            raise ValueError(f"Model `{model_name}` not found for chatbot `{chatbot_id}`")
+
+        plugin.prompt_builder_catalogs = chatbot_config.prompt_builder_catalogs
+        plugin.lmrp_catalogs = chatbot_config.lmrp_catalogs
+        self._builders[chatbot_id] = plugin
+
+        loop = asyncio.new_event_loop()
+        loop.run_until_complete(self._build_plugin_chatbot_model(self, chatbot_id, model, plugin))
+        loop.close()
+
+        pipeline = self._pipeline_cache[pipeline_key]
+        if pipeline:
+            return pipeline
+
+        err = self._pipeline_error.get(pipeline_key)
+        if err:
+            raise err
+
+        raise ValueError(f"Pipeline for chatbot `{chatbot_id}` model `{model_name}` not found")
 
     def get_pipeline_config(self, chatbot_id: str) -> dict[str, Any]:
         """Get the pipeline configuration by chatbot ID.
@@ -300,6 +369,7 @@ class PipelineHandler(PluginHandler):
             app_config (AppConfig): The application configuration.
             chatbot_id (str): The ID of the chatbot.
         """
+        self.app_config = app_config
         chatbot_info = app_config.chatbots.get(chatbot_id)
 
         if not chatbot_info or not chatbot_info.pipeline:
@@ -344,6 +414,7 @@ class PipelineHandler(PluginHandler):
             app_config (AppConfig): The application configuration.
             chatbot_ids (list[str]): The updated chatbot IDs.
         """
+        self.app_config = app_config
         for chatbot_id in chatbot_ids:
             try:
                 chatbot_info = app_config.chatbots.get(chatbot_id)
@@ -388,7 +459,6 @@ class PipelineHandler(PluginHandler):
                 await __class__._build_plugin(self, chatbot_id, supported_models, plugin)
             except Exception as e:
                 logger.error(f"Error updating chatbot `{chatbot_id}`: {e}")
-                pass
 
     def _prepare_pipelines(self) -> None:
         """Build pipeline configurations from the chatbots configuration."""

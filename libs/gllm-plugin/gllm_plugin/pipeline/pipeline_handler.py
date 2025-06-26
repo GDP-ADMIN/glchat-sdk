@@ -268,11 +268,16 @@ class PipelineHandler(PluginHandler):
             return pipeline
 
         err = self._pipeline_error.get(pipeline_key)
+        print(err)
+        print(err.__class__)
+        print(self._retryable_errors)
+        print(any(isinstance(err, error_type) for error_type in self._retryable_errors))
         if err and not any(isinstance(err, error_type) for error_type in self._retryable_errors):
             # raise non-retryable error directly
             raise err
 
         # retry build
+        logger.info(f"Retrying to build pipeline for chatbot `{chatbot_id}` model `{model_name}`")
         chatbot_config = self._chatbot_configs.get(chatbot_id)
         if not chatbot_config:
             logger.warning(f"Chatbot config not found for chatbot `{chatbot_id}`")

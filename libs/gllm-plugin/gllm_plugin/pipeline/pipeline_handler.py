@@ -18,7 +18,7 @@ from pydantic import BaseModel, ConfigDict
 
 from gllm_plugin.config.app_config import AppConfig
 from gllm_plugin.storage.base_chat_history_storage import BaseChatHistoryStorage
-
+import traceback
 
 class ChatbotConfig(BaseModel):
     """Chatbot configuration class containing pipeline configs and metadata.
@@ -153,6 +153,7 @@ class PipelineHandler(PluginHandler):
 
                 await cls._build_plugin(instance, chatbot_id, preset.supported_models, plugin)
             except Exception as e:
+                logger.warning(f"Failed when ainit pliugin {traceback.format_exc()}")
                 logger.error(f"Error initializing plugin for chatbot `{chatbot_id}`: {e}")
                 pass
 
@@ -206,6 +207,7 @@ class PipelineHandler(PluginHandler):
                 instance._chatbot_pipeline_keys.setdefault(chatbot_id, set()).add(pipeline_key)
                 instance._pipeline_cache[pipeline_key] = pipeline
             except Exception as e:
+                logger.warning(f"Failed when ainit pliugin {traceback.format_exc()}")
                 logger.error(f"Error building pipeline for chatbot `{chatbot_id}` model `{model_name}`: {e}")
                 pass
 
@@ -245,17 +247,17 @@ class PipelineHandler(PluginHandler):
 
             chatbot_config = self._chatbot_configs[chatbot_id]
             pipeline_type = chatbot_config.pipeline_type
-            
+
             # Check if we have the plugin for this pipeline type
             if pipeline_type not in self._plugins:
                 logger.error(f"Plugin not found for pipeline type `{pipeline_type}`")
                 return
 
             plugin = self._plugins[pipeline_type]
-            
+
             # Get supported models from the configuration
             supported_models = list(chatbot_config.pipeline_config.get("supported_models", {}).values())
-            
+
             if not supported_models:
                 logger.warning(f"No supported models found for chatbot `{chatbot_id}`")
                 return
@@ -265,9 +267,9 @@ class PipelineHandler(PluginHandler):
             plugin.prompt_builder_catalogs = chatbot_config.prompt_builder_catalogs
             plugin.lmrp_catalogs = chatbot_config.lmrp_catalogs
             self._builders[chatbot_id] = plugin
-            
+
             logger.info(f"Successfully rebuilt pipeline builder for chatbot `{chatbot_id}`")
-            
+
         except Exception as e:
             logger.error(f"Error rebuilding plugin for chatbot `{chatbot_id}`: {e}")
             pass
@@ -286,15 +288,15 @@ class PipelineHandler(PluginHandler):
             ValueError: If the chatbot ID is invalid.
         """
         pipeline_key = (chatbot_id, str(model_name))
-        
+
         if pipeline_key not in self._pipeline_cache:
             logger.warning(f"Pipeline not found for chatbot `{chatbot_id}` model `{model_name}`, attempting to rebuild...")
             # Try to rebuild the pipeline if it's not found
             self._try_rebuild_pipeline(chatbot_id, model_name)
-            
+
         if pipeline_key not in self._pipeline_cache:
             raise ValueError(f"Pipeline for chatbot `{chatbot_id}` model `{model_name}` not found and could not be rebuilt")
-            
+
         return self._pipeline_cache[pipeline_key]
 
     def _try_rebuild_pipeline(self, chatbot_id: str, model_name: str) -> None:
@@ -308,7 +310,51 @@ class PipelineHandler(PluginHandler):
             # First, ensure we have the pipeline builder
             if chatbot_id not in self._builders:
                 self._try_rebuild_plugin(chatbot_id)
-                
+
+            if chatbot_id not in self._builders:
+                logger.error(f"Could not rebuild pipeline builder for chatbot `{chatbot_id}`")
+                return
+
+            # Check if we have the chatbot configuration
+            if chatbot_id not in self._chatbot_configs:
+                logger.error(f"Chatbot configuration not found for `{chatbot_id}`")
+                return
+
+            chatbot_config = self._chatbot_configs[chatbot_id]
+            plugin = self._builders[chatbot_id]
+
+            # Find the model configuration
+            supported_models = list(chatbot_config.pipeline_config.get("supported_models", {}).values())
+            model_config = None
+
+            for model in supported_models:
+                if model.get("name") == model_name:
+                    model_config = model
+                    break
+            if not model_config:
+                logger.error(f"Model `{model_name}` not found in supported models for chatbot `{chatbot_id}` rebuild pipeline")
+                return
+
+            # Note: Since _build_plugin is async, we can't call it directly from this sync method
+            # The actual pipeline building will be done by the async version
+            logger.warning(f"Pipeline rebuild for chatbot `{chatbot_id}` model `{model_name}` requires async context. Use aget_pipeline() for full rebuild capability.")
+
+        except Exception as e:
+            logger.error(f"Error rebuilding pipeline for chatbot `{chatbot_id}` model `{model_name}`: {e}")
+            pass
+
+    async def _async_rebuild_pipeline(self, chatbot_id: str, model_name: str) -> None:
+        """Asynchronously rebuild a pipeline for the given chatbot and model.
+
+        Args:
+            chatbot_id (str): The chatbot ID.
+            model_name (str): The model name.
+        """
+        try:
+            # First, ensure we have the pipeline builder
+            if chatbot_id not in self._builders:
+                await self._async_rebuild_plugin(chatbot_id)
+
             if chatbot_id not in self._builders:
                 logger.error(f"Could not rebuild pipeline builder for chatbot `{chatbot_id}`")
                 return
@@ -329,65 +375,8 @@ class PipelineHandler(PluginHandler):
                 if model.get("name") == model_name:
                     model_config = model
                     break
-                    
             if not model_config:
-                logger.error(f"Model `{model_name}` not found in supported models for chatbot `{chatbot_id}`")
-                return
-
-            # Build the pipeline configuration
-            pipeline_config = chatbot_config.pipeline_config.copy()
-            pipeline_config["model_name"] = model_name
-            pipeline_config["model_kwargs"] = model_config.get("model_kwargs", {})
-            pipeline_config["model_env_kwargs"] = model_config.get("model_env_kwargs", {})
-            
-            # for backward compatibility
-            credentials = pipeline_config["model_env_kwargs"].get("credentials")
-            if credentials:
-                pipeline_config["api_key"] = credentials
-
-            # Note: This is a simplified rebuild that doesn't actually build the pipeline
-            # since the original _build_plugin method is async and we're in a sync context
-            # The actual pipeline building would need to be done asynchronously
-            logger.warning(f"Pipeline rebuild for chatbot `{chatbot_id}` model `{model_name}` requires async context")
-            
-        except Exception as e:
-            logger.error(f"Error rebuilding pipeline for chatbot `{chatbot_id}` model `{model_name}`: {e}")
-            pass
-
-    async def _async_rebuild_pipeline(self, chatbot_id: str, model_name: str) -> None:
-        """Asynchronously rebuild a pipeline for the given chatbot and model.
-
-        Args:
-            chatbot_id (str): The chatbot ID.
-            model_name (str): The model name.
-        """
-        try:
-            # Check if we have the chatbot configuration
-            if chatbot_id not in self._chatbot_configs:
-                logger.error(f"Chatbot configuration not found for `{chatbot_id}`")
-                return
-
-            chatbot_config = self._chatbot_configs[chatbot_id]
-            pipeline_type = chatbot_config.pipeline_type
-            
-            # Check if we have the plugin for this pipeline type
-            if pipeline_type not in self._plugins:
-                logger.error(f"Plugin not found for pipeline type `{pipeline_type}`")
-                return
-
-            plugin = self._plugins[pipeline_type]
-            
-            # Find the model configuration
-            supported_models = list(chatbot_config.pipeline_config.get("supported_models", {}).values())
-            model_config = None
-            
-            for model in supported_models:
-                if model.get("name") == model_name:
-                    model_config = model
-                    break
-                    
-            if not model_config:
-                logger.error(f"Model `{model_name}` not found in supported models for chatbot `{chatbot_id}`")
+                logger.error(f"Model `{model_name}` not found in supported models for chatbot `{chatbot_id}` async rebuild pipeline")
                 return
 
             # Use the existing _build_plugin method to rebuild the pipeline
@@ -417,7 +406,7 @@ class PipelineHandler(PluginHandler):
         if pipeline_key not in self._pipeline_cache:
             logger.warning(f"Pipeline not found for chatbot `{chatbot_id}` model `{model_name}`, attempting to rebuild...")
             # Try to rebuild the pipeline if it's not found
-            await self._async_rebuild_pipeline(chatbot_id, model_name)
+            await self._async_rebuild_pipeline(chatbot_id, str(model_name))
             
         if pipeline_key not in self._pipeline_cache:
             raise ValueError(f"Pipeline for chatbot `{chatbot_id}` model `{model_name}` not found and could not be rebuilt")

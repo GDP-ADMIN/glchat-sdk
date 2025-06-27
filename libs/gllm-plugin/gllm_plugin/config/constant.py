@@ -9,6 +9,10 @@ References:
 
 from enum import StrEnum
 
+import elastic_transport
+import requests
+import urllib3
+
 
 class SearchType(StrEnum):
     """The type of search to perform.
@@ -24,3 +28,17 @@ class SearchType(StrEnum):
     NORMAL = "normal"
     SMART = "smart"
     WEB = "web"
+
+
+DEFAULT_RETRYABLLE_ERRORS = {
+    ConnectionError,
+    TimeoutError,
+    requests.exceptions.ConnectionError,
+    requests.exceptions.Timeout,
+    requests.exceptions.RetryError,
+    urllib3.exceptions.NewConnectionError,
+    urllib3.exceptions.TimeoutError,
+    urllib3.exceptions.MaxRetryError,
+    elastic_transport.ConnectionError,
+    elastic_transport.ConnectionTimeout,
+}

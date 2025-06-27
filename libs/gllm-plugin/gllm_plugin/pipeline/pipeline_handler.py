@@ -18,6 +18,7 @@ from gllm_pipeline.pipeline.pipeline import Pipeline
 from pydantic import BaseModel, ConfigDict
 
 from gllm_plugin.config.app_config import AppConfig
+from gllm_plugin.config.constant import DEFAULT_RETRYABLLE_ERRORS
 from gllm_plugin.storage.base_chat_history_storage import BaseChatHistoryStorage
 
 
@@ -98,19 +99,21 @@ class PipelineHandler(PluginHandler):
         self,
         app_config: AppConfig,
         chat_history_storage: BaseChatHistoryStorage,
-        retryable_errors: set[type[Exception]] | None = None,
+        custom_retryable_errors: set[type[Exception]] | None = None,
     ):
         """Initialize the pipeline handler.
 
         Args:
             app_config (AppConfig): Application configuration.
             chat_history_storage (BaseChatHistoryStorage): Chat history storage.
-            retryable_errors (set[type[Exception]] | None): Set of retryable errors.
-                If empty, defaults to {ConnectionError, TimeoutError}.
+            custom_retryable_errors (set[type[Exception]] | None): Set of custom retryable errors.
+                It will be combined with DEFAULT_RETRYABLLE_ERRORS.
         """
         self.app_config = app_config
         self.chat_history_storage = chat_history_storage
-        self._retryable_errors = retryable_errors or {ConnectionError, TimeoutError}
+        self._retryable_errors = DEFAULT_RETRYABLLE_ERRORS
+        if custom_retryable_errors:
+            self._retryable_errors.update(custom_retryable_errors)
         self._prepare_pipelines()
 
     @classmethod

@@ -7,7 +7,6 @@ Authors:
     Hermes Vincentius Gani (hermes.v.gani@gdplabs.id)
 """
 
-import asyncio
 from typing import Any, Type
 
 from bosa_core import Plugin
@@ -252,7 +251,7 @@ class PipelineHandler(PluginHandler):
         """
         return self._builders[chatbot_id]
 
-    def get_pipeline(self, chatbot_id: str, model_name: str) -> Pipeline:
+    async def get_pipeline(self, chatbot_id: str, model_name: str) -> Pipeline:
         """Get a pipeline instance for the given chatbot and model name.
 
         Args:
@@ -271,10 +270,6 @@ class PipelineHandler(PluginHandler):
             return pipeline
 
         err = self._pipeline_error.get(pipeline_key)
-        print(err)
-        print(err.__class__)
-        print(self._retryable_errors)
-        print(any(isinstance(err, error_type) for error_type in self._retryable_errors))
         if err and not any(isinstance(err, error_type) for error_type in self._retryable_errors):
             # raise non-retryable error directly
             raise err
@@ -301,9 +296,7 @@ class PipelineHandler(PluginHandler):
         plugin.lmrp_catalogs = chatbot_config.lmrp_catalogs
         self._builders[chatbot_id] = plugin
 
-        loop = asyncio.new_event_loop()
-        loop.run_until_complete(self._build_plugin_chatbot_model(self, chatbot_id, model, plugin))
-        loop.close()
+        await self._build_plugin_chatbot_model(self, chatbot_id, model, plugin)
 
         pipeline = self._pipeline_cache[pipeline_key]
         if pipeline:

@@ -351,12 +351,12 @@ def test_get_pipeline_builder_success(pipeline_handler: PipelineHandler):
 def test_get_pipeline_builder_not_found(pipeline_handler: PipelineHandler):
     """
     Condition:
-    - chatbot_id not in _builders
+    - chatbot_id not in _builders and rebuild fails
 
     Expected:
-    - Raises KeyError
+    - Raises ValueError with descriptive message
     """
-    with pytest.raises(KeyError):
+    with pytest.raises(ValueError, match="Pipeline builder for chatbot `nonexistent` not found and could not be rebuilt"):
         pipeline_handler.get_pipeline_builder("nonexistent")
 
 
@@ -379,12 +379,12 @@ def test_get_pipeline_success(pipeline_handler: PipelineHandler):
 def test_get_pipeline_not_found(pipeline_handler: PipelineHandler):
     """
     Condition:
-    - Pipeline key not in cache
+    - Pipeline key not in cache and rebuild fails
 
     Expected:
-    - Raises KeyError
+    - Raises ValueError with descriptive message
     """
-    with pytest.raises(KeyError):
+    with pytest.raises(ValueError, match="Pipeline for chatbot `chatbot1` model `nonexistent_model` not found and could not be rebuilt"):
         pipeline_handler.get_pipeline("chatbot1", "nonexistent_model")
 
 
@@ -433,7 +433,7 @@ def test_get_pipeline_type_not_found(pipeline_handler: PipelineHandler):
     - chatbot_id not in _chatbot_configs
 
     Expected:
-    - Raises KeyError
+    - Raises KeyError (direct dictionary access)
     """
     with pytest.raises(KeyError):
         pipeline_handler.get_pipeline_type("nonexistent")

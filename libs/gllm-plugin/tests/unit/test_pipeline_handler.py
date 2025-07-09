@@ -178,6 +178,7 @@ async def test_ainitialize_plugin_success(pipeline_handler: PipelineHandler, moc
                 supported_models=[
                     {"name": "gpt-3", "model_kwargs": {}, "model_env_kwargs": {}},
                     {"name": "gpt-4", "model_kwargs": {}, "model_env_kwargs": {"credentials": "test_key"}},
+                    {"model_id": "GPT 3", "name": "gpt-3", "model_kwargs": {}, "model_env_kwargs": {}},
                 ],
             )
         },
@@ -189,7 +190,8 @@ async def test_ainitialize_plugin_success(pipeline_handler: PipelineHandler, moc
     assert pipeline_handler._plugins["pipeline_type1"] == mock_plugin
     assert ("chatbot1", "gpt-3") in pipeline_handler._pipeline_cache
     assert ("chatbot1", "gpt-4") in pipeline_handler._pipeline_cache
-    assert mock_plugin.build.call_count == 2
+    assert ("chatbot1", "GPT 3") in pipeline_handler._pipeline_cache
+    assert mock_plugin.build.call_count == 3
 
 
 @pytest.mark.asyncio
@@ -332,7 +334,8 @@ async def test_build_plugin_without_model_name(pipeline_handler: PipelineHandler
     assert mock_plugin.build.call_count == 0
 
 
-def test_get_pipeline_builder_success(pipeline_handler: PipelineHandler):
+@pytest.mark.asyncio
+async def test_aget_pipeline_builder_success(pipeline_handler: PipelineHandler):
     """
     Condition:
     - Valid chatbot_id with existing builder
@@ -343,12 +346,13 @@ def test_get_pipeline_builder_success(pipeline_handler: PipelineHandler):
     mock_builder = Mock(spec=Plugin)
     pipeline_handler._builders["chatbot1"] = mock_builder
 
-    result = pipeline_handler.get_pipeline_builder("chatbot1")
+    result = await pipeline_handler.aget_pipeline_builder("chatbot1")
 
     assert result == mock_builder
 
 
-def test_get_pipeline_builder_not_found(pipeline_handler: PipelineHandler):
+@pytest.mark.asyncio
+async def test_aget_pipeline_builder_not_found(pipeline_handler: PipelineHandler):
     """
     Condition:
     - chatbot_id not in _builders and rebuild fails
@@ -356,11 +360,14 @@ def test_get_pipeline_builder_not_found(pipeline_handler: PipelineHandler):
     Expected:
     - Raises ValueError with descriptive message
     """
-    with pytest.raises(ValueError, match="Pipeline builder for chatbot `nonexistent` not found and could not be rebuilt"):
-        pipeline_handler.get_pipeline_builder("nonexistent")
+    with pytest.raises(
+        ValueError, match="Pipeline builder for chatbot `nonexistent` not found and could not be rebuilt"
+    ):
+        await pipeline_handler.aget_pipeline_builder("nonexistent")
 
 
-def test_get_pipeline_success(pipeline_handler: PipelineHandler):
+@pytest.mark.asyncio
+async def test_aget_pipeline_success(pipeline_handler: PipelineHandler):
     """
     Condition:
     - Valid chatbot_id and model_name with cached pipeline
@@ -371,12 +378,13 @@ def test_get_pipeline_success(pipeline_handler: PipelineHandler):
     mock_pipeline = Mock(spec=Pipeline)
     pipeline_handler._pipeline_cache[("chatbot1", "gpt-3")] = mock_pipeline
 
-    result = pipeline_handler.get_pipeline("chatbot1", "gpt-3")
+    result = await pipeline_handler.aget_pipeline("chatbot1", "gpt-3")
 
     assert result == mock_pipeline
 
 
-def test_get_pipeline_not_found(pipeline_handler: PipelineHandler):
+@pytest.mark.asyncio
+async def test_aget_pipeline_not_found(pipeline_handler: PipelineHandler):
     """
     Condition:
     - Pipeline key not in cache and rebuild fails
@@ -384,8 +392,10 @@ def test_get_pipeline_not_found(pipeline_handler: PipelineHandler):
     Expected:
     - Raises ValueError with descriptive message
     """
-    with pytest.raises(ValueError, match="Pipeline for chatbot `chatbot1` model `nonexistent_model` not found and could not be rebuilt"):
-        pipeline_handler.get_pipeline("chatbot1", "nonexistent_model")
+    with pytest.raises(
+        ValueError, match="Pipeline for chatbot `chatbot1` model `nonexistent_model` not found and could not be rebuilt"
+    ):
+        await pipeline_handler.aget_pipeline("chatbot1", "nonexistent_model")
 
 
 def test_get_pipeline_config_success(pipeline_handler: PipelineHandler):
@@ -738,7 +748,8 @@ def test_validate_pipeline_invalid_chatbot(pipeline_handler: PipelineHandler):
         (None, ("chatbot1", "None")),
     ],
 )
-def test_get_pipeline_handles_different_model_types(
+@pytest.mark.asyncio
+async def test_aget_pipeline_handles_different_model_types(
     pipeline_handler: PipelineHandler, model_name: Any, expected_key: tuple[str, str]
 ):
     """
@@ -751,7 +762,7 @@ def test_get_pipeline_handles_different_model_types(
     mock_pipeline = Mock(spec=Pipeline)
     pipeline_handler._pipeline_cache[expected_key] = mock_pipeline
 
-    result = pipeline_handler.get_pipeline("chatbot1", model_name)
+    result = await pipeline_handler.aget_pipeline("chatbot1", model_name)
 
     assert result == mock_pipeline
 

@@ -20,7 +20,7 @@ import { MessageAPI } from './api/message/handler';
 
 import type { APIVersion, GLChatConfiguration } from './config';
 import { GLChatConfigurationSchema } from './config';
-import { GeneralError, ValidationError } from './error';
+import { ValidationError } from './error';
 
 /**
  * API client that serves as an interface to interact with GLChat
@@ -35,7 +35,7 @@ export class GLChat {
    * Collection of interfaces to interact with message API of
    * GLChat.
    */
-  public message: MessageAPI;
+  public readonly message: MessageAPI;
 
   /**
    * API client that serves as an interface to interact with GLChat.
@@ -51,16 +51,12 @@ export class GLChat {
 
       this.message = new MessageAPI(fetchClient);
     } catch (err) {
-      const error = err as Error;
-
-      if (error instanceof ZodError) {
+      if (err instanceof ZodError) {
         throw new ValidationError(
           'configuration',
-          error.issues.map(
+          err.issues.map(
             issue => ({ path: issue.path as string[], message: issue.message })));
       }
-
-      throw new GeneralError(error.message);
     }
   }
 
@@ -79,16 +75,14 @@ export class GLChat {
 
       this.configuration.baseUrl = url;
     } catch (err) {
-      const error = err as Error;
-
-      if (error instanceof ZodError) {
+      if (err instanceof ZodError) {
         throw new ValidationError(
           'configuration',
-          error.issues.map(
+          err.issues.map(
             issue => ({ path: issue.path as string[], message: issue.message })));
       }
 
-      throw new GeneralError(error.message);
+      throw err;
     }
   }
 
@@ -107,16 +101,14 @@ export class GLChat {
 
       this.configuration.__version = version;
     } catch (err) {
-      const error = err as Error;
-
-      if (error instanceof ZodError) {
+      if (err instanceof ZodError) {
         throw new ValidationError(
           'configuration',
-          error.issues.map(
+          err.issues.map(
             issue => ({ path: issue.path as string[], message: issue.message })));
       }
 
-      throw new GeneralError(error.message);
+      throw err;
     }
   }
 
@@ -137,16 +129,14 @@ export class GLChat {
 
       this.configuration.timeout = timeout;
     } catch (err) {
-      const error = err as Error;
-
-      if (error instanceof ZodError) {
+      if (err instanceof ZodError) {
         throw new ValidationError(
           'configuration',
-          error.issues.map(
+          err.issues.map(
             issue => ({ path: issue.path as string[], message: issue.message })));
       }
 
-      throw new GeneralError(error.message);
+      throw err;
     }
   }
 }

@@ -12,7 +12,8 @@
  * Copyright (c) GDP LABS. All rights reserved.
  */
 
-import { GeneralError } from '@/error';
+import { ChunkError } from '@/error';
+
 import type { GLChatMessageChunk, GLChatMessageStatus } from './message/types';
 
 /**
@@ -26,14 +27,27 @@ export function processGLChatChunk(
   value: unknown,
 ): GLChatMessageChunk {
   if (typeof value !== 'string') {
-    throw new GeneralError('Chunk is not a string!');
+    throw new ChunkError('Chunk is not a string', 'raw');
   }
 
   const stringChunk = value.replace(/^data:/, '');
-  const rawChunk: { status: GLChatMessageStatus; message: string } = JSON.parse(stringChunk);
+
+  let rawChunk: { status: GLChatMessageStatus; message: string };
+  try {
+    rawChunk = JSON.parse(stringChunk);
+  } catch {
+    throw new ChunkError('Chunk is not a valid JSON', 'raw');
+  }
+
+  let parsedMessage;
+  try {
+    parsedMessage = rawChunk.status === 'data' ? JSON.parse(rawChunk.message) : rawChunk.message;
+  } catch {
+    throw new ChunkError('Data chunk is not a valid JSON', 'data');
+  }
 
   return {
     ...rawChunk,
-    message: rawChunk.status === 'data' ? JSON.parse(rawChunk.message) : rawChunk.message,
+    message: parsedMessage,
   } as GLChatMessageChunk;
 }

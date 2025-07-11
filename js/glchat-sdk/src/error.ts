@@ -12,29 +12,6 @@
  */
 
 /**
- * General error class.
- *
- * Extends the original `Error` object with the addition
- * of error codes for quicker error identification.
- */
-export class GLChatError extends Error {
-  constructor(message: string, public readonly code: string) {
-    super(message);
-  }
-}
-
-/**
- * Errors that doesn't belong to any other error.
- *
- * In normal scenario, this error shouldn't be thrown at all.
- */
-export class GeneralError extends GLChatError {
-  constructor(message: string) {
-    super(message, 'GEN');
-  }
-}
-
-/**
  * Issues present in the schema.
  */
 interface ValidationIssue {
@@ -52,11 +29,10 @@ interface ValidationIssue {
  * Errors that are thrown when the user-provided payload
  * doesn't satisfy the constraint.
  */
-export class ValidationError extends GLChatError {
+export class ValidationError extends Error {
   constructor(public readonly object: string, public readonly issues: ValidationIssue[]) {
     super(
       'Invalid payload. Please refer to the `issues` array for detailed information.',
-      'INP',
     );
   }
 }
@@ -65,8 +41,33 @@ export class ValidationError extends GLChatError {
  * Errors that are thrown during API calls, including
  * data parsing.
  */
-export class APIError extends GLChatError {
-  constructor(message: string, code: string) {
-    super(message, `API${code}`);
+export class APIError extends Error {
+  constructor(message: string, public readonly status: number) {
+    super(message);
+  }
+}
+
+/**
+ * Errors that are thrown when the API request timed out
+ */
+export class TimeoutError extends Error {
+  constructor() {
+    super('Request timed out');
+  }
+}
+
+/**
+ * Errors that are thrown when the SDK tries
+ * to parse invalid chunk.
+ *
+ * Consist of 2 types:
+ *   1. `raw`, which signifies that the chunk itself is not a valid JSON.
+ *   2. `data`, which signifies that the data chunk is not a valid JSON.
+ *
+ * Unlikely to be thrown.
+ */
+export class ChunkError extends Error {
+  constructor(message: string, public readonly type: 'raw' | 'data') {
+    super(message);
   }
 }

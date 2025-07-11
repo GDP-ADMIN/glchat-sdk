@@ -1,5 +1,3 @@
-import { GeneralError } from '@/error';
-
 import { describe, expect, it } from 'vitest';
 import { processGLChatChunk } from './lib';
 
@@ -7,7 +5,7 @@ describe('processGLChatChunk', () => {
   it('should throw error when the chunk is incorrect', () => {
     const chunk = 1234123412334;
 
-    expect(() => processGLChatChunk(chunk)).toThrow(GeneralError);
+    expect(() => processGLChatChunk(chunk)).toThrow(Error);
   });
 
   it('should process response chunk', () => {

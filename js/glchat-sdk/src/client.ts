@@ -57,6 +57,8 @@ export class GLChat {
           err.issues.map(
             issue => ({ path: issue.path as string[], message: issue.message })));
       }
+
+      throw err;
     }
   }
 

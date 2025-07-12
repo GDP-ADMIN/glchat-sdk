@@ -13,7 +13,7 @@ class BaseUserService(ABC):
     """A base class for user service."""
 
     @abstractmethod
-    def get_user_id(self, request: Request) -> str:
+    async def get_user_id(self, request: Request) -> str:
         """Abstract method to get the user id.
 
         Returns:

@@ -156,7 +156,7 @@ class PipelineHandler(PluginHandler):
                 await cls._build_plugin(instance, chatbot_id, preset.supported_models, plugin)
             except Exception as e:
                 logger.warning(f"Failed when ainit pliugin {traceback.format_exc()}")
-                logger.error(f"Error initializing plugin for chatbot `{chatbot_id}`: {e}")
+                logger.warning(f"Error initializing plugin for chatbot `{chatbot_id}`: {e}")
                 pass
 
     @classmethod
@@ -170,7 +170,7 @@ class PipelineHandler(PluginHandler):
             try:
                 await plugin.cleanup()
             except Exception as e:
-                logger.error(f"Error cleaning up plugin `{plugin.name}`: {e}")
+                logger.warning(f"Error cleaning up plugin `{plugin.name}`: {e}")
                 pass
 
     @classmethod
@@ -210,7 +210,7 @@ class PipelineHandler(PluginHandler):
                 instance._pipeline_cache[pipeline_key] = pipeline
             except Exception as e:
                 logger.warning(f"Failed when ainit pliugin {traceback.format_exc()}")
-                logger.error(f"Error building pipeline for chatbot `{chatbot_id}` model `{model_id}`: {e}")
+                logger.warning(f"Error building pipeline for chatbot `{chatbot_id}` model `{model_id}`: {e}")
                 pass
 
     def get_pipeline_builder(self, chatbot_id: str) -> Plugin:
@@ -244,7 +244,7 @@ class PipelineHandler(PluginHandler):
         try:
             # Check if we have the chatbot configuration
             if chatbot_id not in self._chatbot_configs:
-                logger.error(f"Chatbot configuration not found for `{chatbot_id}`")
+                logger.warning(f"Chatbot configuration not found for `{chatbot_id}`")
                 return
 
             chatbot_config = self._chatbot_configs[chatbot_id]
@@ -252,7 +252,7 @@ class PipelineHandler(PluginHandler):
 
             # Check if we have the plugin for this pipeline type
             if pipeline_type not in self._plugins:
-                logger.error(f"Plugin not found for pipeline type `{pipeline_type}`")
+                logger.warning(f"Plugin not found for pipeline type `{pipeline_type}`")
                 return
 
             plugin = self._plugins[pipeline_type]
@@ -273,7 +273,7 @@ class PipelineHandler(PluginHandler):
             logger.info(f"Successfully rebuilt pipeline builder for chatbot `{chatbot_id}`")
 
         except Exception as e:
-            logger.error(f"Error rebuilding plugin for chatbot `{chatbot_id}`: {e}")
+            logger.warning(f"Error rebuilding plugin for chatbot `{chatbot_id}`: {e}")
             pass
 
     async def _async_rebuild_pipeline(self, chatbot_id: str, model_id: str) -> None:
@@ -289,12 +289,12 @@ class PipelineHandler(PluginHandler):
                 await self._async_rebuild_plugin(chatbot_id)
 
             if chatbot_id not in self._builders:
-                logger.error(f"Could not rebuild pipeline builder for chatbot `{chatbot_id}`")
+                logger.warning(f"Could not rebuild pipeline builder for chatbot `{chatbot_id}`")
                 return
 
             # Check if we have the chatbot configuration
             if chatbot_id not in self._chatbot_configs:
-                logger.error(f"Chatbot configuration not found for `{chatbot_id}`")
+                logger.warning(f"Chatbot configuration not found for `{chatbot_id}`")
                 return
 
             chatbot_config = self._chatbot_configs[chatbot_id]
@@ -309,7 +309,7 @@ class PipelineHandler(PluginHandler):
                     model_config = model
                     break
             if not model_config:
-                logger.error(
+                logger.warning(
                     f"Model `{model_id}` not found in supported models "
                     f"for chatbot `{chatbot_id}` async rebuild pipeline"
                 )
@@ -321,7 +321,7 @@ class PipelineHandler(PluginHandler):
             logger.info(f"Successfully rebuilt pipeline for chatbot `{chatbot_id}` model `{model_id}`")
 
         except Exception as e:
-            logger.error(f"Error rebuilding pipeline for chatbot `{chatbot_id}` model `{model_id}`: {e}")
+            logger.warning(f"Error rebuilding pipeline for chatbot `{chatbot_id}` model `{model_id}`: {e}")
             pass
 
     async def aget_pipeline(self, chatbot_id: str, model_id: str) -> Pipeline:
@@ -502,7 +502,7 @@ class PipelineHandler(PluginHandler):
 
                 await __class__._build_plugin(self, chatbot_id, supported_models, plugin)
             except Exception as e:
-                logger.error(f"Error updating chatbot `{chatbot_id}`: {e}")
+                logger.warning(f"Error updating chatbot `{chatbot_id}`: {e}")
                 pass
 
     def _prepare_pipelines(self) -> None:
@@ -580,7 +580,7 @@ class PipelineHandler(PluginHandler):
         try:
             # Check if we have the chatbot configuration
             if chatbot_id not in self._chatbot_configs:
-                logger.error(f"Chatbot configuration not found for `{chatbot_id}`")
+                logger.warning(f"Chatbot configuration not found for `{chatbot_id}`")
                 return
 
             chatbot_config = self._chatbot_configs[chatbot_id]
@@ -588,7 +588,7 @@ class PipelineHandler(PluginHandler):
 
             # Check if we have the plugin for this pipeline type
             if pipeline_type not in self._plugins:
-                logger.error(f"Plugin not found for pipeline type `{pipeline_type}`")
+                logger.warning(f"Plugin not found for pipeline type `{pipeline_type}`")
                 return
 
             plugin = self._plugins[pipeline_type]
@@ -606,5 +606,5 @@ class PipelineHandler(PluginHandler):
             logger.info(f"Successfully rebuilt pipeline builder for chatbot `{chatbot_id}`")
 
         except Exception as e:
-            logger.error(f"Error rebuilding plugin for chatbot `{chatbot_id}`: {e}")
+            logger.warning(f"Error rebuilding plugin for chatbot `{chatbot_id}`: {e}")
             pass

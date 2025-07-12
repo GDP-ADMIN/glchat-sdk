@@ -157,7 +157,6 @@ class PipelineHandler(PluginHandler):
             except Exception as e:
                 logger.warning(f"Failed when ainit pliugin {traceback.format_exc()}")
                 logger.warning(f"Error initializing plugin for chatbot `{chatbot_id}`: {e}")
-                pass
 
     @classmethod
     async def acleanup_plugins(cls, instance: "PipelineHandler") -> None:
@@ -171,7 +170,6 @@ class PipelineHandler(PluginHandler):
                 await plugin.cleanup()
             except Exception as e:
                 logger.warning(f"Error cleaning up plugin `{plugin.name}`: {e}")
-                pass
 
     @classmethod
     async def _build_plugin(
@@ -211,7 +209,6 @@ class PipelineHandler(PluginHandler):
             except Exception as e:
                 logger.warning(f"Failed when ainit pliugin {traceback.format_exc()}")
                 logger.warning(f"Error building pipeline for chatbot `{chatbot_id}` model `{model_id}`: {e}")
-                pass
 
     def get_pipeline_builder(self, chatbot_id: str) -> Plugin:
         """Get a pipeline builder instance for the given chatbot.
@@ -274,7 +271,6 @@ class PipelineHandler(PluginHandler):
 
         except Exception as e:
             logger.warning(f"Error rebuilding plugin for chatbot `{chatbot_id}`: {e}")
-            pass
 
     async def _async_rebuild_pipeline(self, chatbot_id: str, model_id: str) -> None:
         """Asynchronously rebuild a pipeline for the given chatbot and model.
@@ -322,7 +318,6 @@ class PipelineHandler(PluginHandler):
 
         except Exception as e:
             logger.warning(f"Error rebuilding pipeline for chatbot `{chatbot_id}` model `{model_id}`: {e}")
-            pass
 
     async def aget_pipeline(self, chatbot_id: str, model_id: str) -> Pipeline:
         """Get a pipeline instance for the given chatbot and model ID (async version).
@@ -503,7 +498,6 @@ class PipelineHandler(PluginHandler):
                 await __class__._build_plugin(self, chatbot_id, supported_models, plugin)
             except Exception as e:
                 logger.warning(f"Error updating chatbot `{chatbot_id}`: {e}")
-                pass
 
     def _prepare_pipelines(self) -> None:
         """Build pipeline configurations from the chatbots configuration."""
@@ -607,4 +601,3 @@ class PipelineHandler(PluginHandler):
 
         except Exception as e:
             logger.warning(f"Error rebuilding plugin for chatbot `{chatbot_id}`: {e}")
-            pass

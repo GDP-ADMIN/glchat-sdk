@@ -785,3 +785,711 @@ async def test_delete_chatbot_with_pipeline_keys_typo(empty_pipeline_handler: Pi
 
     assert ("test_chatbot", "model1") not in empty_pipeline_handler._pipeline_cache
     assert "test_chatbot" not in empty_pipeline_handler._chatbot_pipeline_keys
+
+
+@pytest.mark.asyncio
+async def test_async_rebuild_plugin_success(empty_pipeline_handler: PipelineHandler, mock_plugin: Mock):
+    """
+    Condition:
+    - Valid chatbot_id with existing configuration
+    - Plugin exists for the pipeline type
+    - Supported models are configured
+
+    Expected:
+    - _build_plugin is called with correct parameters
+    - Plugin is successfully rebuilt
+    """
+    # Setup test data
+    chatbot_id = "test_chatbot"
+    pipeline_type = "pipeline_type1"
+
+    empty_pipeline_handler._chatbot_configs[chatbot_id] = ChatbotConfig(
+        pipeline_type=pipeline_type,
+        pipeline_config={
+            "supported_models": {
+                "model1": {"name": "model1", "model_kwargs": {}, "model_env_kwargs": {}},
+                "model2": {"name": "model2", "model_kwargs": {}, "model_env_kwargs": {}},
+            }
+        },
+        prompt_builder_catalogs=None,
+        lmrp_catalogs=None,
+    )
+
+    empty_pipeline_handler._plugins[pipeline_type] = mock_plugin
+
+    # Mock the _build_plugin method
+    with patch.object(PipelineHandler, "_build_plugin", new_callable=AsyncMock) as mock_build_plugin:
+        await empty_pipeline_handler._async_rebuild_plugin(chatbot_id)
+
+        # Verify _build_plugin was called with correct parameters
+        mock_build_plugin.assert_called_once()
+        call_args = mock_build_plugin.call_args[0]
+        assert call_args[0] is empty_pipeline_handler  # self
+        assert call_args[1] == chatbot_id
+        assert len(call_args[2]) == 2  # supported_models list
+        assert call_args[3] == mock_plugin
+
+
+@pytest.mark.asyncio
+async def test_async_rebuild_plugin_chatbot_not_found(empty_pipeline_handler: PipelineHandler):
+    """
+    Condition:
+    - chatbot_id not in _chatbot_configs
+
+    Expected:
+    - Method logs warning and returns early
+    - _build_plugin is not called
+    """
+    with patch("gllm_plugin.pipeline.pipeline_handler.logger") as mock_logger:
+        with patch.object(PipelineHandler, "_build_plugin", new_callable=AsyncMock) as mock_build_plugin:
+            await empty_pipeline_handler._async_rebuild_plugin("nonexistent_chatbot")
+
+            mock_logger.warning.assert_called_once()
+            mock_build_plugin.assert_not_called()
+
+
+@pytest.mark.asyncio
+async def test_async_rebuild_plugin_plugin_not_found(empty_pipeline_handler: PipelineHandler):
+    """
+    Condition:
+    - Valid chatbot_id with existing configuration
+    - Plugin does not exist for the pipeline type
+
+    Expected:
+    - Method logs warning and returns early
+    - _build_plugin is not called
+    """
+    # Setup test data
+    chatbot_id = "test_chatbot"
+    pipeline_type = "unknown_pipeline_type"
+
+    empty_pipeline_handler._chatbot_configs[chatbot_id] = ChatbotConfig(
+        pipeline_type=pipeline_type, pipeline_config={}, prompt_builder_catalogs=None, lmrp_catalogs=None
+    )
+
+    with patch("gllm_plugin.pipeline.pipeline_handler.logger") as mock_logger:
+        with patch.object(PipelineHandler, "_build_plugin", new_callable=AsyncMock) as mock_build_plugin:
+            await empty_pipeline_handler._async_rebuild_plugin(chatbot_id)
+
+            mock_logger.warning.assert_called_once()
+            mock_build_plugin.assert_not_called()
+
+
+@pytest.mark.asyncio
+async def test_async_rebuild_plugin_no_supported_models(empty_pipeline_handler: PipelineHandler, mock_plugin: Mock):
+    """
+    Condition:
+    - Valid chatbot_id with existing configuration
+    - Plugin exists for the pipeline type
+    - No supported models in configuration
+
+    Expected:
+    - Method logs warning and returns early
+    - _build_plugin is not called
+    """
+    # Setup test data
+    chatbot_id = "test_chatbot"
+    pipeline_type = "pipeline_type1"
+
+    empty_pipeline_handler._chatbot_configs[chatbot_id] = ChatbotConfig(
+        pipeline_type=pipeline_type,
+        pipeline_config={"supported_models": {}},  # Empty supported_models
+        prompt_builder_catalogs=None,
+        lmrp_catalogs=None,
+    )
+
+    empty_pipeline_handler._plugins[pipeline_type] = mock_plugin
+
+    with patch("gllm_plugin.pipeline.pipeline_handler.logger") as mock_logger:
+        with patch.object(PipelineHandler, "_build_plugin", new_callable=AsyncMock) as mock_build_plugin:
+            await empty_pipeline_handler._async_rebuild_plugin(chatbot_id)
+
+            mock_logger.warning.assert_called_once()
+            mock_build_plugin.assert_not_called()
+
+
+@pytest.mark.asyncio
+async def test_async_rebuild_plugin_handles_exception(empty_pipeline_handler: PipelineHandler, mock_plugin: Mock):
+    """
+    Condition:
+    - Valid setup but _build_plugin raises an exception
+
+    Expected:
+    - Exception is caught and logged
+    - Method completes without raising exception
+    """
+    # Setup test data
+    chatbot_id = "test_chatbot"
+    pipeline_type = "pipeline_type1"
+
+    empty_pipeline_handler._chatbot_configs[chatbot_id] = ChatbotConfig(
+        pipeline_type=pipeline_type,
+        pipeline_config={
+            "supported_models": {"model1": {"name": "model1", "model_kwargs": {}, "model_env_kwargs": {}}}
+        },
+        prompt_builder_catalogs=None,
+        lmrp_catalogs=None,
+    )
+
+    empty_pipeline_handler._plugins[pipeline_type] = mock_plugin
+
+    # Make _build_plugin raise an exception
+    with patch.object(
+        PipelineHandler, "_build_plugin", new_callable=AsyncMock, side_effect=Exception("Test error")
+    ) as mock_build_plugin:
+        with patch("gllm_plugin.pipeline.pipeline_handler.logger") as mock_logger:
+            await empty_pipeline_handler._async_rebuild_plugin(chatbot_id)
+
+            mock_build_plugin.assert_called_once()
+            mock_logger.warning.assert_called_once()
+
+
+@pytest.mark.asyncio
+async def test_async_rebuild_pipeline_success(empty_pipeline_handler: PipelineHandler, mock_plugin: Mock):
+    """
+    Condition:
+    - Valid chatbot_id and model_id
+    - Builder exists
+    - Model configuration exists
+
+    Expected:
+    - _build_plugin is called with correct parameters
+    - Pipeline is successfully rebuilt
+    """
+    # Setup test data
+    chatbot_id = "test_chatbot"
+    model_id = "model1"
+    pipeline_type = "pipeline_type1"
+
+    # Setup builder
+    empty_pipeline_handler._builders[chatbot_id] = mock_plugin
+
+    # Setup chatbot config
+    empty_pipeline_handler._chatbot_configs[chatbot_id] = ChatbotConfig(
+        pipeline_type=pipeline_type,
+        pipeline_config={
+            "supported_models": {"model1": {"name": "model1", "model_kwargs": {}, "model_env_kwargs": {}}}
+        },
+        prompt_builder_catalogs=None,
+        lmrp_catalogs=None,
+    )
+
+    # Mock the _build_plugin method
+    with patch.object(PipelineHandler, "_build_plugin", new_callable=AsyncMock) as mock_build_plugin:
+        with patch("gllm_plugin.pipeline.pipeline_handler.logger") as mock_logger:
+            await empty_pipeline_handler._async_rebuild_pipeline(chatbot_id, model_id)
+
+            # Verify _build_plugin was called with correct parameters
+            mock_build_plugin.assert_called_once()
+            call_args = mock_build_plugin.call_args[0]
+            assert call_args[0] is empty_pipeline_handler  # self
+            assert call_args[1] == chatbot_id
+            assert len(call_args[2]) == 1  # model_config list
+            assert call_args[3] == mock_plugin
+
+            # Verify success was logged
+            mock_logger.info.assert_called_once()
+
+
+@pytest.mark.asyncio
+async def test_async_rebuild_pipeline_missing_builder_rebuild_success(
+    empty_pipeline_handler: PipelineHandler, mock_plugin: Mock
+):
+    """
+    Condition:
+    - Valid chatbot_id and model_id
+    - Builder does not exist initially but is successfully rebuilt
+    - Model configuration exists
+
+    Expected:
+    - _async_rebuild_plugin is called to rebuild the plugin
+    - _build_plugin is called with correct parameters
+    - Pipeline is successfully rebuilt
+    """
+    # Setup test data
+    chatbot_id = "test_chatbot"
+    model_id = "model1"
+    pipeline_type = "pipeline_type1"
+
+    # Setup chatbot config
+    empty_pipeline_handler._chatbot_configs[chatbot_id] = ChatbotConfig(
+        pipeline_type=pipeline_type,
+        pipeline_config={
+            "supported_models": {"model1": {"name": "model1", "model_kwargs": {}, "model_env_kwargs": {}}}
+        },
+        prompt_builder_catalogs=None,
+        lmrp_catalogs=None,
+    )
+
+    # Mock _async_rebuild_plugin to add the builder
+    async def mock_rebuild_plugin(chat_id):
+        empty_pipeline_handler._builders[chat_id] = mock_plugin
+        return None
+
+    with patch.object(empty_pipeline_handler, "_async_rebuild_plugin", side_effect=mock_rebuild_plugin) as mock_rebuild:
+        with patch.object(PipelineHandler, "_build_plugin", new_callable=AsyncMock) as mock_build_plugin:
+            with patch("gllm_plugin.pipeline.pipeline_handler.logger") as mock_logger:
+                await empty_pipeline_handler._async_rebuild_pipeline(chatbot_id, model_id)
+
+                # Verify _async_rebuild_plugin was called
+                mock_rebuild.assert_called_once_with(chatbot_id)
+
+                # Verify _build_plugin was called
+                mock_build_plugin.assert_called_once()
+
+                # Verify success was logged
+                mock_logger.info.assert_called_once()
+
+
+@pytest.mark.asyncio
+async def test_async_rebuild_pipeline_missing_builder_rebuild_fails(empty_pipeline_handler: PipelineHandler):
+    """
+    Condition:
+    - Valid chatbot_id and model_id
+    - Builder does not exist and rebuild fails
+
+    Expected:
+    - _async_rebuild_plugin is called
+    - Method logs warning and returns early
+    - _build_plugin is not called
+    """
+    chatbot_id = "test_chatbot"
+    model_id = "model1"
+
+    # Setup chatbot config
+    empty_pipeline_handler._chatbot_configs[chatbot_id] = ChatbotConfig(
+        pipeline_type="pipeline_type1", pipeline_config={}, prompt_builder_catalogs=None, lmrp_catalogs=None
+    )
+
+    with patch.object(empty_pipeline_handler, "_async_rebuild_plugin", new_callable=AsyncMock) as mock_rebuild:
+        with patch.object(PipelineHandler, "_build_plugin", new_callable=AsyncMock) as mock_build_plugin:
+            with patch("gllm_plugin.pipeline.pipeline_handler.logger") as mock_logger:
+                await empty_pipeline_handler._async_rebuild_pipeline(chatbot_id, model_id)
+
+                # Verify _async_rebuild_plugin was called
+                mock_rebuild.assert_called_once_with(chatbot_id)
+
+                # Verify warning was logged
+                mock_logger.warning.assert_called_once()
+
+                # Verify _build_plugin was not called
+                mock_build_plugin.assert_not_called()
+
+
+@pytest.mark.asyncio
+async def test_async_rebuild_pipeline_chatbot_config_not_found(
+    empty_pipeline_handler: PipelineHandler, mock_plugin: Mock
+):
+    """
+    Condition:
+    - Valid chatbot_id and model_id
+    - Builder exists
+    - Chatbot configuration not found
+
+    Expected:
+    - Method logs warning and returns early
+    - _build_plugin is not called
+    """
+    chatbot_id = "test_chatbot"
+    model_id = "model1"
+
+    # Setup builder but no config
+    empty_pipeline_handler._builders[chatbot_id] = mock_plugin
+
+    with patch.object(PipelineHandler, "_build_plugin", new_callable=AsyncMock) as mock_build_plugin:
+        with patch("gllm_plugin.pipeline.pipeline_handler.logger") as mock_logger:
+            await empty_pipeline_handler._async_rebuild_pipeline(chatbot_id, model_id)
+
+            # Verify warning was logged
+            mock_logger.warning.assert_called_once()
+
+            # Verify _build_plugin was not called
+            mock_build_plugin.assert_not_called()
+
+
+@pytest.mark.asyncio
+async def test_async_rebuild_pipeline_model_not_found(empty_pipeline_handler: PipelineHandler, mock_plugin: Mock):
+    """
+    Condition:
+    - Valid chatbot_id
+    - Builder exists
+    - Chatbot configuration exists
+    - Model ID not found in supported models
+
+    Expected:
+    - Method logs warning and returns early
+    - _build_plugin is not called
+    """
+    chatbot_id = "test_chatbot"
+    model_id = "nonexistent_model"
+
+    # Setup builder and config
+    empty_pipeline_handler._builders[chatbot_id] = mock_plugin
+    empty_pipeline_handler._chatbot_configs[chatbot_id] = ChatbotConfig(
+        pipeline_type="pipeline_type1",
+        pipeline_config={
+            "supported_models": {"model1": {"name": "model1", "model_kwargs": {}, "model_env_kwargs": {}}}
+        },
+        prompt_builder_catalogs=None,
+        lmrp_catalogs=None,
+    )
+
+    with patch.object(PipelineHandler, "_build_plugin", new_callable=AsyncMock) as mock_build_plugin:
+        with patch("gllm_plugin.pipeline.pipeline_handler.logger") as mock_logger:
+            await empty_pipeline_handler._async_rebuild_pipeline(chatbot_id, model_id)
+
+            # Verify warning was logged
+            mock_logger.warning.assert_called_once()
+
+            # Verify _build_plugin was not called
+            mock_build_plugin.assert_not_called()
+
+
+@pytest.mark.asyncio
+async def test_async_rebuild_pipeline_model_with_model_id(empty_pipeline_handler: PipelineHandler, mock_plugin: Mock):
+    """
+    Condition:
+    - Valid chatbot_id
+    - Model has model_id field instead of relying on name
+
+    Expected:
+    - Model is correctly identified by model_id
+    - _build_plugin is called with correct parameters
+    """
+    chatbot_id = "test_chatbot"
+    model_id = "custom_model_id"
+
+    # Setup builder and config with model having model_id
+    empty_pipeline_handler._builders[chatbot_id] = mock_plugin
+    empty_pipeline_handler._chatbot_configs[chatbot_id] = ChatbotConfig(
+        pipeline_type="pipeline_type1",
+        pipeline_config={
+            "supported_models": {
+                "model1": {
+                    "model_id": "custom_model_id",
+                    "name": "different_name",
+                    "model_kwargs": {},
+                    "model_env_kwargs": {},
+                }
+            }
+        },
+        prompt_builder_catalogs=None,
+        lmrp_catalogs=None,
+    )
+
+    with patch.object(PipelineHandler, "_build_plugin", new_callable=AsyncMock) as mock_build_plugin:
+        await empty_pipeline_handler._async_rebuild_pipeline(chatbot_id, model_id)
+
+        # Verify _build_plugin was called
+        mock_build_plugin.assert_called_once()
+
+        # Verify the correct model config was passed
+        model_config = mock_build_plugin.call_args[0][2][0]
+        assert model_config.get("model_id") == "custom_model_id"
+        assert model_config.get("name") == "different_name"
+
+
+@pytest.mark.asyncio
+async def test_async_rebuild_pipeline_handles_exception(empty_pipeline_handler: PipelineHandler, mock_plugin: Mock):
+    """
+    Condition:
+    - Valid setup
+    - _build_plugin raises an exception
+
+    Expected:
+    - Exception is caught and logged
+    - Method completes without raising exception
+    """
+    chatbot_id = "test_chatbot"
+    model_id = "model1"
+
+    # Setup builder and config
+    empty_pipeline_handler._builders[chatbot_id] = mock_plugin
+    empty_pipeline_handler._chatbot_configs[chatbot_id] = ChatbotConfig(
+        pipeline_type="pipeline_type1",
+        pipeline_config={
+            "supported_models": {"model1": {"name": "model1", "model_kwargs": {}, "model_env_kwargs": {}}}
+        },
+        prompt_builder_catalogs=None,
+        lmrp_catalogs=None,
+    )
+
+    # Make _build_plugin raise an exception
+    with patch.object(
+        PipelineHandler, "_build_plugin", new_callable=AsyncMock, side_effect=Exception("Test error")
+    ) as mock_build_plugin:
+        with patch("gllm_plugin.pipeline.pipeline_handler.logger") as mock_logger:
+            await empty_pipeline_handler._async_rebuild_pipeline(chatbot_id, model_id)
+
+            # Verify _build_plugin was called
+            mock_build_plugin.assert_called_once()
+
+            # Verify warning was logged
+            mock_logger.warning.assert_called_once()
+
+
+def test_try_rebuild_plugin_success(empty_pipeline_handler: PipelineHandler, mock_plugin: Mock):
+    """
+    Condition:
+    - Valid chatbot_id with existing configuration
+    - Plugin exists for the pipeline type
+    - Supported models are configured
+
+    Expected:
+    - Plugin is stored in _builders
+    - Catalogs are set on the plugin
+    - Success is logged
+    """
+    # Setup test data
+    chatbot_id = "test_chatbot"
+    pipeline_type = "pipeline_type1"
+
+    mock_prompt_catalog = Mock(spec=PromptBuilderCatalog)
+    mock_lmrp_catalog = Mock(spec=LMRequestProcessorCatalog)
+
+    empty_pipeline_handler._chatbot_configs[chatbot_id] = ChatbotConfig(
+        pipeline_type=pipeline_type,
+        pipeline_config={
+            "supported_models": {"model1": {"name": "model1", "model_kwargs": {}, "model_env_kwargs": {}}}
+        },
+        prompt_builder_catalogs={"default": mock_prompt_catalog},
+        lmrp_catalogs={"default": mock_lmrp_catalog},
+    )
+
+    empty_pipeline_handler._plugins[pipeline_type] = mock_plugin
+
+    with patch("gllm_plugin.pipeline.pipeline_handler.logger") as mock_logger:
+        empty_pipeline_handler._try_rebuild_plugin(chatbot_id)
+
+        # Verify plugin was stored in _builders
+        assert chatbot_id in empty_pipeline_handler._builders
+        assert empty_pipeline_handler._builders[chatbot_id] == mock_plugin
+
+        # Verify catalogs were set on the plugin
+        assert mock_plugin.prompt_builder_catalogs == {"default": mock_prompt_catalog}
+        assert mock_plugin.lmrp_catalogs == {"default": mock_lmrp_catalog}
+
+        # Verify success was logged
+        mock_logger.info.assert_called_once()
+
+
+def test_try_rebuild_plugin_chatbot_not_found(empty_pipeline_handler: PipelineHandler):
+    """
+    Condition:
+    - chatbot_id not in _chatbot_configs
+
+    Expected:
+    - Method logs warning and returns early
+    - No plugin is stored in _builders
+    """
+    with patch("gllm_plugin.pipeline.pipeline_handler.logger") as mock_logger:
+        empty_pipeline_handler._try_rebuild_plugin("nonexistent_chatbot")
+
+        # Verify warning was logged
+        mock_logger.warning.assert_called_once()
+
+        # Verify no plugin was stored
+        assert "nonexistent_chatbot" not in empty_pipeline_handler._builders
+
+
+def test_try_rebuild_plugin_plugin_not_found(empty_pipeline_handler: PipelineHandler):
+    """
+    Condition:
+    - Valid chatbot_id with existing configuration
+    - Plugin does not exist for the pipeline type
+
+    Expected:
+    - Method logs warning and returns early
+    - No plugin is stored in _builders
+    """
+    # Setup test data
+    chatbot_id = "test_chatbot"
+    pipeline_type = "unknown_pipeline_type"
+
+    empty_pipeline_handler._chatbot_configs[chatbot_id] = ChatbotConfig(
+        pipeline_type=pipeline_type, pipeline_config={}, prompt_builder_catalogs=None, lmrp_catalogs=None
+    )
+
+    with patch("gllm_plugin.pipeline.pipeline_handler.logger") as mock_logger:
+        empty_pipeline_handler._try_rebuild_plugin(chatbot_id)
+
+        # Verify warning was logged
+        mock_logger.warning.assert_called_once()
+
+        # Verify no plugin was stored
+        assert chatbot_id not in empty_pipeline_handler._builders
+
+
+def test_try_rebuild_plugin_no_supported_models(empty_pipeline_handler: PipelineHandler, mock_plugin: Mock):
+    """
+    Condition:
+    - Valid chatbot_id with existing configuration
+    - Plugin exists for the pipeline type
+    - No supported models in configuration
+
+    Expected:
+    - Method logs warning and returns early
+    - No plugin is stored in _builders
+    """
+    # Setup test data
+    chatbot_id = "test_chatbot"
+    pipeline_type = "pipeline_type1"
+
+    empty_pipeline_handler._chatbot_configs[chatbot_id] = ChatbotConfig(
+        pipeline_type=pipeline_type,
+        pipeline_config={"supported_models": {}},  # Empty supported_models
+        prompt_builder_catalogs=None,
+        lmrp_catalogs=None,
+    )
+
+    empty_pipeline_handler._plugins[pipeline_type] = mock_plugin
+
+    with patch("gllm_plugin.pipeline.pipeline_handler.logger") as mock_logger:
+        empty_pipeline_handler._try_rebuild_plugin(chatbot_id)
+
+        # Verify warning was logged
+        mock_logger.warning.assert_called_once()
+
+        # Verify no plugin was stored
+        assert chatbot_id not in empty_pipeline_handler._builders
+
+
+def test_try_rebuild_plugin_handles_exception(empty_pipeline_handler: PipelineHandler, mock_plugin: Mock):
+    """
+    Condition:
+    - Valid setup but plugin manipulation raises an exception
+
+    Expected:
+    - Exception is caught and logged
+    - Method completes without raising exception
+    """
+    # Setup test data
+    chatbot_id = "test_chatbot"
+    pipeline_type = "pipeline_type1"
+
+    empty_pipeline_handler._chatbot_configs[chatbot_id] = ChatbotConfig(
+        pipeline_type=pipeline_type,
+        pipeline_config={
+            "supported_models": {"model1": {"name": "model1", "model_kwargs": {}, "model_env_kwargs": {}}}
+        },
+        prompt_builder_catalogs=None,
+        lmrp_catalogs=None,
+    )
+
+    # Create a plugin that raises an exception when setting prompt_builder_catalogs
+    mock_plugin_with_error = Mock(spec=Plugin)
+    type(mock_plugin_with_error).prompt_builder_catalogs = property(
+        fget=lambda x: None,
+        fset=lambda x, y: exec('raise Exception("Test error")'),
+    )
+
+    empty_pipeline_handler._plugins[pipeline_type] = mock_plugin_with_error
+
+    with patch("gllm_plugin.pipeline.pipeline_handler.logger") as mock_logger:
+        empty_pipeline_handler._try_rebuild_plugin(chatbot_id)
+
+        # Verify warning was logged
+        mock_logger.warning.assert_called_once()
+
+        # Verify no plugin was stored
+        assert chatbot_id not in empty_pipeline_handler._builders
+
+
+def test_get_pipeline_builder_success(empty_pipeline_handler: PipelineHandler, mock_plugin: Mock):
+    """
+    Condition:
+    - Valid chatbot_id with existing builder in _builders
+
+    Expected:
+    - Returns the correct builder without attempting to rebuild
+    """
+    # Setup test data
+    chatbot_id = "test_chatbot"
+    empty_pipeline_handler._builders[chatbot_id] = mock_plugin
+
+    # Patch _try_rebuild_plugin to verify it's not called
+    with patch.object(empty_pipeline_handler, "_try_rebuild_plugin") as mock_rebuild:
+        result = empty_pipeline_handler.get_pipeline_builder(chatbot_id)
+
+        # Verify correct builder is returned
+        assert result == mock_plugin
+
+        # Verify rebuild was not attempted
+        mock_rebuild.assert_not_called()
+
+
+def test_get_pipeline_builder_rebuild_success(empty_pipeline_handler: PipelineHandler, mock_plugin: Mock):
+    """
+    Condition:
+    - chatbot_id not in _builders initially
+    - _try_rebuild_plugin successfully adds the builder
+
+    Expected:
+    - _try_rebuild_plugin is called
+    - Returns the newly built builder
+    """
+    # Setup test data
+    chatbot_id = "test_chatbot"
+
+    # Define mock behavior to add the builder when _try_rebuild_plugin is called
+    def mock_rebuild_side_effect(chat_id):
+        empty_pipeline_handler._builders[chat_id] = mock_plugin
+
+    # Patch _try_rebuild_plugin with the side effect
+    with patch.object(
+        empty_pipeline_handler, "_try_rebuild_plugin", side_effect=mock_rebuild_side_effect
+    ) as mock_rebuild:
+        result = empty_pipeline_handler.get_pipeline_builder(chatbot_id)
+
+        # Verify rebuild was attempted
+        mock_rebuild.assert_called_once_with(chatbot_id)
+
+        # Verify correct builder is returned
+        assert result == mock_plugin
+
+
+def test_get_pipeline_builder_rebuild_fails(empty_pipeline_handler: PipelineHandler):
+    """
+    Condition:
+    - chatbot_id not in _builders initially
+    - _try_rebuild_plugin fails to add the builder
+
+    Expected:
+    - _try_rebuild_plugin is called
+    - Raises ValueError with appropriate message
+    """
+    # Setup test data
+    chatbot_id = "test_chatbot"
+
+    # Patch _try_rebuild_plugin (default implementation won't add any builder)
+    with patch.object(empty_pipeline_handler, "_try_rebuild_plugin") as mock_rebuild:
+        # Verify ValueError is raised
+        with pytest.raises(
+            ValueError, match=f"Pipeline builder for chatbot `{chatbot_id}` not found and could not be rebuilt"
+        ):
+            empty_pipeline_handler.get_pipeline_builder(chatbot_id)
+
+        # Verify rebuild was attempted
+        mock_rebuild.assert_called_once_with(chatbot_id)
+
+
+def test_get_pipeline_builder_with_logger(empty_pipeline_handler: PipelineHandler):
+    """
+    Condition:
+    - chatbot_id not in _builders initially
+
+    Expected:
+    - Warning is logged before attempting rebuild
+    """
+    # Setup test data
+    chatbot_id = "test_chatbot"
+
+    # Patch logger and _try_rebuild_plugin
+    with patch("gllm_plugin.pipeline.pipeline_handler.logger") as mock_logger:
+        with patch.object(empty_pipeline_handler, "_try_rebuild_plugin"):
+            # This will raise ValueError, but we're just testing the logging
+            with pytest.raises(ValueError):
+                empty_pipeline_handler.get_pipeline_builder(chatbot_id)
+
+            # Verify warning was logged
+            mock_logger.warning.assert_called_once()

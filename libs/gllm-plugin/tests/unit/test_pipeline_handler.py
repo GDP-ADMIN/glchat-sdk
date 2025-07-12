@@ -248,7 +248,7 @@ async def test_ainitialize_plugin_handles_build_error(empty_pipeline_handler: Pi
     with patch("gllm_plugin.pipeline.pipeline_handler.logger") as mock_logger:
         await PipelineHandler.ainitialize_plugin(empty_pipeline_handler, mock_plugin)
 
-        assert mock_logger.error.called
+        assert mock_logger.warning.called
         assert ("chatbot1", "gpt-3") in empty_pipeline_handler._pipeline_cache
         assert ("chatbot1", "gpt-4") not in empty_pipeline_handler._pipeline_cache
 
@@ -296,7 +296,7 @@ async def test_acleanup_plugins_handles_errors(pipeline_handler: PipelineHandler
     with patch("gllm_plugin.pipeline.pipeline_handler.logger") as mock_logger:
         await PipelineHandler.acleanup_plugins(pipeline_handler)
 
-        assert mock_logger.error.called
+        assert mock_logger.warning.called
         plugin2.cleanup.assert_called_once()
 
 

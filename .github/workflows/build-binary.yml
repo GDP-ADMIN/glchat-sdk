@@ -32,6 +32,12 @@ jobs:
         python-version: ${{ fromJson(needs.Set-Python-Version-Matrix.outputs.matrix) }}
     continue-on-error: true
     steps:
+    - name: Clean workspace
+      shell: bash
+      run: |
+        echo "GITHUB_WORKSPACE: $GITHUB_WORKSPACE"
+        rm -rf $GITHUB_WORKSPACE/*
+
     - uses: actions/checkout@v4
 
     - name: Setup Python ${{ matrix.python-version }}

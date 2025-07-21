@@ -201,13 +201,15 @@ async def test_ainitialize_plugin_no_matching_config(pipeline_handler: PipelineH
     - Plugin type not in activated configs
 
     Expected:
-    - Method returns early without building pipelines
+    - Method stores plugin in _plugins but returns early without building pipelines
     """
     mock_plugin.name = "unknown_type"
 
     await PipelineHandler.ainitialize_plugin(pipeline_handler, mock_plugin)
 
-    assert "unknown_type" not in pipeline_handler._plugins
+    # The plugin is stored regardless of whether it has a matching config
+    assert "unknown_type" in pipeline_handler._plugins
+    # But no pipelines are built
     assert mock_plugin.build.call_count == 0
 
 
@@ -579,7 +581,7 @@ async def test_create_chatbot_no_pipeline_config(empty_pipeline_handler: Pipelin
 
 
 @pytest.mark.asyncio
-async def test_create_chatbot_no_matching_plugin(pipeline_handler: PipelineHandler):
+async def test_create_chatbot_no_matching_plugin(empty_pipeline_handler: PipelineHandler):
     """
     Condition:
     - Pipeline type has no matching plugin
@@ -587,6 +589,9 @@ async def test_create_chatbot_no_matching_plugin(pipeline_handler: PipelineHandl
     Expected:
     - Method logs warning and returns early
     """
+    # Use empty_pipeline_handler to ensure a clean state
+    # Note: empty_pipeline_handler has an empty _plugins dictionary by default
+
     new_app_config = Mock(spec=AppConfig)
     new_app_config.chatbots = {
         "new_chatbot": Mock(
@@ -595,9 +600,12 @@ async def test_create_chatbot_no_matching_plugin(pipeline_handler: PipelineHandl
     }
 
     with patch("gllm_plugin.pipeline.pipeline_handler.logger") as mock_logger:
-        await pipeline_handler.create_chatbot(new_app_config, "new_chatbot")
+        await empty_pipeline_handler.create_chatbot(new_app_config, "new_chatbot")
 
-        assert mock_logger.warning.called
+        # Verify warning was logged
+        mock_logger.warning.assert_called_once_with("Pipeline plugin not found for chatbot `new_chatbot`")
+        # Verify the chatbot wasn't added to the configs
+        assert "new_chatbot" not in empty_pipeline_handler._chatbot_configs
 
 
 @pytest.mark.asyncio

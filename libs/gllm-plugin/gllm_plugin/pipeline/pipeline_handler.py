@@ -141,13 +141,12 @@ class PipelineHandler(PluginHandler):
             plugin (Plugin): The pipeline builder plugin instance.
         """
         pipeline_type = plugin.name
+        instance._plugins[pipeline_type] = plugin
 
         if pipeline_type not in instance._activated_configs:
             return
 
         active_config = instance._activated_configs[pipeline_type]
-        instance._plugins[pipeline_type] = plugin
-
         for chatbot_id, preset in active_config.chatbot_preset_map.items():
             try:
                 if pipeline_type != instance._chatbot_configs[chatbot_id].pipeline_type:

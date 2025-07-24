@@ -256,3 +256,5 @@ zsdoc/data
 setup.cfg
 setup.py
 *.tgz
+
+*.DS_Store

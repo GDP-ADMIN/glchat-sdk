@@ -345,7 +345,7 @@ Each `GLChatAttachment` includes:
 GLChat JavaScript SDK provides several helpful errors in case when incorrect parameters are supplied, the API returned non-200 HTTP status code, or network failures. All errors are wrapped inside `GLChatError` class to distinguish them from other errors that don't came from GLChat JavaScript SDK.
 
 ```ts
-import { GLChat, GLChatError } from 'glchat-sdk';
+import { GLChat, APIError } from 'glchat-sdk';
 
 const client = new GLChat();
 
@@ -360,8 +360,9 @@ void (async () => {
       // Process the chunk
     }
   } catch (err) {
-    if (err instanceof GLChatError) {
-
+    if (err instanceof APIError) {
+      console.log(err.status);
+      console.log(err.headers);
     }
   }
 })();
@@ -373,7 +374,7 @@ Below are the list of possible error that can be thrown by the SDK
 | Class | Cause |
 | ----- | ----- |
 | ValidationError | Thrown when incorrect parameters are supplied. This error has an extra field `issues` that stores detailed information which field(s) are invalid. |
-| APIError | Thrown when API returned a non-OK HTTP response. |
+| APIError | Thrown when API returned a non-OK HTTP response. Contains additional field `status` that stores the HTTP status and `headers` that stores the response headers. |
 | TimeoutError | Thrown when request to API has timed out. Can only be thrown when `timeout` is supplied. |
 | ChunkError | Thrown when API returned an invalid stream chunk format. Unlikely to be thrown. |
 | NetworkError | Thrown when API request fails due to network error. This error has an extra field `originalError` that stores the original network error. |

@@ -49,7 +49,7 @@ export class ValidationError extends GLChatError {
  * data parsing.
  */
 export class APIError extends GLChatError {
-  constructor(message: string, public readonly status: number) {
+  constructor(message: string, public readonly status: number, public readonly headers: Headers) {
     super(message);
   }
 }

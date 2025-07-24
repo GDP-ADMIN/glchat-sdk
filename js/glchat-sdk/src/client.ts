@@ -66,9 +66,10 @@ export class GLChat {
    * Sets the base URL that will be used for API calls.
    *
    * @param {string} url Base URL to be used
+   * @returns {GLChat} The current GLChat client instance.
    * @throws `ValidationError` if the provided base URL isn't valid.
    */
-  public setBaseUrl(url: string): void {
+  public setBaseUrl(url: string): GLChat {
     try {
       GLChatConfigurationSchema.parse({
         ...this.configuration,
@@ -76,6 +77,8 @@ export class GLChat {
       });
 
       this.configuration.baseUrl = url;
+
+      return this;
     } catch (err) {
       if (err instanceof ZodError) {
         throw new ValidationError(
@@ -91,10 +94,11 @@ export class GLChat {
   /**
    * Sets the API version that will be used for API calls.
    *
-   * @param {string} version API version to be used
+   * @param {string} version API version to be used.
+   * @returns {GLChat} The current GLChat client instance.
    * @throws `ValidationError` if the provided version isn't valid.
    */
-  public setAPIVersion(version: APIVersion): void {
+  public setAPIVersion(version: APIVersion): GLChat {
     try {
       GLChatConfigurationSchema.parse({
         ...this.configuration,
@@ -102,6 +106,8 @@ export class GLChat {
       });
 
       this.configuration.__version = version;
+
+      return this;
     } catch (err) {
       if (err instanceof ZodError) {
         throw new ValidationError(
@@ -120,9 +126,10 @@ export class GLChat {
    * Set to `0` to disable timeout.
    *
    * @param {number} timeout Timeout value in milliseconds.
+   * @returns {GLChat} The current GLChat client instance.
    * @throws `ValidationError` if the provided timeout isn't valid.
    */
-  public setTimeout(timeout: number): void {
+  public setTimeout(timeout: number): GLChat {
     try {
       GLChatConfigurationSchema.parse({
         ...this.configuration,
@@ -130,6 +137,8 @@ export class GLChat {
       });
 
       this.configuration.timeout = timeout;
+
+      return this;
     } catch (err) {
       if (err instanceof ZodError) {
         throw new ValidationError(

@@ -88,7 +88,7 @@ export function createGLChatFetchClient(
       });
 
       if (!response.ok) {
-        throw new APIError('API Returned non-OK status', response.status);
+        throw new APIError('API Returned non-OK status', response.status, response.headers);
       }
 
       return response;

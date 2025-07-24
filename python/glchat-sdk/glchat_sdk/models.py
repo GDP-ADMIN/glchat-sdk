@@ -44,3 +44,14 @@ class MessageRequest(BaseModel):
     anonymize_lm: bool | None = None
     use_cache: bool | None = None
     search_type: str | None = None
+
+
+class PipelineRequest(BaseModel):
+    """Request model for registering pipeline plugins with the GLChat API."""
+
+    # Disable pydantic's protected namespace "model_"
+    model_config = ConfigDict(protected_namespaces=())
+
+    # Note: The zip file will be handled separately as a file upload
+    # This model is for any additional metadata that might be needed
+    pass

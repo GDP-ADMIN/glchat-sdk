@@ -2,6 +2,7 @@
 
 from glchat_sdk.client import GLChat
 from glchat_sdk.message import MessageAPI
-from glchat_sdk.models import MessageRequest
+from glchat_sdk.models import MessageRequest, PipelineRequest
+from glchat_sdk.pipeline import PipelineAPI
 
-__all__ = ["GLChat", "MessageRequest", "MessageAPI"]
+__all__ = ["GLChat", "MessageRequest", "MessageAPI", "PipelineRequest", "PipelineAPI"]

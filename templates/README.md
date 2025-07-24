@@ -7,13 +7,11 @@
    Example: `copier copy basic-pipeline-template basic-pipeline`
 3. Follow the instructions to fill in the required information
 4. Zip the destination folder
-5. It is ready to be registered to GLLM Backend using GL SDK
+   Example: `zip -r basic-pipeline.zip basic-pipeline`
+5. It is ready to be registered to GLLM Backend
+
 
 ## Template List
 
 1. `basic-pipeline-template`
    - A basic pipeline that uses a response synthesizer to generate a response.
-
-## Modify templates
-
-TODO

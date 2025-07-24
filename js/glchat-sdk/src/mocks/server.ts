@@ -14,8 +14,12 @@ const handlers = [
     });
   }),
 
-  http.get('https://test.glchat.id/fetch/fail', () => {
+  http.get('https://test.glchat.id/fetch/fail/network', () => {
     return HttpResponse.error();
+  }),
+
+  http.get('https://test.glchat.id/fetch/fail/not-ok', () => {
+    return HttpResponse.json({}, { status: 401 });
   }),
 
   http.post('https://test.glchat.id/message', async ({ request }) => {

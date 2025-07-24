@@ -1,8 +1,8 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { GLChat } from './client';
 
-import { ZodError } from 'zod/v4';
 import type { APIVersion } from './config';
+import { ValidationError } from './error';
 
 describe('GLChat', () => {
   afterEach(() => vi.clearAllMocks());
@@ -23,7 +23,7 @@ describe('GLChat', () => {
     it('should throw if configuration validation fails', () => {
       expect(() => new GLChat({
         baseUrl: 'haha',
-      })).toThrow(ZodError);
+      })).toThrow(ValidationError);
     });
   });
 
@@ -39,7 +39,7 @@ describe('GLChat', () => {
       const client = new GLChat();
       const newUrl = 'AKU CINTA GLCHAT ♡';
 
-      expect(() => client.setBaseUrl(newUrl)).toThrow(ZodError);
+      expect(() => client.setBaseUrl(newUrl)).toThrow(ValidationError);
     });
   });
 
@@ -55,7 +55,7 @@ describe('GLChat', () => {
       const client = new GLChat();
       const newVersion = 'versi-3';
 
-      expect(() => client.setAPIVersion(newVersion as unknown as APIVersion)).toThrow(ZodError);
+      expect(() => client.setAPIVersion(newVersion as unknown as APIVersion)).toThrow(ValidationError);
     });
   });
 
@@ -71,7 +71,7 @@ describe('GLChat', () => {
       const client = new GLChat();
       const newTimeout = -123;
 
-      expect(() => client.setTimeout(newTimeout)).toThrow(ZodError);
+      expect(() => client.setTimeout(newTimeout)).toThrow(ValidationError);
     });
   });
 });

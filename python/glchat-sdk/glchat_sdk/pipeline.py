@@ -135,7 +135,7 @@ class PipelineAPI:
             response.raise_for_status()
             return response
 
-    def register_plugin(
+    def register(
         self,
         zip_file: str | Path | BinaryIO | bytes,
     ) -> dict[str, Any]:
@@ -166,3 +166,39 @@ class PipelineAPI:
         response = self._make_request(url, data, zip_file_tuple, headers)
 
         return response.json()
+
+    def unregister(
+        self,
+        plugin_ids: list[str],
+    ) -> dict[str, Any]:
+        """
+        Unregister pipeline plugins by sending their IDs to the GLChat API.
+
+        Args:
+            plugin_ids (list[str]): List of plugin IDs to unregister
+
+        Returns:
+            dict[str, Any]: Response from the API containing unregistration details
+
+        Raises:
+            ValueError: If input validation fails
+            httpx.HTTPStatusError: If the API request fails
+        """
+        if not plugin_ids:
+            raise ValueError("plugin_ids cannot be empty")
+
+        logger.debug("Unregistering pipeline plugins: %s", plugin_ids)
+
+        url = urljoin(self._client.base_url, "unregister-pipeline-plugin")
+        headers = self._prepare_headers()
+
+        timeout = httpx.Timeout(self._client.timeout, read=self._client.timeout)
+
+        with httpx.Client(timeout=timeout) as client:
+            response = client.post(
+                url,
+                json=plugin_ids,
+                headers=headers,
+            )
+            response.raise_for_status()
+            return response.json()

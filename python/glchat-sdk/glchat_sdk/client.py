@@ -14,7 +14,11 @@ Example:
     ...     print(chunk.decode("utf-8"), end="")
     >>>
     >>> # Register a pipeline plugin
-    >>> response = client.pipeline.register_plugin("path/to/plugin.zip")
+    >>> response = client.pipeline.register("path/to/plugin.zip")
+    >>> print(response)
+    >>>
+    >>> # Unregister pipeline plugins
+    >>> response = client.pipeline.unregister(["plugin_id_1", "plugin_id_2"])
     >>> print(response)
 
 Authors:

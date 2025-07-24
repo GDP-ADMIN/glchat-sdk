@@ -1,0 +1,36 @@
+"""{{pipeline_display_name}} State.
+
+Authors:
+    {{author_name}} ({{author_email}})
+
+References:
+    NONE
+"""
+
+from typing import TypedDict
+from enum import StrEnum
+
+from gllm_core.event.event_emitter import EventEmitter
+
+
+class {{pipeline_name}}State(TypedDict):
+    """A TypedDict representing the state of the {{pipeline_display_name}}.
+
+    Attributes:
+        query (str): The user's query.
+        response (str): The generated response to the user's query.
+        event_emitter (EventEmitter): The event emitter.
+    """
+
+    query: str
+    response: str
+    event_emitter: EventEmitter
+
+
+
+class {{pipeline_name}}StateKeys(StrEnum):
+    """List of all possible keys in {{pipeline_name}}State."""
+
+    QUERY = "query"
+    RESPONSE = "response"
+    EVENT_EMITTER = "event_emitter"

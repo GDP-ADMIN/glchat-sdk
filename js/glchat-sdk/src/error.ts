@@ -12,6 +12,13 @@
  */
 
 /**
+ * A wrapper class for all GLChat related errors.
+ *
+ * For now, it contains nothing.
+ */
+export class GLChatError extends Error {}
+
+/**
  * Issues present in the schema.
  */
 interface ValidationIssue {
@@ -29,10 +36,10 @@ interface ValidationIssue {
  * Errors that are thrown when the user-provided payload
  * doesn't satisfy the constraint.
  */
-export class ValidationError extends Error {
+export class ValidationError extends GLChatError {
   constructor(public readonly object: string, public readonly issues: ValidationIssue[]) {
     super(
-      'Invalid payload. Please refer to the `issues` array for detailed information.',
+      'Invalid payload. Please refer to `issues` for detailed information.',
     );
   }
 }
@@ -41,7 +48,7 @@ export class ValidationError extends Error {
  * Errors that are thrown during API calls, including
  * data parsing.
  */
-export class APIError extends Error {
+export class APIError extends GLChatError {
   constructor(message: string, public readonly status: number) {
     super(message);
   }
@@ -50,7 +57,7 @@ export class APIError extends Error {
 /**
  * Errors that are thrown when the API request timed out
  */
-export class TimeoutError extends Error {
+export class TimeoutError extends GLChatError {
   constructor() {
     super('Request timed out');
   }
@@ -66,8 +73,23 @@ export class TimeoutError extends Error {
  *
  * Unlikely to be thrown.
  */
-export class ChunkError extends Error {
+export class ChunkError extends GLChatError {
   constructor(message: string, public readonly type: 'raw' | 'data') {
     super(message);
+  }
+}
+
+/**
+ * Errors that are thrown when `fetch` request failed due to possible
+ * network errors.
+ *
+ * Since the actual cause may vary, this error wraps the original error
+ * in scope of `GLChatError`.
+ */
+export class NetworkError extends GLChatError {
+  constructor(public readonly originalError: Error) {
+    super(
+      'Failed to process request due to network error. Please refer to `originalError` for detailed information.',
+    );
   }
 }

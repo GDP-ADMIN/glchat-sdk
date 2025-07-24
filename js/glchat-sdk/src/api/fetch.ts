@@ -11,7 +11,7 @@
  * Copyright (c) GDP LABS. All rights reserved.
  */
 
-import { APIError } from '@/error';
+import { APIError, GLChatError, NetworkError } from '@/error';
 import type { GLChatConfiguration } from '../config';
 
 declare const __packageVersion: string;
@@ -92,8 +92,12 @@ export function createGLChatFetchClient(
       }
 
       return response;
-    } catch {
-      throw new Error('Failed to fetch');
+    } catch (err) {
+      if (err instanceof GLChatError) {
+        throw err;
+      }
+
+      throw new NetworkError(err as Error);
     }
   };
 }

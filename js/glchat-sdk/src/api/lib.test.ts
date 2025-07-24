@@ -1,11 +1,18 @@
+import { ChunkError } from '@/error';
 import { describe, expect, it } from 'vitest';
 import { processGLChatChunk } from './lib';
 
 describe('processGLChatChunk', () => {
-  it('should throw error when the chunk is incorrect', () => {
+  it('should throw error when the chunk has incorrect type', () => {
     const chunk = 1234123412334;
 
-    expect(() => processGLChatChunk(chunk)).toThrow(Error);
+    expect(() => processGLChatChunk(chunk)).toThrow(ChunkError);
+  });
+
+  it('should throw error when the chunk is an incorrect JSON', () => {
+    const chunk = '{234j123oi52';
+
+    expect(() => processGLChatChunk(chunk)).toThrow(ChunkError);
   });
 
   it('should process response chunk', () => {

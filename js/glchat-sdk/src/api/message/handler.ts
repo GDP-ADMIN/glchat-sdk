@@ -11,7 +11,7 @@
  * Copyright (c) GDP LABS. All rights reserved.
  */
 
-import { APIError, GeneralError, ValidationError } from '@/error';
+import { ValidationError } from '@/error';
 import { ZodError } from 'zod/v4';
 import { processGLChatChunk } from '../lib';
 import { CreateMessagePayloadSchema, type CreateMessagePayload, type GLChatMessageChunk } from './types';
@@ -106,12 +106,7 @@ export class MessageAPI {
       }
 
       // re-throw, handled in other part of the code.
-      if (err instanceof APIError) {
-        throw err;
-      }
-
-      const { message } = err as Error;
-      throw new GeneralError(message); ;
+      throw err;
     }
   }
 }

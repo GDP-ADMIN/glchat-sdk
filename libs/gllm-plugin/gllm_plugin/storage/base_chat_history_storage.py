@@ -137,42 +137,6 @@ class BaseChatHistoryStorage(ABC):
         pass
 
     @abstractmethod
-    def add_user_message(self, message: str, user_id: str, conversation_id: str, 
-                        parent_id: str | None = None, source: str | None = None, **kwargs: Any) -> Message:
-        """Add a user message to a conversation.
-
-        Args:
-            message (str): The message content.
-            user_id (str): The ID of the user.
-            conversation_id (str): The ID of the conversation.
-            parent_id (str | None, optional): The ID of the parent message. Defaults to None.
-            source (str | None, optional): The source of the message. Defaults to None.
-            kwargs (Any): Additional arguments.
-
-        Returns:
-            Message: The added message.
-        """
-        pass
-
-    @abstractmethod
-    def add_ai_message(self, message: str, user_id: str, conversation_id: str,
-                      parent_id: str | None = None, source: str | None = None, **kwargs: Any) -> Message:
-        """Add an AI message to a conversation.
-
-        Args:
-            message (str): The message content.
-            user_id (str): The ID of the user.
-            conversation_id (str): The ID of the conversation.
-            parent_id (str | None, optional): The ID of the parent message. Defaults to None.
-            source (str | None, optional): The source of the message. Defaults to None.
-            kwargs (Any): Additional arguments.
-
-        Returns:
-            Message: The added message.
-        """
-        pass
-
-    @abstractmethod
     def save_message(self, user_id: str, conversation_id: str, message_list: list[Any],
                     attachments: dict[str, Any] | None, **kwargs: Any) -> list[Message]:
         """Save a list of messages to a conversation.

@@ -15,10 +15,10 @@ This example will guide you through creating new pipeline classes from an extern
     poetry config http-basic.gen-ai oauth2accesstoken "$(gcloud auth print-access-token)"
 
     # Latest version
-    poetry add gllm-plugin --source gen-ai
+    poetry add glchat-plugin --source gen-ai
 
     # Specific version
-    poetry add gllm-plugin@0.0.1b5 --source gen-ai
+    poetry add glchat-plugin@0.0.1b5 --source gen-ai
     ```
 
 2. **Define the Pipeline State**
@@ -95,7 +95,7 @@ This example will guide you through creating new pipeline classes from an extern
     - Interact with the chatbot to ensure that it responds using the registered pipeline.
 
     This confirms that the new pipeline has been successfully integrated into GLChat.
-    
+
 `state.py`
 ```python
 from enum import StrEnum
@@ -125,99 +125,103 @@ class SimpleStateKeys(StrEnum):
 ```
 
 `preset_config.py`
+
 ```python
-from gllm_plugin.config.base_pipeline_preset_config import BasePipelinePresetConfig
+from glchat_plugin.config.base_pipeline_preset_config import BasePipelinePresetConfig
+
 
 class SimplePresetConfig(BasePipelinePresetConfig):
-    """A Pydantic model representing the preset config of the Simple Pipeline.
+   """A Pydantic model representing the preset config of the Simple Pipeline.
 
-    Inherits attributes from `BasePipelinePresetConfig`.
+   Inherits attributes from `BasePipelinePresetConfig`.
 
-    Attributes:
-        None
-    """
+   Attributes:
+       None
+   """
 ```
 
 `pipeline.py`
+
 ```python
 from typing import Any
 
 from gllm_generation.response_synthesizer import StaticListResponseSynthesizer
 from gllm_pipeline.pipeline.pipeline import Pipeline
 from gllm_pipeline.steps import step
-from gllm_plugin.pipeline.pipeline_plugin import PipelineBuilderPlugin
+from glchat_plugin.pipeline.pipeline_plugin import PipelineBuilderPlugin
 
 from new_repository.config.pipeline.simple.preset_config import SimplePresetConfig
 from new_repository.config.pipeline.simple.state import SimpleState, SimpleStateKeys
 
 
 class SimplePipelineBuilder(PipelineBuilderPlugin[SimpleState, SimplePresetConfig]):
-    """The Simple Pipeline Builder.
+   """The Simple Pipeline Builder.
 
-    This pipeline will simply pass the user query to the response synthesizer.
-    There are no prompt templates used in this pipeline.
+   This pipeline will simply pass the user query to the response synthesizer.
+   There are no prompt templates used in this pipeline.
 
-    Inherits attributes from `PipelineBuilder`.
-    """
+   Inherits attributes from `PipelineBuilder`.
+   """
 
-    name = "simple-pipeline"
-    preset_config_class = SimplePresetConfig
+   name = "simple-pipeline"
+   preset_config_class = SimplePresetConfig
 
-    def __init__(self):
-        """Initialize the Simple Pipeline Builder."""
-        super().__init__()
+   def __init__(self):
+      """Initialize the Simple Pipeline Builder."""
+      super().__init__()
 
-    async def build(self, pipeline_config: dict[str, Any]) -> Pipeline:
-        """Build the pipeline.
+   async def build(self, pipeline_config: dict[str, Any]) -> Pipeline:
+      """Build the pipeline.
 
-        Args:
-            pipeline_config (dict[str, Any]): The pipeline configuration.
+      Args:
+          pipeline_config (dict[str, Any]): The pipeline configuration.
 
-        Returns:
-            Pipeline: The Simple Pipeline.
-        """
-        response_synthesizer_step = step(
-            component=self.build_response_synthesizer(),
-            input_state_map={
-                "state_variables": SimpleStateKeys.RESPONSE_SYNTHESIS_BUNDLE
-            },
-            output_state=SimpleStateKeys.RESPONSE,
-        )
+      Returns:
+          Pipeline: The Simple Pipeline.
+      """
+      response_synthesizer_step = step(
+         component=self.build_response_synthesizer(),
+         input_state_map={
+            "state_variables": SimpleStateKeys.RESPONSE_SYNTHESIS_BUNDLE
+         },
+         output_state=SimpleStateKeys.RESPONSE,
+      )
 
-        pipeline = Pipeline(
-            steps=[
-                response_synthesizer_step,
-            ],
-            state_type=SimpleState,
-        )
+      pipeline = Pipeline(
+         steps=[
+            response_synthesizer_step,
+         ],
+         state_type=SimpleState,
+      )
 
-        return pipeline
+      return pipeline
 
-    def build_initial_state(self, request: dict[str, Any], pipeline_config: dict[str, Any], **kwargs: Any) -> SimpleState:
-        """Build the initial state for pipeline invoke.
+   def build_initial_state(self, request: dict[str, Any], pipeline_config: dict[str, Any],
+                           **kwargs: Any) -> SimpleState:
+      """Build the initial state for pipeline invoke.
 
-        Args:
-            request (dict[str, Any]): The given request from the user.
-            pipeline_config (dict[str, Any]): The pipeline configuration.
-            **kwargs (Any): A dictionary of arguments required for building the initial state.
+      Args:
+          request (dict[str, Any]): The given request from the user.
+          pipeline_config (dict[str, Any]): The pipeline configuration.
+          **kwargs (Any): A dictionary of arguments required for building the initial state.
 
-        Returns:
-            SimpleState: The initial state.
-        """
-        return SimpleState(
-            response_synthesis_bundle={"context_list": [f"Re: {request.get("message")}"]}
-        )
+      Returns:
+          SimpleState: The initial state.
+      """
+      return SimpleState(
+         response_synthesis_bundle={"context_list": [f"Re: {request.get("message")}"]}
+      )
 
-    def build_response_synthesizer(self) -> StaticListResponseSynthesizer:
-        """Build the response synthesizer component.
+   def build_response_synthesizer(self) -> StaticListResponseSynthesizer:
+      """Build the response synthesizer component.
 
-        Args:
-            None
+      Args:
+          None
 
-        Returns:
-            StaticListResponseSynthesizer: The response synthesizer component.
-        """
-        return StaticListResponseSynthesizer()
+      Returns:
+          StaticListResponseSynthesizer: The response synthesizer component.
+      """
+      return StaticListResponseSynthesizer()
 ```
 
 `config.yaml`

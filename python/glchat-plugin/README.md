@@ -19,12 +19,12 @@ Choose one of the following methods to install the package:
 
 #### Using pip
 ```bash
-pip install gllm-plugin-binary
+pip install glchat-plugin-binary
 ```
 
 #### Using Poetry
 ```bash
-poetry add gllm-plugin-binary
+poetry add glchat-plugin-binary
 ```
 
 ### 2. Development Installation (Git)

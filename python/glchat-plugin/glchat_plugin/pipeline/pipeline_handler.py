@@ -17,8 +17,8 @@ from gllm_inference.catalog import LMRequestProcessorCatalog, PromptBuilderCatal
 from gllm_pipeline.pipeline.pipeline import Pipeline
 from pydantic import BaseModel, ConfigDict
 
-from gllm_plugin.config.app_config import AppConfig
-from gllm_plugin.storage.base_chat_history_storage import BaseChatHistoryStorage
+from glchat_plugin.config.app_config import AppConfig
+from glchat_plugin.storage.base_chat_history_storage import BaseChatHistoryStorage
 
 
 class ChatbotConfig(BaseModel):

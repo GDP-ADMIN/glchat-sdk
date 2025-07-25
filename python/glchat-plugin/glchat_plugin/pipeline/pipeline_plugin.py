@@ -14,7 +14,7 @@ from bosa_core.plugin.plugin import Plugin
 from gllm_inference.catalog.catalog import BaseCatalog
 from gllm_pipeline.pipeline.pipeline import Pipeline
 
-from gllm_plugin.pipeline.pipeline_handler import PipelineHandler
+from glchat_plugin.pipeline.pipeline_handler import PipelineHandler
 
 PipelineState = TypeVar("PipelineState")
 PipelinePresetConfig = TypeVar("PipelinePresetConfig", bound="BasePipelinePresetConfig")

@@ -13,7 +13,7 @@ import pytest
 from langchain_core.tools import BaseTool
 from pydantic import BaseModel, Field
 
-from gllm_plugin.tools.decorators import (
+from glchat_plugin.tools.decorators import (
     get_plugin_metadata,
     is_tool_plugin,
     tool_plugin,
@@ -26,7 +26,7 @@ class TestInput(BaseModel):
     test_param: str = Field(description="Test parameter")
 
 
-@patch("gllm_plugin.tools.decorators.logger")
+@patch("glchat_plugin.tools.decorators.logger")
 def test_tool_plugin_decorator_basic(mock_logger):
     """Test the basic functionality of the tool_plugin decorator.
 
@@ -72,7 +72,7 @@ def test_tool_plugin_decorator_basic(mock_logger):
     mock_logger.info.assert_called()
 
 
-@patch("gllm_plugin.tools.decorators.logger")
+@patch("glchat_plugin.tools.decorators.logger")
 def test_tool_plugin_decorator_with_invalid_class(mock_logger):
     """Test that the decorator raises an error when used on a non-BaseTool class.
 
@@ -90,7 +90,7 @@ def test_tool_plugin_decorator_with_invalid_class(mock_logger):
             pass
 
 
-@patch("gllm_plugin.tools.decorators.logger")
+@patch("glchat_plugin.tools.decorators.logger")
 def test_is_tool_plugin_function(mock_logger):
     """Test the is_tool_plugin helper function.
 
@@ -131,7 +131,7 @@ def test_is_tool_plugin_function(mock_logger):
     mock_logger.info.assert_called()
 
 
-@patch("gllm_plugin.tools.decorators.logger")
+@patch("glchat_plugin.tools.decorators.logger")
 def test_get_plugin_metadata(mock_logger):
     """Test the get_plugin_metadata helper function.
 
@@ -174,7 +174,7 @@ def test_get_plugin_metadata(mock_logger):
     mock_logger.info.assert_called()
 
 
-@patch("gllm_plugin.tools.decorators.logger")
+@patch("glchat_plugin.tools.decorators.logger")
 def test_tool_plugin_with_args(mock_logger):
     """Test that the tool plugin works with tools that take constructor arguments.
 
@@ -216,7 +216,7 @@ def test_tool_plugin_with_args(mock_logger):
     mock_logger.info.assert_called()
 
 
-@patch("gllm_plugin.tools.decorators.logger")
+@patch("glchat_plugin.tools.decorators.logger")
 def test_tool_plugin_decorator_logging_failure(mock_logger):
     """Test that the decorator handles logging failures gracefully.
 

@@ -12,11 +12,11 @@ Authors:
 import inspect
 from typing import Any, Callable, Type
 
+from gllm_core.utils import LoggerManager
 from langchain_core.tools import BaseTool
 
-from gllm_core.utils import LoggerManager
-
 logger = LoggerManager().get_logger()
+
 
 def tool_plugin(
     version: str = "1.0.0",

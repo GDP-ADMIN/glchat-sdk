@@ -1,8 +1,8 @@
-### Add new Pipeline to GLLM Backend
+### Add new Pipeline to GLChat
 
 This example will guide you through creating new pipeline classes from an external repository and integrating them into GLChat.
 
-1. **Add [`gllm-plugin`](https://console.cloud.google.com/artifacts/python/gdp-labs/asia-southeast2/gen-ai/gllm-plugin?project=gdp-labs) dependency in `pyproject.toml`**
+1. **Add [`glchat-plugin`](https://console.cloud.google.com/artifacts/python/gdp-labs/asia-southeast2/gen-ai/gllm-plugin?project=gdp-labs) dependency in `pyproject.toml`**
 
     ```sh
     # Add GDP Labs artifact repository as primary source
@@ -60,12 +60,12 @@ This example will guide you through creating new pipeline classes from an extern
     Create a new file `.env` and define the env key value for your pipeline.
     Add prefix to all env keys to prevent clash with other pipelines.
 
-7. **Register the new pipeline to GLLM Backend using API.**
+7. **Register the new pipeline to GLChat Backend using API.**
 
     The project structure will be as follows:
     ```
     - simple-pipeline [git folder]
-    - pyproject.toml [depends on gllm-plugin]
+    - pyproject.toml [depends on glchat-plugin]
     - simple_pipeline
         - .env
         - config.yaml

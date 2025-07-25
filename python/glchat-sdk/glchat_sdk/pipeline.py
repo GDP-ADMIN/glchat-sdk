@@ -69,14 +69,15 @@ class PipelineAPI:
             headers["Authorization"] = f"Bearer {self._client.api_key}"
         return headers
 
-    def _process_zip_file(self, zip_path_file: str) -> tuple[str, bytes, str]:
+    def _process_zip_file(self, zip_path_file: str) -> tuple[str, tuple[str, bytes, str]]:
         """Process the zip file and return the file tuple for httpx.
 
         Args:
             zip_path_file (str): Zip file path to process
 
         Returns:
-            tuple of (field_name, (filename, file_content, content_type))
+            tuple[str, tuple[str, bytes, str]]: A tuple of (field_name,
+                (filename, file_content, content_type))
 
         Raises:
             FileNotFoundError: If file path doesn't exist
@@ -85,7 +86,7 @@ class PipelineAPI:
         if not file_path.exists():
             raise FileNotFoundError(f"Zip file not found: {file_path}")
         with open(file_path, "rb") as f:
-            return ("zip_file", (file_path.name, f.read(), ZIP_FILE_TYPE))
+            return "zip_file", (file_path.name, f.read(), ZIP_FILE_TYPE)
 
     def _make_request(
         self,
@@ -99,7 +100,7 @@ class PipelineAPI:
         Args:
             url (str): API endpoint URL
             data (dict[str, Any]): Request data
-            zip_file_tuple (tuple[str, tuple[str, str | BinaryIO | bytes, str]]): Prepared zip data
+            zip_file_tuple (tuple[str, tuple[str, bytes, str]]): Prepared zip data
             headers (dict[str, str]): Request headers
 
         Returns:
@@ -149,7 +150,7 @@ class PipelineAPI:
         url = urljoin(self._client.base_url, "register-pipeline-plugin")
         data = self._prepare_request_data()
         headers = self._prepare_headers()
-        zip_file_tuple = self._process_zip_file(zip_path_file)
+        zip_file_tuple: tuple[str, tuple[str, bytes, str]] = self._process_zip_file(zip_path_file)
 
         response = self._make_request(url, data, zip_file_tuple, headers)
 

@@ -12,7 +12,7 @@ References:
 
 import logging
 from pathlib import Path
-from typing import Any, BinaryIO
+from typing import Any
 from urllib.parse import urljoin
 
 import httpx
@@ -30,25 +30,24 @@ class PipelineAPI:
     def __init__(self, client):
         self._client = client
 
-    def _validate_zip_file(self, zip_file: str | Path | BinaryIO | bytes) -> None:
+    def _validate_zip_file(self, zip_path_file: str) -> None:
         """Validate zip file input.
 
         Args:
-            zip_file (Union[str, Path, BinaryIO, bytes]): Zip file to validate
+            zip_path_file (str): Zip file path to validate
 
         Raises:
-            ValueError: If zip_file is empty or invalid
+            ValueError: If zip_path_file is empty or invalid
             FileNotFoundError: If file path doesn't exist
         """
-        if not zip_file:
-            raise ValueError("zip_file cannot be empty")
+        if not zip_path_file:
+            raise ValueError("zip_path_file cannot be empty")
 
-        if isinstance(zip_file, str | Path):
-            file_path = Path(zip_file)
-            if not file_path.exists():
-                raise FileNotFoundError(f"Zip file not found: {file_path}")
-            if not file_path.suffix.lower() == ".zip":
-                raise ValueError(f"File must be a zip file: {file_path}")
+        file_path = Path(zip_path_file)
+        if not file_path.exists():
+            raise FileNotFoundError(f"Zip file not found: {file_path}")
+        if not file_path.suffix.lower() == ".zip":
+            raise ValueError(f"File must be a zip file: {file_path}")
 
     def _prepare_request_data(self) -> dict[str, Any]:
         """Prepare request data for the API call.
@@ -70,43 +69,29 @@ class PipelineAPI:
             headers["Authorization"] = f"Bearer {self._client.api_key}"
         return headers
 
-    def _process_zip_file(
-        self, zip_file: str | Path | BinaryIO | bytes
-    ) -> tuple[str, str | BinaryIO | bytes, str]:
+    def _process_zip_file(self, zip_path_file: str) -> tuple[str, bytes, str]:
         """Process the zip file and return the file tuple for httpx.
 
         Args:
-            zip_file (Union[str, Path, BinaryIO, bytes]): Zip file to process
+            zip_path_file (str): Zip file path to process
 
         Returns:
             tuple of (field_name, (filename, file_content, content_type))
 
         Raises:
-            ValueError: If file type is not supported
             FileNotFoundError: If file path doesn't exist
         """
-        if isinstance(zip_file, str | Path):
-            # File path
-            file_path = Path(zip_file)
-            if not file_path.exists():
-                raise FileNotFoundError(f"Zip file not found: {file_path}")
-            with open(file_path, "rb") as f:
-                return ("zip_file", (file_path.name, f.read(), ZIP_FILE_TYPE))
-        elif isinstance(zip_file, bytes):
-            # Raw bytes
-            return ("zip_file", ("plugin.zip", zip_file, ZIP_FILE_TYPE))
-        elif hasattr(zip_file, "read"):
-            # File-like object - pass directly to avoid memory issues
-            filename = getattr(zip_file, "name", "plugin.zip")
-            return ("zip_file", (filename, zip_file, ZIP_FILE_TYPE))
-        else:
-            raise ValueError(f"Unsupported file type: {type(zip_file)}")
+        file_path = Path(zip_path_file)
+        if not file_path.exists():
+            raise FileNotFoundError(f"Zip file not found: {file_path}")
+        with open(file_path, "rb") as f:
+            return ("zip_file", (file_path.name, f.read(), ZIP_FILE_TYPE))
 
     def _make_request(
         self,
         url: str,
         data: dict[str, Any],
-        zip_file_tuple: tuple[str, tuple[str, str | BinaryIO | bytes, str]],
+        zip_file_tuple: tuple[str, tuple[str, bytes, str]],
         headers: dict[str, str],
     ) -> httpx.Response:
         """Make the HTTP request for pipeline plugin registration.
@@ -137,31 +122,34 @@ class PipelineAPI:
 
     def register(
         self,
-        zip_file: str | Path | BinaryIO | bytes,
+        zip_path_file: str,
     ) -> dict[str, Any]:
         """
         Register a pipeline plugin by uploading a zip file to the GLChat API.
 
         Args:
-            zip_file (Union[str, Path, BinaryIO, bytes]): Zip file containing the plugin
-                (filepath, binary, file object, or bytes)
+            zip_path_file (str): Path to the zip file containing the plugin
 
         Returns:
             dict[str, Any]: Response from the API containing registration details
 
         Raises:
+            TypeError: If zip_path_file is not a string
             ValueError: If input validation fails
             FileNotFoundError: If zip file path doesn't exist
             httpx.HTTPStatusError: If the API request fails
         """
-        self._validate_zip_file(zip_file)
+        if not isinstance(zip_path_file, str):
+            raise TypeError(f"zip_path_file must be a string, got {type(zip_path_file).__name__}")
+
+        self._validate_zip_file(zip_path_file)
 
         logger.debug("Registering pipeline plugin with zip file")
 
         url = urljoin(self._client.base_url, "register-pipeline-plugin")
         data = self._prepare_request_data()
         headers = self._prepare_headers()
-        zip_file_tuple = self._process_zip_file(zip_file)
+        zip_file_tuple = self._process_zip_file(zip_path_file)
 
         response = self._make_request(url, data, zip_file_tuple, headers)
 

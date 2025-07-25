@@ -186,36 +186,26 @@ def test_pipeline_register_with_file_path(client, mock_pipeline_response, tmp_pa
         assert call_args[1]["headers"]["Authorization"] == "Bearer test_api_key"
 
 
-def test_pipeline_register_with_bytes(client, mock_pipeline_response):
-    """Test pipeline plugin registration with bytes data."""
+def test_pipeline_register_with_bytes_raises_type_error(client, mock_pipeline_response):
+    """Test pipeline plugin registration with bytes data raises TypeError."""
     test_bytes = b"fake zip content"
 
-    with patch("httpx.Client.post") as mock_post:
-        mock_post.return_value = mock_pipeline_response
-
-        response = client.pipeline.register(test_bytes)
-
-        assert response == {"status": "success", "plugin_id": "test-plugin-123"}
-        mock_post.assert_called_once()
+    with pytest.raises(TypeError, match="zip_path_file must be a string"):
+        client.pipeline.register(test_bytes)
 
 
-def test_pipeline_register_with_file_object(client, mock_pipeline_response):
-    """Test pipeline plugin registration with file-like object."""
+def test_pipeline_register_with_file_object_raises_type_error(client, mock_pipeline_response):
+    """Test pipeline plugin registration with file-like object raises TypeError."""
     file_obj = io.BytesIO(b"fake zip content")
     file_obj.name = "test_plugin.zip"
 
-    with patch("httpx.Client.post") as mock_post:
-        mock_post.return_value = mock_pipeline_response
-
-        response = client.pipeline.register(file_obj)
-
-        assert response == {"status": "success", "plugin_id": "test-plugin-123"}
-        mock_post.assert_called_once()
+    with pytest.raises(TypeError, match="zip_path_file must be a string"):
+        client.pipeline.register(file_obj)
 
 
 def test_pipeline_register_with_empty_input(client):
     """Test pipeline plugin registration with empty input."""
-    with pytest.raises(ValueError, match="zip_file cannot be empty"):
+    with pytest.raises(ValueError, match="zip_path_file cannot be empty"):
         client.pipeline.register("")
 
 
@@ -235,9 +225,9 @@ def test_pipeline_register_with_non_zip_file(client, tmp_path):
         client.pipeline.register(str(test_file))
 
 
-def test_pipeline_register_with_invalid_file_type(client):
-    """Test pipeline plugin registration with invalid file type."""
-    with pytest.raises(ValueError, match="Unsupported file type"):
+def test_pipeline_register_with_invalid_file_type_raises_type_error(client):
+    """Test pipeline plugin registration with invalid file type raises TypeError."""
+    with pytest.raises(TypeError, match="zip_path_file must be a string"):
         client.pipeline.register(123)  # Invalid file type
 
 
@@ -293,34 +283,28 @@ def test_pipeline_unregister_http_error(client):
             client.pipeline.unregister(plugin_ids)
 
 
-def test_pipeline_register_with_path_object(client, mock_pipeline_response, tmp_path):
-    """Test pipeline plugin registration with Path object."""
+def test_pipeline_register_with_path_object_raises_type_error(
+    client, mock_pipeline_response, tmp_path
+):
+    """Test pipeline plugin registration with Path object raises TypeError."""
     from pathlib import Path
 
     test_zip = tmp_path / "test_plugin.zip"
     test_zip.write_bytes(b"fake zip content")
 
-    with patch("httpx.Client.post") as mock_post:
-        mock_post.return_value = mock_pipeline_response
-
-        response = client.pipeline.register(Path(test_zip))
-
-        assert response == {"status": "success", "plugin_id": "test-plugin-123"}
-        mock_post.assert_called_once()
+    with pytest.raises(TypeError, match="zip_path_file must be a string"):
+        client.pipeline.register(Path(test_zip))
 
 
-def test_pipeline_register_with_file_object_no_name(client, mock_pipeline_response):
-    """Test pipeline plugin registration with file object without name attribute."""
+def test_pipeline_register_with_file_object_no_name_raises_type_error(
+    client, mock_pipeline_response
+):
+    """Test pipeline plugin registration with file without name attribute raises TypeError."""
     file_obj = io.BytesIO(b"fake zip content")
     # No name attribute set
 
-    with patch("httpx.Client.post") as mock_post:
-        mock_post.return_value = mock_pipeline_response
-
-        response = client.pipeline.register(file_obj)
-
-        assert response == {"status": "success", "plugin_id": "test-plugin-123"}
-        mock_post.assert_called_once()
+    with pytest.raises(TypeError, match="zip_path_file must be a string"):
+        client.pipeline.register(file_obj)
 
 
 def test_client_pipeline_attribute_exists(client):

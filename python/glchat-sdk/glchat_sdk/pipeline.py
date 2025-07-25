@@ -91,14 +91,14 @@ class PipelineAPI:
             if not file_path.exists():
                 raise FileNotFoundError(f"Zip file not found: {file_path}")
             with open(file_path, "rb") as f:
-                return ("file", (file_path.name, f.read(), ZIP_FILE_TYPE))
+                return ("zip_file", (file_path.name, f.read(), ZIP_FILE_TYPE))
         elif isinstance(zip_file, bytes):
             # Raw bytes
-            return ("file", ("plugin.zip", zip_file, ZIP_FILE_TYPE))
+            return ("zip_file", ("plugin.zip", zip_file, ZIP_FILE_TYPE))
         elif hasattr(zip_file, "read"):
             # File-like object - pass directly to avoid memory issues
             filename = getattr(zip_file, "name", "plugin.zip")
-            return ("file", (filename, zip_file, ZIP_FILE_TYPE))
+            return ("zip_file", (filename, zip_file, ZIP_FILE_TYPE))
         else:
             raise ValueError(f"Unsupported file type: {type(zip_file)}")
 

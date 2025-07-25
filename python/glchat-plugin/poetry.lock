@@ -5723,4 +5723,4 @@ flair = ["flair"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.11,<3.13"
-content-hash = "dc26de27afd12032606ee0e5011fc99a01a1690642148c322c05927842e2b4b0"
+content-hash = "486614dc6583df281a1c44940f720ca750b1cc45059a80bc1943b7270a336bfb"

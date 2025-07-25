@@ -18,4 +18,4 @@ export const PipelineFileSchema = UploadedFileSchema.refine(file =>
   file.type === 'application/zip',
 );
 
-export const UnregisterPluginSchema = z.array(z.string());
+export const UnregisterPluginSchema = z.array(z.uuid());

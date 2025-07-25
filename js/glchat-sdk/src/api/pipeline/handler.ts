@@ -26,5 +26,7 @@ export class PipelineAPI {
     return response.json();
   }
 
-  public async unregister();
+  public async unregister(pluginId: string[]) {
+
+  };
 }

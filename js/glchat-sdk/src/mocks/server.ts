@@ -98,6 +98,13 @@ const handlers = [
       },
     });
   }),
+
+  http.post('https://test.glchat.id/register-pipeline-plugin', async () => {
+    return HttpResponse.json({
+      status: 'success',
+      registered_pipelines: ['Rocky Balboa'],
+    });
+  }),
 ];
 
 export const server = setupServer(...handlers);

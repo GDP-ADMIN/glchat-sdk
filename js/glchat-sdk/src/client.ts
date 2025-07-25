@@ -16,6 +16,7 @@
 
 import { createGLChatFetchClient } from './api/fetch';
 import { MessageAPI } from './api/message/handler';
+import { PipelineAPI } from './api/pipeline/handler';
 
 import type { APIVersion, GLChatConfiguration } from './config';
 import { GLChatConfigurationSchema } from './config';
@@ -36,6 +37,12 @@ export class GLChat {
   public message: MessageAPI;
 
   /**
+   * Collection of interfaces to interact with pipeline registry
+   * of GLChat.
+   */
+  public pipeline: PipelineAPI;
+
+  /**
    * API client that serves as an interface to interact with GLChat.
    *
    * @param {Partial<GLChatConfiguration>} config GLChat configuration object
@@ -44,9 +51,10 @@ export class GLChat {
   public constructor(config: Partial<GLChatConfiguration> = {}) {
     this.configuration = GLChatConfigurationSchema.parse(config);
 
-    const fetchClient = createGLChatFetchClient(this.configuration);
+    const client = createGLChatFetchClient(this.configuration);
 
-    this.message = new MessageAPI(fetchClient);
+    this.message = new MessageAPI(client);
+    this.pipeline = new PipelineAPI(client);
   }
 
   /**

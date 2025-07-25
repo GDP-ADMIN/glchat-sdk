@@ -1,7 +1,7 @@
 /*
  * types.ts
  *
- * Collection of types related with message API (payload).
+ * Collection of types related with message API.
  *
  * Authors:
  *   Cristopher (cristopher@gdplabs.id)
@@ -13,15 +13,7 @@
 
 import { z } from 'zod/v4';
 
-/**
- * Custom file type of files for message-related functionality.
- *
- * Mainly made to maintain runtime-compatibility with Bun, since Bun
- * doesn't support `File` natively.
- */
-export interface UploadedFile extends Blob {
-  readonly name?: string | undefined;
-}
+import { UploadedFileSchema, type UploadedFile } from '../types';
 
 /**
  * Common chat mode of a message, where the data
@@ -208,10 +200,6 @@ interface MessageMetadata {
    */
   quote?: string;
 }
-
-const UploadedFileSchema = z.instanceof(Blob).refine(
-  (file): file is UploadedFile => !('name' in file) || typeof (file as UploadedFile).name === 'string',
-);
 
 const MessageMetadataSchema = z.object({
   quote: z.string().optional(),

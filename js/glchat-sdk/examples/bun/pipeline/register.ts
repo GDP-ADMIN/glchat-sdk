@@ -1,12 +1,9 @@
-import { readFileSync } from 'node:fs';
-
-import { GLChat } from './../../src/client';
+import { GLChat } from '@/client';
 
 const client = new GLChat();
 
 void (async () => {
-  const buffer = readFileSync('examples/fixtures/pipeline.zip');
-  const file = new File([buffer], 'pipeline.zip', { type: 'application/zip' });
+  const file = Bun.file('examples/fixtures/pipeline.zip');
 
   /**
    * If you are using a Node version that doesn't support File API yet, you can try:
@@ -18,5 +15,5 @@ void (async () => {
    */
 
   const result = await client.pipeline.register(file);
-  console.log(result);
+  console.log(JSON.stringify(result, null, 2));
 })();

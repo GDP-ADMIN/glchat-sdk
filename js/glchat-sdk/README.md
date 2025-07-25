@@ -126,7 +126,7 @@ const client = new GLChat();
 > If your `baseUrl` contains a path, ensure that it ends with a trailing slash! Otherwise, the path will be dropped
 > during request and may cause unexpected errors.
 
-### Methods
+#### Methods
 
 #### `.setBaseUrl(url: string): void`
 
@@ -210,7 +210,7 @@ const stream = await client.message.create({
 
 - `Promise<AsyncIterable<GLChatMessageChunk>>`: An asynchronous iterable yielding streamed message chunks.
 
-### Example Usage
+#### Example Usage
 
 ```ts
 for await (const chunk of await client.message.create({
@@ -220,6 +220,12 @@ for await (const chunk of await client.message.create({
   console.log(chunk);
 }
 ```
+
+### Pipeline API
+
+#### `pipeline.register(pipeline: UploadedFile): Promise<PipelineRegistrationResponse>`
+
+Register a new pipeline
 
 ## Message Chunks
 

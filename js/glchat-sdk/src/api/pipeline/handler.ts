@@ -1,18 +1,56 @@
-import type { UploadedFile } from '../types';
-import { PipelineFileSchema } from './types';
+/*
+ * handler.ts
+ *
+ * Collection of functions and helpers related with pipeline
+ * registry.
+ *
+ * Authors:
+ *   Cristopher (cristopher@gdplabs.id)
+ * Created at: July 25th 2025
+ *
+ * ---
+ * Copyright (c) GDP LABS. All rights reserved.
+ */
 
+import type { UploadedFile } from '../types';
+import { PipelineFileSchema, UnregisterPluginSchema, type PipelineRegistrationResponse } from './types';
+
+/**
+ * An API that serves as an interface to GLChat pipeline registry.
+ *
+ * Not to be used outside the main GLChat interface.
+ */
 export class PipelineAPI {
+  /**
+   * An API that serves as an interface to GLChat pipeline registry.
+   *
+   * @params {typeof fetch} client Fetch API client, augmented with authentication data.
+  */
   public constructor(private readonly client: typeof fetch) {}
 
-  public async register(plugin: UploadedFile) {
-    PipelineFileSchema.parse(plugin);
+  /**
+   * Register new pipeline(s) to GLChat pipeline registry.
+   *
+   * The pipelines must be packaged as a zip file. Please
+   * consult our documentation for the complete schema of the
+   * zip file.
+   *
+   * @param {UploadedFile} pipeline Schema of the pipeline packaged
+   * as a zip file.
+   * @returns {Promise<PipelineRegistrationResponse>} Pipeline registration
+   * response.
+   */
+  public async register(
+    pipeline: UploadedFile,
+  ): Promise<PipelineRegistrationResponse> {
+    PipelineFileSchema.parse(pipeline);
 
     const form = new FormData();
 
     form.append(
-      'files',
-      plugin,
-      plugin.name ?? 'plugin.zip',
+      'zip_file',
+      pipeline,
+      pipeline.name ?? 'plugin.zip',
     );
 
     const response = await this.client('register-pipeline-plugin', {
@@ -23,10 +61,32 @@ export class PipelineAPI {
       body: form,
     });
 
-    return response.json();
+    const body = await response.json();
+
+    return body as PipelineRegistrationResponse;
   }
 
-  public async unregister(pluginId: string[]) {
+  /**
+   * Unregister a pipeline from GLChat pipeline registry.
+   *
+   * @param {string[]} pluginIds List of plugin identifiers to be removed from
+   * GLChat pipeline registry. The plugin identifier should be returned during the
+   * registration process.
+   * @returns
+   */
+  public async unregister(pluginIds: string[]) {
+    UnregisterPluginSchema.parse(pluginIds);
 
+    const response = await this.client('unregister-pipeline-plugin', {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+      },
+      body: JSON.stringify({
+        plugin_ids: pluginIds,
+      }),
+    });
+
+    return response.json();
   };
 }

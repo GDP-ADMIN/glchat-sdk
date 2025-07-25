@@ -1,11 +1,11 @@
-import { GLChat } from './../../src/client';
+import { GLChat } from '@/client';
 
 const client = new GLChat();
 
 void (async () => {
   // Deno uses custom filesystem API inside the Deno namespace
   const rawFile = await Deno.readFile('examples/fixtures/sample.txt');
-  const file = new Blob([rawFile], { type: 'text/plain' });
+  const file = new File([rawFile], 'file.txt', { type: 'text/plain' });
 
   const result = await client.message.create({
     chatbot_id: 'general-purpose',

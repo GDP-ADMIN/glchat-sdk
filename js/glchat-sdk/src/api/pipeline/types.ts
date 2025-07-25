@@ -18,4 +18,13 @@ export const PipelineFileSchema = UploadedFileSchema.refine(file =>
   file.type === 'application/zip',
 );
 
-export const UnregisterPluginSchema = z.array(z.uuid());
+export const UnregisterPluginSchema = z.array(z.string()).min(1);
+
+/**
+ * Pipeline registration result. Stores the identifier
+ * of each pipelines in an array.
+ */
+export interface PipelineRegistrationResponse {
+  status: 'success';
+  registered_pipelines: string[];
+}

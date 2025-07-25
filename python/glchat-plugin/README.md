@@ -30,7 +30,7 @@ poetry add glchat-plugin-binary
 ### 2. Development Installation (Git)
 For development purposes, you can install directly from the Git repository:
 ```bash
-poetry add "git+ssh://git@github.com/GDP-ADMIN/glchat-sdk.git#subdirectory=python/gllm-plugin"
+poetry add "git+ssh://git@github.com/GDP-ADMIN/glchat-sdk.git#subdirectory=python/glchat-plugin"
 ```
 
 ## Usage

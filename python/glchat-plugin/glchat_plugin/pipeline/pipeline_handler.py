@@ -13,6 +13,7 @@ from typing import Any, Type
 from bosa_core import Plugin
 from bosa_core.plugin.handler import PluginHandler
 from gllm_core.utils import LoggerManager
+from gllm_datastore.sql_data_store import SQLAlchemySQLDataStore
 from gllm_inference.catalog import LMRequestProcessorCatalog, PromptBuilderCatalog
 from gllm_pipeline.pipeline.pipeline import Pipeline
 from pydantic import BaseModel, ConfigDict

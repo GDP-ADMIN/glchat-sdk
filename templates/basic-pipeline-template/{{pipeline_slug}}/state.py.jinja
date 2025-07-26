@@ -7,7 +7,7 @@ References:
     NONE
 """
 
-from typing import TypedDict
+from typing import Any, TypedDict
 from enum import StrEnum
 
 from gllm_core.event.event_emitter import EventEmitter
@@ -17,13 +17,19 @@ class {{pipeline_name}}State(TypedDict):
     """A TypedDict representing the state of the {{pipeline_display_name}}.
 
     Attributes:
+        history (list[tuple[str, list[Any]]]): The chat history.
         query (str): The user's query.
         response (str): The generated response to the user's query.
+        user_metadata (dict[str, Any]): The user metadata.
+        assistant_metadata (dict[str, Any]): The assistant metadata.
         event_emitter (EventEmitter): The event emitter.
     """
 
+    history: list[tuple[str, list[Any]]]
     query: str
     response: str
+    user_metadata: dict[str, Any]
+    assistant_metadata: dict[str, Any]
     event_emitter: EventEmitter
 
 
@@ -31,6 +37,9 @@ class {{pipeline_name}}State(TypedDict):
 class {{pipeline_name}}StateKeys(StrEnum):
     """List of all possible keys in {{pipeline_name}}State."""
 
+    HISTORY = "history"
     QUERY = "query"
     RESPONSE = "response"
+    USER_METADATA = "user_metadata"
+    ASSISTANT_METADATA = "assistant_metadata"
     EVENT_EMITTER = "event_emitter"

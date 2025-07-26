@@ -1,6 +1,15 @@
 rago_pipeline: {{pipeline_id}}
 
 
+extra_configs:
+  - name: chat_history_pair_limit
+    type: int
+    constraints: {"ge": 0}
+    default_value: 10
+    ui_type: number_field
+    level: PRESET
+
+
 presets:
   - pipeline_preset_id: default
     supported_models:
@@ -9,6 +18,7 @@ presets:
       - anthropic/claude-3-5-sonnet
     support_multimodal: true
     use_docproc: true
+    chat_history_pair_limit: 10
 
 
 chatbots:

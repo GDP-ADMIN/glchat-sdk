@@ -90,15 +90,19 @@ class PipelineHandler(PluginHandler):
     _pipeline_cache: dict[tuple[str, str], Pipeline] = {}
     _chatbot_pipeline_keys: dict[str, set[tuple[str, str]]] = {}
 
-    def __init__(self, app_config: AppConfig, chat_history_storage: BaseChatHistoryStorage):
+    def __init__(
+        self, app_config: AppConfig, chat_history_storage: BaseChatHistoryStorage, data_store: SQLAlchemySQLDataStore
+    ):
         """Initialize the pipeline handler.
 
         Args:
             app_config (AppConfig): Application configuration.
             chat_history_storage (BaseChatHistoryStorage): Chat history storage.
+            data_store (SQLAlchemySQLDataStore): Data store.
         """
         self.app_config = app_config
         self.chat_history_storage = chat_history_storage
+        self.data_store = data_store
         self._prepare_pipelines()
 
     @classmethod
@@ -114,6 +118,7 @@ class PipelineHandler(PluginHandler):
         return {
             AppConfig: instance.app_config,
             BaseChatHistoryStorage: instance.chat_history_storage,
+            SQLAlchemySQLDataStore: instance.data_store,
         }
 
     @classmethod

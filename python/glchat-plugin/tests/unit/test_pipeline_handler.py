@@ -8,14 +8,14 @@ from bosa_core import Plugin
 from gllm_inference.catalog import LMRequestProcessorCatalog, PromptBuilderCatalog
 from gllm_pipeline.pipeline.pipeline import Pipeline
 
-from gllm_plugin.config.app_config import AppConfig
-from gllm_plugin.pipeline.pipeline_handler import (
+from glchat_plugin.config.app_config import AppConfig
+from glchat_plugin.pipeline.pipeline_handler import (
     ChatbotConfig,
     ChatbotPresetMapping,
     PipelineHandler,
     PipelinePresetConfig,
 )
-from gllm_plugin.storage.base_chat_history_storage import BaseChatHistoryStorage
+from glchat_plugin.storage.base_chat_history_storage import BaseChatHistoryStorage
 
 
 @pytest.fixture
@@ -247,7 +247,7 @@ async def test_ainitialize_plugin_handles_build_error(empty_pipeline_handler: Pi
     # First call succeeds, second fails
     mock_plugin.build.side_effect = [Mock(spec=Pipeline), Exception("Build failed")]
 
-    with patch("gllm_plugin.pipeline.pipeline_handler.logger") as mock_logger:
+    with patch("glchat_plugin.pipeline.pipeline_handler.logger") as mock_logger:
         await PipelineHandler.ainitialize_plugin(empty_pipeline_handler, mock_plugin)
 
         assert mock_logger.warning.called
@@ -295,7 +295,7 @@ async def test_acleanup_plugins_handles_errors(pipeline_handler: PipelineHandler
 
     pipeline_handler._plugins = {"type1": plugin1, "type2": plugin2}
 
-    with patch("gllm_plugin.pipeline.pipeline_handler.logger") as mock_logger:
+    with patch("glchat_plugin.pipeline.pipeline_handler.logger") as mock_logger:
         await PipelineHandler.acleanup_plugins(pipeline_handler)
 
         assert mock_logger.warning.called
@@ -573,7 +573,7 @@ async def test_create_chatbot_no_pipeline_config(empty_pipeline_handler: Pipelin
     new_app_config = Mock(spec=AppConfig)
     new_app_config.chatbots = {"new_chatbot": Mock(pipeline=None)}
 
-    with patch("gllm_plugin.pipeline.pipeline_handler.logger") as mock_logger:
+    with patch("glchat_plugin.pipeline.pipeline_handler.logger") as mock_logger:
         await empty_pipeline_handler.create_chatbot(new_app_config, "new_chatbot")
 
         assert mock_logger.warning.called
@@ -599,7 +599,7 @@ async def test_create_chatbot_no_matching_plugin(empty_pipeline_handler: Pipelin
         )
     }
 
-    with patch("gllm_plugin.pipeline.pipeline_handler.logger") as mock_logger:
+    with patch("glchat_plugin.pipeline.pipeline_handler.logger") as mock_logger:
         await empty_pipeline_handler.create_chatbot(new_app_config, "new_chatbot")
 
         # Verify warning was logged
@@ -718,7 +718,7 @@ async def test_update_chatbots_handles_errors(pipeline_handler: PipelineHandler)
         ),
     }
 
-    with patch("gllm_plugin.pipeline.pipeline_handler.logger") as mock_logger:
+    with patch("glchat_plugin.pipeline.pipeline_handler.logger") as mock_logger:
         await pipeline_handler.update_chatbots(updated_app_config, ["chatbot1", "chatbot2"])
 
         assert mock_logger.warning.called
@@ -848,7 +848,7 @@ async def test_async_rebuild_plugin_chatbot_not_found(empty_pipeline_handler: Pi
     - Method logs warning and returns early
     - _build_plugin is not called
     """
-    with patch("gllm_plugin.pipeline.pipeline_handler.logger") as mock_logger:
+    with patch("glchat_plugin.pipeline.pipeline_handler.logger") as mock_logger:
         with patch.object(PipelineHandler, "_build_plugin", new_callable=AsyncMock) as mock_build_plugin:
             await empty_pipeline_handler._async_rebuild_plugin("nonexistent_chatbot")
 
@@ -875,7 +875,7 @@ async def test_async_rebuild_plugin_plugin_not_found(empty_pipeline_handler: Pip
         pipeline_type=pipeline_type, pipeline_config={}, prompt_builder_catalogs=None, lmrp_catalogs=None
     )
 
-    with patch("gllm_plugin.pipeline.pipeline_handler.logger") as mock_logger:
+    with patch("glchat_plugin.pipeline.pipeline_handler.logger") as mock_logger:
         with patch.object(PipelineHandler, "_build_plugin", new_callable=AsyncMock) as mock_build_plugin:
             await empty_pipeline_handler._async_rebuild_plugin(chatbot_id)
 
@@ -908,7 +908,7 @@ async def test_async_rebuild_plugin_no_supported_models(empty_pipeline_handler: 
 
     empty_pipeline_handler._plugins[pipeline_type] = mock_plugin
 
-    with patch("gllm_plugin.pipeline.pipeline_handler.logger") as mock_logger:
+    with patch("glchat_plugin.pipeline.pipeline_handler.logger") as mock_logger:
         with patch.object(PipelineHandler, "_build_plugin", new_callable=AsyncMock) as mock_build_plugin:
             await empty_pipeline_handler._async_rebuild_plugin(chatbot_id)
 
@@ -945,7 +945,7 @@ async def test_async_rebuild_plugin_handles_exception(empty_pipeline_handler: Pi
     with patch.object(
         PipelineHandler, "_build_plugin", new_callable=AsyncMock, side_effect=Exception("Test error")
     ) as mock_build_plugin:
-        with patch("gllm_plugin.pipeline.pipeline_handler.logger") as mock_logger:
+        with patch("glchat_plugin.pipeline.pipeline_handler.logger") as mock_logger:
             await empty_pipeline_handler._async_rebuild_plugin(chatbot_id)
 
             mock_build_plugin.assert_called_once()
@@ -984,7 +984,7 @@ async def test_async_rebuild_pipeline_success(empty_pipeline_handler: PipelineHa
 
     # Mock the _build_plugin method
     with patch.object(PipelineHandler, "_build_plugin", new_callable=AsyncMock) as mock_build_plugin:
-        with patch("gllm_plugin.pipeline.pipeline_handler.logger") as mock_logger:
+        with patch("glchat_plugin.pipeline.pipeline_handler.logger") as mock_logger:
             await empty_pipeline_handler._async_rebuild_pipeline(chatbot_id, model_id)
 
             # Verify _build_plugin was called with correct parameters
@@ -1036,7 +1036,7 @@ async def test_async_rebuild_pipeline_missing_builder_rebuild_success(
 
     with patch.object(empty_pipeline_handler, "_async_rebuild_plugin", side_effect=mock_rebuild_plugin) as mock_rebuild:
         with patch.object(PipelineHandler, "_build_plugin", new_callable=AsyncMock) as mock_build_plugin:
-            with patch("gllm_plugin.pipeline.pipeline_handler.logger") as mock_logger:
+            with patch("glchat_plugin.pipeline.pipeline_handler.logger") as mock_logger:
                 await empty_pipeline_handler._async_rebuild_pipeline(chatbot_id, model_id)
 
                 # Verify _async_rebuild_plugin was called
@@ -1071,7 +1071,7 @@ async def test_async_rebuild_pipeline_missing_builder_rebuild_fails(empty_pipeli
 
     with patch.object(empty_pipeline_handler, "_async_rebuild_plugin", new_callable=AsyncMock) as mock_rebuild:
         with patch.object(PipelineHandler, "_build_plugin", new_callable=AsyncMock) as mock_build_plugin:
-            with patch("gllm_plugin.pipeline.pipeline_handler.logger") as mock_logger:
+            with patch("glchat_plugin.pipeline.pipeline_handler.logger") as mock_logger:
                 await empty_pipeline_handler._async_rebuild_pipeline(chatbot_id, model_id)
 
                 # Verify _async_rebuild_plugin was called
@@ -1105,7 +1105,7 @@ async def test_async_rebuild_pipeline_chatbot_config_not_found(
     empty_pipeline_handler._builders[chatbot_id] = mock_plugin
 
     with patch.object(PipelineHandler, "_build_plugin", new_callable=AsyncMock) as mock_build_plugin:
-        with patch("gllm_plugin.pipeline.pipeline_handler.logger") as mock_logger:
+        with patch("glchat_plugin.pipeline.pipeline_handler.logger") as mock_logger:
             await empty_pipeline_handler._async_rebuild_pipeline(chatbot_id, model_id)
 
             # Verify warning was logged
@@ -1143,7 +1143,7 @@ async def test_async_rebuild_pipeline_model_not_found(empty_pipeline_handler: Pi
     )
 
     with patch.object(PipelineHandler, "_build_plugin", new_callable=AsyncMock) as mock_build_plugin:
-        with patch("gllm_plugin.pipeline.pipeline_handler.logger") as mock_logger:
+        with patch("glchat_plugin.pipeline.pipeline_handler.logger") as mock_logger:
             await empty_pipeline_handler._async_rebuild_pipeline(chatbot_id, model_id)
 
             # Verify warning was logged
@@ -1226,7 +1226,7 @@ async def test_async_rebuild_pipeline_handles_exception(empty_pipeline_handler: 
     with patch.object(
         PipelineHandler, "_build_plugin", new_callable=AsyncMock, side_effect=Exception("Test error")
     ) as mock_build_plugin:
-        with patch("gllm_plugin.pipeline.pipeline_handler.logger") as mock_logger:
+        with patch("glchat_plugin.pipeline.pipeline_handler.logger") as mock_logger:
             await empty_pipeline_handler._async_rebuild_pipeline(chatbot_id, model_id)
 
             # Verify _build_plugin was called
@@ -1266,7 +1266,7 @@ def test_try_rebuild_plugin_success(empty_pipeline_handler: PipelineHandler, moc
 
     empty_pipeline_handler._plugins[pipeline_type] = mock_plugin
 
-    with patch("gllm_plugin.pipeline.pipeline_handler.logger") as mock_logger:
+    with patch("glchat_plugin.pipeline.pipeline_handler.logger") as mock_logger:
         empty_pipeline_handler._try_rebuild_plugin(chatbot_id)
 
         # Verify plugin was stored in _builders
@@ -1290,7 +1290,7 @@ def test_try_rebuild_plugin_chatbot_not_found(empty_pipeline_handler: PipelineHa
     - Method logs warning and returns early
     - No plugin is stored in _builders
     """
-    with patch("gllm_plugin.pipeline.pipeline_handler.logger") as mock_logger:
+    with patch("glchat_plugin.pipeline.pipeline_handler.logger") as mock_logger:
         empty_pipeline_handler._try_rebuild_plugin("nonexistent_chatbot")
 
         # Verify warning was logged
@@ -1318,7 +1318,7 @@ def test_try_rebuild_plugin_plugin_not_found(empty_pipeline_handler: PipelineHan
         pipeline_type=pipeline_type, pipeline_config={}, prompt_builder_catalogs=None, lmrp_catalogs=None
     )
 
-    with patch("gllm_plugin.pipeline.pipeline_handler.logger") as mock_logger:
+    with patch("glchat_plugin.pipeline.pipeline_handler.logger") as mock_logger:
         empty_pipeline_handler._try_rebuild_plugin(chatbot_id)
 
         # Verify warning was logged
@@ -1352,7 +1352,7 @@ def test_try_rebuild_plugin_no_supported_models(empty_pipeline_handler: Pipeline
 
     empty_pipeline_handler._plugins[pipeline_type] = mock_plugin
 
-    with patch("gllm_plugin.pipeline.pipeline_handler.logger") as mock_logger:
+    with patch("glchat_plugin.pipeline.pipeline_handler.logger") as mock_logger:
         empty_pipeline_handler._try_rebuild_plugin(chatbot_id)
 
         # Verify warning was logged
@@ -1393,7 +1393,7 @@ def test_try_rebuild_plugin_handles_exception(empty_pipeline_handler: PipelineHa
 
     empty_pipeline_handler._plugins[pipeline_type] = mock_plugin_with_error
 
-    with patch("gllm_plugin.pipeline.pipeline_handler.logger") as mock_logger:
+    with patch("glchat_plugin.pipeline.pipeline_handler.logger") as mock_logger:
         empty_pipeline_handler._try_rebuild_plugin(chatbot_id)
 
         # Verify warning was logged
@@ -1493,7 +1493,7 @@ def test_get_pipeline_builder_with_logger(empty_pipeline_handler: PipelineHandle
     chatbot_id = "test_chatbot"
 
     # Patch logger and _try_rebuild_plugin
-    with patch("gllm_plugin.pipeline.pipeline_handler.logger") as mock_logger:
+    with patch("glchat_plugin.pipeline.pipeline_handler.logger") as mock_logger:
         with patch.object(empty_pipeline_handler, "_try_rebuild_plugin"):
             # This will raise ValueError, but we're just testing the logging
             with pytest.raises(ValueError):

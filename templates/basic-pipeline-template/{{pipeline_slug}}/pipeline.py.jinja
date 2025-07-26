@@ -77,8 +77,8 @@ class ReferenceMetadata(BaseModel):
         return value
 
 
-class {{pipeline_name}}PipelineBuilder(PipelineBuilderPlugin[{{pipeline_name}}State, {{pipeline_name}}PresetConfig]):
-    """{{pipeline_display_name}} pipeline builder.
+class {{pipeline_name}}Builder(PipelineBuilderPlugin[{{pipeline_name}}State, {{pipeline_name}}PresetConfig]):
+    """{{pipeline_display_name}} builder.
 
     This pipeline will simply pass the user query to the response synthesizer.
     There are no prompt templates used in this pipeline.
@@ -90,12 +90,11 @@ class {{pipeline_name}}PipelineBuilder(PipelineBuilderPlugin[{{pipeline_name}}St
     preset_config_class = {{pipeline_name}}PresetConfig
 
     # this will be injected by GL Chat to reuse the same data store with GL Chat
-    data_store: SQLAlchemySQLDataStore
+    chat_history_manager: ChatHistoryManager
 
     def __init__(self):
-        """Initialize the {{pipeline_display_name}} pipeline builder."""
+        """Initialize the {{pipeline_display_name}} builder."""
         super().__init__()
-        self.chat_history_manager = ChatHistoryManager(data_store=self.data_store)
 
     async def build(self, pipeline_config: dict[str, Any]) -> Pipeline:
         """Build the pipeline.
@@ -149,12 +148,12 @@ class {{pipeline_name}}PipelineBuilder(PipelineBuilderPlugin[{{pipeline_name}}St
         save_history_step = step(
             component=self.chat_history_manager,
             input_state_map={
-                Parameter.USER_MESSAGE: SimpleStateKeys.QUERY,
-                Parameter.ASSISTANT_MESSAGE: SimpleStateKeys.RESPONSE,
-                Parameter.USER_METADATA: SimpleStateKeys.USER_METADATA,
-                Parameter.ASSISTANT_METADATA: SimpleStateKeys.ASSISTANT_METADATA,
+                Parameter.USER_MESSAGE: {{pipeline_name}}StateKeys.QUERY,
+                Parameter.ASSISTANT_MESSAGE: {{pipeline_name}}StateKeys.RESPONSE,
+                Parameter.USER_METADATA: {{pipeline_name}}StateKeys.USER_METADATA,
+                Parameter.ASSISTANT_METADATA: {{pipeline_name}}StateKeys.ASSISTANT_METADATA,
             },
-            output_state=SimpleStateKeys.HISTORY,
+            output_state={{pipeline_name}}StateKeys.HISTORY,
             runtime_config_map={
                 Parameter.CONVERSATION_ID: Parameter.CONVERSATION_ID,
                 Parameter.USER_MESSAGE_ID: Parameter.USER_MESSAGE_ID,
@@ -199,6 +198,10 @@ class {{pipeline_name}}PipelineBuilder(PipelineBuilderPlugin[{{pipeline_name}}St
         return {{pipeline_name}}State(
             query=request.get("message"),
             response=None,
+            references=[],
+            history=[],
+            user_metadata={},
+            assistant_metadata={},
             event_emitter=kwargs.get("event_emitter")
         )
 
@@ -281,7 +284,6 @@ class {{pipeline_name}}PipelineBuilder(PipelineBuilderPlugin[{{pipeline_name}}St
 
             user_metadata_keys = [
                 "search_type",
-                "agent_ids",
                 "is_edited",
             ]
             user_metadata.update({key: value for key in user_metadata_keys if (value := inputs.get(key))})
@@ -297,7 +299,6 @@ class {{pipeline_name}}PipelineBuilder(PipelineBuilderPlugin[{{pipeline_name}}St
                 "anonymize_em": "anonymize_em",
                 "anonymize_lm": "anonymize_lm",
                 "search_type": "search_type",
-                "agent_ids": "agent_ids",
                 "is_edited": "is_edited",
             },
             output_state={{pipeline_name}}StateKeys.USER_METADATA,
@@ -327,13 +328,7 @@ class {{pipeline_name}}PipelineBuilder(PipelineBuilderPlugin[{{pipeline_name}}St
             assistant_metadata.update(anonymize_metadata_metadata)
 
             assistant_metadata_keys = [
-                "related",
                 "search_type",
-                "step_indicators",
-                "steps",
-                "agent_ids",
-                "media_mapping",
-                "cache_hit",
                 "is_regenerated",
             ]
             assistant_metadata.update({key: value for key in assistant_metadata_keys if (value := inputs.get(key))})
@@ -354,18 +349,11 @@ class {{pipeline_name}}PipelineBuilder(PipelineBuilderPlugin[{{pipeline_name}}St
 
         return transform(
             operation=map_assistant_metadata,
-            input_states=[],
+            input_states=[{{pipeline_name}}StateKeys.REFERENCES],
             runtime_config_map={
                 "anonymize_em": "anonymize_em",
                 "anonymize_lm": "anonymize_lm",
-                "references": "references",
-                "related": "related",
                 "search_type": "search_type",
-                "step_indicators": "step_indicators",
-                "steps": "steps",
-                "agent_ids": "agent_ids",
-                "media_mapping": "media_mapping",
-                "cache_hit": "cache_hit",
                 "is_regenerated": "is_regenerated",
             },
             output_state={{pipeline_name}}StateKeys.ASSISTANT_METADATA,

@@ -11,7 +11,7 @@ from typing import Any
 
 from pydantic import BaseModel
 
-from gllm_plugin.config.constant import SearchType
+from glchat_plugin.config.constant import SearchType
 
 
 class BasePipelinePresetConfig(BaseModel):

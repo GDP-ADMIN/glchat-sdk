@@ -8,7 +8,7 @@ Authors:
     Raymond Christopher (raymond.christopher@gdplabs.id)
 """
 
-from gllm_plugin.tools.decorators import (
+from glchat_plugin.tools.decorators import (
     get_plugin_metadata,
     is_tool_plugin,
     tool_plugin,

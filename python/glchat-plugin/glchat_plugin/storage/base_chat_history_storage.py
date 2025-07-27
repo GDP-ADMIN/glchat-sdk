@@ -14,7 +14,7 @@ from typing import Any
 
 from typing_extensions import TypeVar
 
-from gllm_plugin.storage.base_anonymizer_storage import AnonymizerMapping
+from glchat_plugin.storage.base_anonymizer_storage import AnonymizerMapping
 
 Conversation = TypeVar("Conversation")
 Message = TypeVar("Message")
@@ -40,7 +40,9 @@ class BaseChatHistoryStorage(ABC):
     """Interface for chat history storage that defines methods for managing chat conversations and messages."""
 
     @abstractmethod
-    def create_conversation(self, user_id: str, conversation_title: str, chatbot_id: str, **kwargs: Any) -> Conversation:
+    def create_conversation(
+        self, user_id: str, conversation_title: str, chatbot_id: str, **kwargs: Any
+    ) -> Conversation:
         """Create a new conversation.
 
         Args:
@@ -137,44 +139,14 @@ class BaseChatHistoryStorage(ABC):
         pass
 
     @abstractmethod
-    def add_user_message(self, message: str, user_id: str, conversation_id: str, 
-                        parent_id: str | None = None, source: str | None = None, **kwargs: Any) -> Message:
-        """Add a user message to a conversation.
-
-        Args:
-            message (str): The message content.
-            user_id (str): The ID of the user.
-            conversation_id (str): The ID of the conversation.
-            parent_id (str | None, optional): The ID of the parent message. Defaults to None.
-            source (str | None, optional): The source of the message. Defaults to None.
-            kwargs (Any): Additional arguments.
-
-        Returns:
-            Message: The added message.
-        """
-        pass
-
-    @abstractmethod
-    def add_ai_message(self, message: str, user_id: str, conversation_id: str,
-                      parent_id: str | None = None, source: str | None = None, **kwargs: Any) -> Message:
-        """Add an AI message to a conversation.
-
-        Args:
-            message (str): The message content.
-            user_id (str): The ID of the user.
-            conversation_id (str): The ID of the conversation.
-            parent_id (str | None, optional): The ID of the parent message. Defaults to None.
-            source (str | None, optional): The source of the message. Defaults to None.
-            kwargs (Any): Additional arguments.
-
-        Returns:
-            Message: The added message.
-        """
-        pass
-
-    @abstractmethod
-    def save_message(self, user_id: str, conversation_id: str, message_list: list[Any],
-                    attachments: dict[str, Any] | None, **kwargs: Any) -> list[Message]:
+    def save_message(
+        self,
+        user_id: str,
+        conversation_id: str,
+        message_list: list[Any],
+        attachments: dict[str, Any] | None,
+        **kwargs: Any,
+    ) -> list[Message]:
         """Save a list of messages to a conversation.
 
         Args:
@@ -216,8 +188,14 @@ class BaseChatHistoryStorage(ABC):
         pass
 
     @abstractmethod
-    def get_messages(self, user_id: str, conversation_id: str, limit: int | None = None,
-                    max_timestamp: datetime | None = None, **kwargs: Any) -> list[Message]:
+    def get_messages(
+        self,
+        user_id: str,
+        conversation_id: str,
+        limit: int | None = None,
+        max_timestamp: datetime | None = None,
+        **kwargs: Any,
+    ) -> list[Message]:
         """Retrieve messages from a conversation.
 
         Args:
@@ -262,8 +240,9 @@ class BaseChatHistoryStorage(ABC):
         pass
 
     @abstractmethod
-    def create_conversation_document(self, conversation_id: str, status: str = DocumentStatus.PROCESSING.value,
-                                  file_hash: str = "", **kwargs: Any) -> ConversationDocument:
+    def create_conversation_document(
+        self, conversation_id: str, status: str = DocumentStatus.PROCESSING.value, file_hash: str = "", **kwargs: Any
+    ) -> ConversationDocument:
         """Create a new conversation document.
 
         Args:
@@ -291,8 +270,15 @@ class BaseChatHistoryStorage(ABC):
         pass
 
     @abstractmethod
-    def update_conversation_document(self, document_id: str, status: str, number_of_chunks: int,
-                                  message: str | None, object_key: str | None, **kwargs: Any) -> ConversationDocument:
+    def update_conversation_document(
+        self,
+        document_id: str,
+        status: str,
+        number_of_chunks: int,
+        message: str | None,
+        object_key: str | None,
+        **kwargs: Any,
+    ) -> ConversationDocument:
         """Update a conversation document.
 
         Args:
@@ -324,8 +310,15 @@ class BaseChatHistoryStorage(ABC):
         pass
 
     @abstractmethod
-    def get_deanonymized_message(self, user_id: str, conversation_id: str, message_id: str,
-                               is_anonymized: bool, mappings: list[AnonymizerMapping], **kwargs: Any) -> Message:
+    def get_deanonymized_message(
+        self,
+        user_id: str,
+        conversation_id: str,
+        message_id: str,
+        is_anonymized: bool,
+        mappings: list[AnonymizerMapping],
+        **kwargs: Any,
+    ) -> Message:
         """Retrieve a deanonymized message.
 
         Args:
@@ -342,8 +335,13 @@ class BaseChatHistoryStorage(ABC):
         pass
 
     @abstractmethod
-    def get_deanonymized_messages(self, messages: list[Message], is_anonymized: bool,
-                                mappings: list[AnonymizerMapping] | None = None, **kwargs: Any) -> list[Message]:
+    def get_deanonymized_messages(
+        self,
+        messages: list[Message],
+        is_anonymized: bool,
+        mappings: list[AnonymizerMapping] | None = None,
+        **kwargs: Any,
+    ) -> list[Message]:
         """Retrieve a list of deanonymized messages.
 
         Args:

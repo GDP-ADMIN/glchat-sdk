@@ -13,8 +13,8 @@ from gllm_inference.prompt_builder.prompt_builder import BasePromptBuilder
 from gllm_pipeline.pipeline.pipeline import Pipeline
 from pydantic import BaseModel
 
-from gllm_plugin.config.app_config import AppConfig
-from gllm_plugin.pipeline.pipeline_plugin import PipelineBuilderPlugin
+from glchat_plugin.config.app_config import AppConfig
+from glchat_plugin.pipeline.pipeline_plugin import PipelineBuilderPlugin
 
 
 class TestPipelineState:

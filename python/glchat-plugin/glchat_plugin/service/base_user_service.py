@@ -9,13 +9,14 @@ References:
 """
 
 from abc import ABC, abstractmethod
+from typing import Any
 
 
 class BaseUserService(ABC):
     """A base class for user service."""
 
     @abstractmethod
-    async def get_user_id(self, **kwargs) -> str:
+    async def get_user_id(self, **kwargs: Any) -> str:
         """Abstract method to get the user id.
 
         Args:
@@ -26,33 +27,36 @@ class BaseUserService(ABC):
         """
 
     @abstractmethod
-    async def register(self, **kwargs):
+    async def register(self, **kwargs: Any):
         """Abstract method to register a new user.
 
         Args:
-            **kwargs: Additional keyword arguments for user registration.
+            **kwargs (Any): Additional keyword arguments for user registration.
         """
 
     @abstractmethod
-    async def login(self, **kwargs):
+    async def login(self, **kwargs: Any):
         """Abstract method to authenticate and login a user.
 
         Args:
-            **kwargs: Additional keyword arguments for user login.
+            **kwargs (Any): Additional keyword arguments for user login.
         """
 
     @abstractmethod
-    async def get_applications(self, **kwargs):
+    async def get_applications(self, **kwargs: Any) -> Any:
         """Abstract method to get user applications.
 
         Args:
-            **kwargs: Additional keyword arguments for retrieving applications.
+            **kwargs (Any): Additional keyword arguments for retrieving applications.
+
+        Returns:
+            Any: User applications data.
         """
 
     @abstractmethod
-    async def set_user_applications(self, **kwargs):
+    async def set_user_applications(self, **kwargs: Any):
         """Abstract method to set user applications.
 
         Args:
-            **kwargs: Additional keyword arguments for setting user applications.
+            **kwargs (Any): Additional keyword arguments for setting user applications.
         """

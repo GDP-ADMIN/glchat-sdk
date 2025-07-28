@@ -13,7 +13,8 @@ from typing import Any
 from gllm_core.utils.retry import RetryConfig
 from gllm_inference.builder import build_lm_invoker
 from gllm_inference.lm_invoker.lm_invoker import BaseLMInvoker
-from gllm_plugin.constants.constants import (
+
+from glchat_plugin.constants.constants import (
     LM_INVOKER_MAX_RETRIES,
     LM_INVOKER_TIMEOUT_SECONDS,
 )

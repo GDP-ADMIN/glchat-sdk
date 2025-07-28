@@ -12,8 +12,7 @@ from pydantic import BaseModel, field_validator
 import json
 
 from glchat_plugin.pipeline.pipeline_plugin import PipelineBuilderPlugin
-from glchat_plugin.utils.get_catalog import get_catalog
-from glchat_plugin.utils.get_lm_invoker import get_lm_invoker
+from glchat_plugin.utils import get_catalog, get_lm_invoker
 from gllm_generation.response_synthesizer import StuffResponseSynthesizer
 from gllm_misc.chat_history_manager import ChatHistoryManager
 from gllm_misc.chat_history_manager.schema import OperationType, Parameter

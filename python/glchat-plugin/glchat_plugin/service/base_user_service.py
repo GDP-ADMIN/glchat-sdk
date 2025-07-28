@@ -24,7 +24,11 @@ class BaseUserService(ABC):
 
         Returns:
             str: user id.
+
+        Raises:
+            NotImplementedError: If the method is not implemented.
         """
+        raise NotImplementedError
 
     @abstractmethod
     async def register(self, **kwargs: Any):
@@ -32,7 +36,11 @@ class BaseUserService(ABC):
 
         Args:
             **kwargs (Any): Additional keyword arguments for user registration.
+
+        Raises:
+            NotImplementedError: If the method is not implemented.
         """
+        raise NotImplementedError
 
     @abstractmethod
     async def login(self, **kwargs: Any):
@@ -40,7 +48,11 @@ class BaseUserService(ABC):
 
         Args:
             **kwargs (Any): Additional keyword arguments for user login.
+
+        Raises:
+            NotImplementedError: If the method is not implemented.
         """
+        raise NotImplementedError
 
     @abstractmethod
     async def get_applications(self, **kwargs: Any) -> Any:
@@ -51,7 +63,11 @@ class BaseUserService(ABC):
 
         Returns:
             Any: User applications data.
+
+        Raises:
+            NotImplementedError: If the method is not implemented.
         """
+        raise NotImplementedError
 
     @abstractmethod
     async def set_user_applications(self, **kwargs: Any):
@@ -59,4 +75,8 @@ class BaseUserService(ABC):
 
         Args:
             **kwargs (Any): Additional keyword arguments for setting user applications.
+
+        Raises:
+            NotImplementedError: If the method is not implemented.
         """
+        raise NotImplementedError

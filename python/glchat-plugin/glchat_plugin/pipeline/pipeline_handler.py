@@ -13,8 +13,8 @@ from typing import Any, Type
 from bosa_core import Plugin
 from bosa_core.plugin.handler import PluginHandler
 from gllm_core.utils import LoggerManager
-from gllm_datastore.sql_data_store import SQLAlchemySQLDataStore
 from gllm_inference.catalog import LMRequestProcessorCatalog, PromptBuilderCatalog
+from gllm_misc.chat_history_manager import ChatHistoryManager
 from gllm_pipeline.pipeline.pipeline import Pipeline
 from pydantic import BaseModel, ConfigDict
 
@@ -92,18 +92,21 @@ class PipelineHandler(PluginHandler):
     _chatbot_pipeline_keys: dict[str, set[tuple[str, str]]] = {}
 
     def __init__(
-        self, app_config: AppConfig, chat_history_storage: BaseChatHistoryStorage, data_store: SQLAlchemySQLDataStore
+        self,
+        app_config: AppConfig,
+        chat_history_storage: BaseChatHistoryStorage,
+        chat_history_manager: ChatHistoryManager,
     ):
         """Initialize the pipeline handler.
 
         Args:
             app_config (AppConfig): Application configuration.
             chat_history_storage (BaseChatHistoryStorage): Chat history storage.
-            data_store (SQLAlchemySQLDataStore): Data store.
+            chat_history_manager (ChatHistoryManager): Chat history manager.
         """
         self.app_config = app_config
         self.chat_history_storage = chat_history_storage
-        self.data_store = data_store
+        self.chat_history_manager = chat_history_manager
         self._prepare_pipelines()
 
     @classmethod
@@ -119,7 +122,7 @@ class PipelineHandler(PluginHandler):
         return {
             AppConfig: instance.app_config,
             BaseChatHistoryStorage: instance.chat_history_storage,
-            SQLAlchemySQLDataStore: instance.data_store,
+            ChatHistoryManager: instance.chat_history_manager,
         }
 
     @classmethod

@@ -6,6 +6,7 @@ services:
       - MODULE=${MODULE:-notdefined}
       - UV_PUBLISH_TOKEN=${PYPI_TOKEN:-notdefined}
       - TAG_NAME=${TAG_NAME}
+      - VERSION=${VERSION}
     entrypoint: /bin/bash
     command:
       - '-c'

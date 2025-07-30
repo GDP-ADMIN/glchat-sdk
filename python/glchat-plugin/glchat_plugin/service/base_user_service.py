@@ -20,7 +20,7 @@ class BaseUserService(ABC):
         """Abstract method to get the user id.
 
         Args:
-            **kwargs: Additional keyword arguments for user identification.
+            **kwargs (Any): Additional keyword arguments for user identification.
 
         Returns:
             str: user id.

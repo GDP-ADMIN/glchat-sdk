@@ -13,9 +13,9 @@ fi
 MODULE="$1"
 cd "$MODULE"
 
-if [ -n "${TAG_NAME}" ]; then
+if [ -n "${TAG_NAME}" ] && [ "${VERSION}" = "3.13" ]; then
     # Publish to PyPI
     uv publish --no-cache
 else
-    echo "No release tag detected. Skipping binary upload."
+    echo "No release tag detected or VERSION is not 3.13. Skipping package upload."
 fi

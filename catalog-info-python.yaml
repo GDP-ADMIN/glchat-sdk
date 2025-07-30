@@ -32,15 +32,15 @@ spec:
 apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
-  name: gen-ai-external-python-gllm-plugin
+  name: gen-ai-external-python-glchat-plugin
   links:
     - title: PyPI Page
-      url: https://pypi.org/project/gllm-plugin-binary/
+      url: https://pypi.org/project/glchat-plugin/
   annotations:
     google.com/cloudbuild-project-slug: 'gdp-labs'
     google.com/cloudbuild-repo-name: 'gen-ai-external'
     google.com/cloudbuild-location: 'asia-southeast2'
-    sonarqube.org/project-key: default/gllm-plugin
+    sonarqube.org/project-key: default/glchat-plugin
     gdplabs/project-email: "gat@gdplabs.id"
 spec:
   type: library

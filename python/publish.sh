@@ -13,7 +13,7 @@ fi
 MODULE="$1"
 cd "$MODULE"
 
-if [ -n "${TAG_NAME}" ] && [ "${VERSION}" = "3.13" ]; then
+if [ -n "${TAG_NAME}" ] && [ "${VERSION}" = "3.12" ]; then
     # Publish to PyPI
     uv publish --no-cache
 else

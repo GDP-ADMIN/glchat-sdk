@@ -15,7 +15,7 @@ class BaseTenantService(ABC):
     """A base class for tenant service."""
 
     @abstractmethod
-    async def get_tenant_id(self, **kwargs: Any) -> str | None:
+    async def get_tenant_id(self, **kwargs: Any) -> str:
         """Abstract method to get the tenant id.
 
         Args:
@@ -23,7 +23,7 @@ class BaseTenantService(ABC):
                 The kwargs are Fast API Request object.
 
         Returns:
-            str | None: tenant id, None if not found.
+            str: tenant id.
 
         Raises:
             NotImplementedError: If the method is not implemented.

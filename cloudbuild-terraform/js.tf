@@ -1,5 +1,5 @@
 module "gcb_gen_ai_external_pr_js_sdk" {
-  source     = "s3::https://s3.amazonaws.com/gl-terraform-modules/terraform-gcp-gcb/terraform-gcp-gcb-1.0.0.zip"
+  source     = "s3::https://s3.amazonaws.com/gl-terraform-modules/terraform-gcp-gcb/terraform-gcp-gcb-1.0.2.zip"
   location   = var.region
   project_id = local.project_id.gdplabs
   for_each   = toset(local.js_modules_names)
@@ -23,7 +23,7 @@ module "gcb_gen_ai_external_pr_js_sdk" {
 }
 
 # module "gcb_gen_ai_external_push_js_sdk" {
-#   source     = "s3::https://s3.amazonaws.com/gl-terraform-modules/terraform-gcp-gcb/terraform-gcp-gcb-1.0.0.zip"
+#   source     = "s3::https://s3.amazonaws.com/gl-terraform-modules/terraform-gcp-gcb/terraform-gcp-gcb-1.0.2.zip"
 #   location   = var.region
 #   project_id = local.project_id.gdplabs
 #   for_each   = toset(local.js_modules_names)
@@ -47,7 +47,7 @@ module "gcb_gen_ai_external_pr_js_sdk" {
 # }
 
 module "gcb_gen_ai_external_push_tag_js_sdk" {
-  source     = "s3::https://s3.amazonaws.com/gl-terraform-modules/terraform-gcp-gcb/terraform-gcp-gcb-1.0.0.zip"
+  source     = "s3::https://s3.amazonaws.com/gl-terraform-modules/terraform-gcp-gcb/terraform-gcp-gcb-1.0.2.zip"
   location   = var.region
   project_id = local.project_id.gdplabs
   for_each   = toset(local.js_modules_names)

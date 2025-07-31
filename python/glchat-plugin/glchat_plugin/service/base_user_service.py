@@ -16,14 +16,14 @@ class BaseUserService(ABC):
     """A base class for user service."""
 
     @abstractmethod
-    async def get_user_id(self, **kwargs: Any) -> str:
+    async def get_user_id(self, **kwargs: Any) -> str | None:
         """Abstract method to get the user id.
 
         Args:
             **kwargs (Any): Additional keyword arguments for user identification.
 
         Returns:
-            str: user id.
+            str | None: user id, None if not found.
 
         Raises:
             NotImplementedError: If the method is not implemented.

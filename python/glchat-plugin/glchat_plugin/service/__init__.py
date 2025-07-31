@@ -1,1 +1,1 @@
-"""Module for glchat_plugin user service."""
+"""Module for glchat_plugin custom service."""

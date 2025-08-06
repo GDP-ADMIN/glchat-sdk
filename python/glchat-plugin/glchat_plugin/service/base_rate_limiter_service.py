@@ -15,10 +15,12 @@ class BaseRateLimiterService(ABC):
     """A base class for tenant service."""
 
     @abstractmethod
-    async def custom_identifier(self, **kwargs: Any) -> str:
+    async def custom_identifier(self, request: Any, identifier_id: Any, **kwargs: Any) -> str:
         """Abstract method to get a custom identifier for rate limiting.
 
         Args:
+            request (Request): The incoming request.
+            identifier_id (str): The identifier ID for rate limiting.
             **kwargs (Any): Additional keyword arguments.
 
         Returns:
@@ -28,10 +30,11 @@ class BaseRateLimiterService(ABC):
 
 
     @abstractmethod
-    async def setup_rate_limiter(self, **kwargs: Any) -> None:
+    async def setup_rate_limiter(self, redis_client: Any, **kwargs: Any) -> None:
         """Abstract method to set up the rate limiter.
 
         Args:
+            redis_client (Any): The Redis client instance.
             **kwargs (Any): Additional keyword arguments.
         """
         raise NotImplementedError

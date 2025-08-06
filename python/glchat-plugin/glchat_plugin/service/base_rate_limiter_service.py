@@ -30,11 +30,10 @@ class BaseRateLimiterService(ABC):
 
 
     @abstractmethod
-    async def setup_rate_limiter(self, redis_client: Any, **kwargs: Any) -> None:
+    async def setup_rate_limiter(self, **kwargs: Any) -> None:
         """Abstract method to set up the rate limiter.
 
         Args:
-            redis_client (Any): The Redis client instance.
             **kwargs (Any): Additional keyword arguments.
         """
         raise NotImplementedError

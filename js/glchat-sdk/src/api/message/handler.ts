@@ -23,10 +23,10 @@ export class MessageAPI {
   /**
    * An API that serves as an interface to GLChat message-related API.
    *
-   * @params {string} apiKey
+   * @params {typeof fetch} client Fetch API client, augmented with authentication data.
    */
   public constructor(
-    private readonly fetchClient: typeof fetch,
+    private readonly client: typeof fetch,
   ) {}
 
   /**
@@ -66,7 +66,7 @@ export class MessageAPI {
       );
     }
 
-    const response = await this.fetchClient('message', {
+    const response = await this.client('message', {
       method: 'POST',
       headers: {
         Accept: 'text/event-stream',

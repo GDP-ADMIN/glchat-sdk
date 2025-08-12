@@ -15,13 +15,11 @@ class BaseRateLimiterService(ABC):
     """A base class for tenant service."""
 
     @abstractmethod
-    async def custom_identifier(self, request: Any, identifier_id: Any, **kwargs: Any) -> str:
+    async def custom_identifier(self, request: Any) -> str:
         """Abstract method to get a custom identifier for rate limiting.
 
         Args:
             request (Request): The incoming request.
-            identifier_id (str): The identifier ID for rate limiting.
-            **kwargs (Any): Additional keyword arguments.
 
         Returns:
             str: A custom identifier for rate limiting.

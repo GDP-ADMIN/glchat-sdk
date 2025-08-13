@@ -19,7 +19,7 @@ class BaseRateLimiterService(ABC):
         """Abstract method to get a custom identifier for rate limiting.
 
         Args:
-            request (Request): The incoming request.
+            request (Any): The incoming request.
 
         Returns:
             str: A custom identifier for rate limiting.

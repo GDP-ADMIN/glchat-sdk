@@ -1,5 +1,5 @@
+import { ValidationError } from '@/error';
 import { describe, expect, it } from 'vitest';
-import { ZodError } from 'zod/v4';
 import { createGLChatFetchClient } from '../fetch';
 import { MessageAPI } from './handler';
 import type { CreateMessagePayload } from './types';
@@ -21,7 +21,7 @@ describe('MessageAPI', () => {
 
       const handler = new MessageAPI(client);
 
-      await expect(() => handler.create(payload as unknown as CreateMessagePayload)).rejects.toThrow(ZodError);
+      await expect(() => handler.create(payload as unknown as CreateMessagePayload)).rejects.toThrow(ValidationError);
     });
 
     it('should stream basic message correctly', async () => {

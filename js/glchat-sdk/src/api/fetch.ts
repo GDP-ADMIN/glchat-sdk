@@ -11,6 +11,7 @@
  * Copyright (c) GDP LABS. All rights reserved.
  */
 
+import { APIError, GLChatError, NetworkError } from '@/error';
 import type { GLChatConfiguration } from '../config';
 
 declare const __packageVersion: string;
@@ -87,12 +88,16 @@ export function createGLChatFetchClient(
       });
 
       if (!response.ok) {
-        throw new Error('Response is not OK');
+        throw new APIError('API Returned non-OK status', response.status, response.headers);
       }
 
       return response;
-    } catch {
-      throw new Error('Failed to fetch');
+    } catch (err) {
+      if (err instanceof GLChatError) {
+        throw err;
+      }
+
+      throw new NetworkError(err as Error);
     }
   };
 }

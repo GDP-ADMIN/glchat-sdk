@@ -173,6 +173,29 @@ for chunk in client.message.create(
     print(chunk.decode("utf-8"), end="")
 ```
 
+### 🔌 Pipeline Plugin Management
+
+Register and unregister pipeline plugins for enhanced functionality:
+
+```python
+from glchat_sdk import GLChat
+
+client = GLChat(api_key="your-api-key")
+
+# Register a pipeline plugin
+response = client.pipeline.register("path/to/plugin.zip")
+print(f"Plugin registered: {response}")
+
+# Unregister pipeline plugins
+response = client.pipeline.unregister(["plugin_id_1", "plugin_id_2"])
+print(f"Plugins unregistered: {response}")
+```
+
+**Supported file types for registration:**
+- **📂 File paths** (string or Path object)
+- **💾 Binary data** (bytes)
+- **📄 File-like objects** (with read() method)
+
 ## 📚 API Reference
 
 ### GLChat
@@ -248,6 +271,42 @@ response_stream = client.message.create(
 **Returns:**
 
 - `Iterator[bytes]`: Streaming response chunks 📡
+
+##### 🔌 pipeline.register
+
+Registers a pipeline plugin by uploading a zip file.
+
+```python
+response = client.pipeline.register(
+    zip_file: Union[str, Path, BinaryIO, bytes]
+) -> dict[str, Any]
+```
+
+**Parameters:**
+
+- `zip_file`: Zip file containing the plugin (filepath, binary, file object, or bytes) 📦
+
+**Returns:**
+
+- `dict[str, Any]`: Response containing registration details 📋
+
+##### 🔌 pipeline.unregister
+
+Unregisters pipeline plugins by their IDs.
+
+```python
+response = client.pipeline.unregister(
+    plugin_ids: list[str]
+) -> dict[str, Any]
+```
+
+**Parameters:**
+
+- `plugin_ids`: List of plugin IDs to unregister 🆔
+
+**Returns:**
+
+- `dict[str, Any]`: Response containing unregistration details 📋
 
 ## 📁 File Support
 

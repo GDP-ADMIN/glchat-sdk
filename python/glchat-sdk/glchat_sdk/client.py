@@ -12,6 +12,14 @@ Example:
     ...     user_id="user_456"
     ... ):
     ...     print(chunk.decode("utf-8"), end="")
+    >>>
+    >>> # Register a pipeline plugin
+    >>> response = client.pipeline.register("path/to/plugin.zip")
+    >>> print(response)
+    >>>
+    >>> # Unregister pipeline plugins
+    >>> response = client.pipeline.unregister(["plugin_id_1", "plugin_id_2"])
+    >>> print(response)
 
 Authors:
     Vincent Chuardi (vincent.chuardi@gdplabs.id)
@@ -23,9 +31,13 @@ References:
 import os
 
 from glchat_sdk.message import MessageAPI
+from glchat_sdk.pipeline import PipelineAPI
 
 # Ensure the URL ends with a slash; without the trailing slash, the base path will be incorrect.
 DEFAULT_BASE_URL = "https://chat.gdplabs.id/api/proxy/"
+ERROR_MESSAGE = """
+API key is required. Provide it via 'api_key' parameter or 'GLCHAT_API_KEY' environment variable.
+"""
 
 
 class GLChat:
@@ -36,6 +48,7 @@ class GLChat:
         base_url: Base URL for the GLChat API
         timeout: Request timeout in seconds
         message: MessageAPI instance for message operations
+        pipeline: PipelineAPI instance for pipeline operations
     """
 
     def __init__(
@@ -57,10 +70,9 @@ class GLChat:
         """
         self.api_key = api_key or os.getenv("GLCHAT_API_KEY")
         if not self.api_key:
-            raise ValueError(
-                "API key is required. Provide it via 'api_key' parameter or 'GLCHAT_API_KEY' environment variable."
-            )
+            raise ValueError(ERROR_MESSAGE)
 
         self.base_url = base_url or os.getenv("GLCHAT_BASE_URL") or DEFAULT_BASE_URL
         self.timeout = timeout
         self.message = MessageAPI(self)
+        self.pipeline = PipelineAPI(self)

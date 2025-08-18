@@ -12,35 +12,58 @@
  */
 
 /**
+ * StandardSchema definiton.
+ *
+ * The base schema is directly copied from
+ * https://github.com/standard-schema/standard-schema/blob/main/packages/spec/src/index.ts
+ * to avoid extra dependencies and trimmed to remove unnecessary additions.
+ */
+
+// eslint-disable-next-line @typescript-eslint/no-namespace
+declare namespace StandardSchemaV1 {
+  /** The result interface if validation fails. */
+  export interface FailureResult {
+    /** The issues of failed validation. */
+    readonly issues: readonly Issue[];
+  }
+
+  /** The issue interface of the failure output. */
+  export interface Issue {
+    /** The error message of the issue. */
+    readonly message: string;
+    /** The path of the issue, if any. */
+    readonly path?: readonly (PropertyKey | PathSegment)[] | undefined;
+  }
+
+  /** The path segment interface of the issue. */
+  export interface PathSegment {
+    /** The key representing a path segment. */
+    readonly key: PropertyKey;
+  }
+}
+
+/**
  * A wrapper class for all GLChat related errors.
  *
  * For now, it contains nothing.
  */
-export class GLChatError extends Error {}
-
-/**
- * Issues present in the schema.
- */
-interface ValidationIssue {
-  /**
-   * Human-readable message related with the error.
-   */
-  message: string;
-  /**
-   * Object path related with the schema.
-   */
-  path: string[];
-}
+export class GLChatError extends Error { }
 
 /**
  * Errors that are thrown when the user-provided payload
  * doesn't satisfy the constraint.
+ *
+ * This error accepts a StandardSchema.FailureResult and extract the issues.
  */
 export class ValidationError extends GLChatError {
-  constructor(public readonly object: string, public readonly issues: ValidationIssue[]) {
+  public readonly issues: readonly StandardSchemaV1.Issue[];
+
+  constructor(public readonly object: string, err: StandardSchemaV1.FailureResult) {
     super(
       'Invalid payload. Please refer to `issues` for detailed information.',
     );
+
+    this.issues = err.issues;
   }
 }
 

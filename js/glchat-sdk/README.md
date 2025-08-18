@@ -373,7 +373,7 @@ Below are the list of possible error that can be thrown by the SDK
 
 | Class | Cause |
 | ----- | ----- |
-| ValidationError | Thrown when incorrect parameters are supplied. This error has an extra field `issues` that stores detailed information which field(s) are invalid. |
+| ValidationError | Thrown when incorrect parameters are supplied. This error has an extra field `issues` that stores detailed information which field(s) are invalid. This field is a [Standard Schema](https://github.com/standard-schema/standard-schema) issues field. |
 | APIError | Thrown when API returned a non-OK HTTP response. Contains additional field `status` that stores the HTTP status and `headers` that stores the response headers. |
 | TimeoutError | Thrown when request to API has timed out. Can only be thrown when `timeout` is supplied. |
 | ChunkError | Thrown when API returned an invalid stream chunk format. Unlikely to be thrown. |

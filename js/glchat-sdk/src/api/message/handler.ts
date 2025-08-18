@@ -99,10 +99,7 @@ export class MessageAPI {
       };
     } catch (err) {
       if (err instanceof ZodError) {
-        throw new ValidationError(
-          'payload',
-          err.issues.map(
-            issue => ({ path: issue.path as string[], message: issue.message })));
+        throw new ValidationError('payload', err);
       }
 
       // re-throw, handled in other part of the code.

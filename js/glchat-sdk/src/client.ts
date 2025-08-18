@@ -52,10 +52,7 @@ export class GLChat {
       this.message = new MessageAPI(fetchClient);
     } catch (err) {
       if (err instanceof ZodError) {
-        throw new ValidationError(
-          'configuration',
-          err.issues.map(
-            issue => ({ path: issue.path as string[], message: issue.message })));
+        throw new ValidationError('configuration', err);
       }
 
       throw err;
@@ -81,10 +78,7 @@ export class GLChat {
       return this;
     } catch (err) {
       if (err instanceof ZodError) {
-        throw new ValidationError(
-          'configuration',
-          err.issues.map(
-            issue => ({ path: issue.path as string[], message: issue.message })));
+        throw new ValidationError('configuration', err);
       }
 
       throw err;
@@ -110,10 +104,7 @@ export class GLChat {
       return this;
     } catch (err) {
       if (err instanceof ZodError) {
-        throw new ValidationError(
-          'configuration',
-          err.issues.map(
-            issue => ({ path: issue.path as string[], message: issue.message })));
+        throw new ValidationError('configuration', err);
       }
 
       throw err;
@@ -141,10 +132,7 @@ export class GLChat {
       return this;
     } catch (err) {
       if (err instanceof ZodError) {
-        throw new ValidationError(
-          'configuration',
-          err.issues.map(
-            issue => ({ path: issue.path as string[], message: issue.message })));
+        throw new ValidationError('configuration', err);
       }
 
       throw err;

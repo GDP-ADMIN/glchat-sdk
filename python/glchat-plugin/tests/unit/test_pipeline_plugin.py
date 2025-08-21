@@ -8,8 +8,7 @@ from unittest.mock import Mock
 
 import pytest
 from gllm_inference.catalog.catalog import BaseCatalog
-from gllm_inference.multimodal_prompt_builder import MultimodalPromptBuilder
-from gllm_inference.prompt_builder.prompt_builder import BasePromptBuilder
+from gllm_inference.prompt_builder import PromptBuilder
 from gllm_pipeline.pipeline.pipeline import Pipeline
 from pydantic import BaseModel
 
@@ -71,9 +70,8 @@ def mock_catalog():
     """Create a mock catalog."""
     catalog = Mock(spec=BaseCatalog)
     catalog.components = {
-        "test_prompt": Mock(spec=BasePromptBuilder),
-        "test_prompt_openai": Mock(spec=BasePromptBuilder),
-        "multimodal_prompt": Mock(spec=MultimodalPromptBuilder),
+        "test_prompt": Mock(spec=PromptBuilder),
+        "test_prompt_openai": Mock(spec=PromptBuilder),
     }
     return catalog
 

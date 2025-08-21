@@ -8,7 +8,7 @@ from unittest.mock import Mock
 
 import pytest
 from gllm_inference.catalog.catalog import BaseCatalog
-from gllm_inference.prompt_builder import PromptBuilder  
+from gllm_inference.prompt_builder import PromptBuilder
 from gllm_pipeline.pipeline.pipeline import Pipeline
 from pydantic import BaseModel
 

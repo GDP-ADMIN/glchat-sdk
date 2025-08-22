@@ -58,7 +58,7 @@ class ConversationAPI:
             model_name (str | None): Optional model name to use
 
         Returns:
-            dict containing the prepared request data
+            dict[str, Any]: Dictionary containing the prepared request data
         """
         request = ConversationRequest(
             user_id=user_id,
@@ -72,7 +72,7 @@ class ConversationAPI:
         """Prepare headers for the API request.
 
         Returns:
-            dict containing the request headers
+            dict[str, str]: Dictionary containing the request headers
         """
         headers = {}
         if self._client.api_key:
@@ -98,7 +98,7 @@ class ConversationAPI:
             model_name (str | None): Optional model name to use
 
         Returns:
-            Dict containing the conversation response data
+            dict[str, Any]: Dictionary containing the conversation response data
 
         Raises:
             ValueError: If input validation fails

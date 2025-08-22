@@ -13,7 +13,7 @@ References:
 import logging
 from collections.abc import Iterator
 from pathlib import Path
-from typing import Any, BinaryIO
+from typing import Any, BinaryIO, TypeVar
 from urllib.parse import urljoin
 
 import httpx
@@ -21,6 +21,9 @@ import httpx
 from glchat_sdk.models import MessageRequest
 
 logger = logging.getLogger(__name__)
+
+# Type variable for file types
+FileType = TypeVar("FileType", str, Path, BinaryIO, bytes)
 
 FILE_TYPE = "application/octet-stream"
 
@@ -88,7 +91,7 @@ class MessageAPI:
             search_type (str | None): Type of search to perform
 
         Returns:
-            Dict containing the prepared request data
+            dict[str, Any]: Dictionary containing the prepared request data
         """
         request = MessageRequest(
             chatbot_id=chatbot_id,
@@ -115,7 +118,7 @@ class MessageAPI:
         """Prepare headers for the API request.
 
         Returns:
-            Dict containing the request headers
+            dict[str, str]: Dictionary containing the request headers
         """
         headers = {}
         if self._client.api_key:
@@ -124,16 +127,15 @@ class MessageAPI:
             headers["X-Tenant-ID"] = self._client.tenant_id
         return headers
 
-    def _process_file_item(
-        self, file_item: str | Path | BinaryIO | bytes
-    ) -> tuple[str, tuple[str, str | BinaryIO | bytes, str]]:
+    def _process_file_item(self, file_item: FileType) -> tuple[str, tuple[str, FileType, str]]:
         """Process a single file item and return the file tuple for httpx.
 
         Args:
-            file_item (Union[str, Path, BinaryIO, bytes]): Item to process
+            file_item (FileType): Item to process
 
         Returns:
-            Tuple of (field_name, (filename, file_content, content_type))
+            tuple[str, tuple[str, FileType, str]]: Tuple of
+                (field_name, (filename, file_content, content_type))
 
         Raises:
             ValueError: If file type is not supported
@@ -156,15 +158,16 @@ class MessageAPI:
             raise ValueError(f"Unsupported file type: {type(file_item)}")
 
     def _prepare_files(
-        self, files: list[str | Path | BinaryIO | bytes] | None
-    ) -> list[tuple[str, tuple[str, str | BinaryIO | bytes, str]]] | None:
+        self, files: list[FileType] | None
+    ) -> list[tuple[str, tuple[str, FileType, str]]] | None:
         """Prepare files for upload.
 
         Args:
-            files (list[Union[str, Path, BinaryIO, bytes]] | None): List of files to process
+            files (list[FileType] | None): List of files to process
 
         Returns:
-            List of file tuples for httpx or None if no files
+            list[tuple[str, tuple[str, FileType, str]]] | None: List of file tuples for httpx
+                or None if no files
 
         Raises:
             ValueError: If any file type is not supported
@@ -188,7 +191,7 @@ class MessageAPI:
         self,
         url: str,
         data: dict[str, Any],
-        files: list[tuple[str, tuple[str, str | BinaryIO | bytes, str]]] | None,
+        files: list[tuple[str, tuple[str, FileType, str]]] | None,
         headers: dict[str, str],
     ) -> Iterator[bytes]:
         """Make the streaming HTTP request.
@@ -196,8 +199,7 @@ class MessageAPI:
         Args:
             url (str): API endpoint URL
             data (dict[str, Any]): Request data
-            files (list[Tuple[str, Tuple[str, Union[str, BinaryIO, bytes], str]]]
-                | None, Optional): Prepared files data
+            files (list[tuple[str, tuple[str, FileType, str]]] | None): Prepared files data
             headers (dict[str, str]): Request headers
 
         Yields:
@@ -223,7 +225,7 @@ class MessageAPI:
         self,
         chatbot_id: str,
         message: str,
-        files: list[str | Path | BinaryIO | bytes] | None = None,
+        files: list[FileType] | None = None,
         parent_id: str | None = None,
         source: str | None = None,
         quote: str | None = None,
@@ -247,7 +249,7 @@ class MessageAPI:
         Args:
             chatbot_id (str): Required chatbot identifier
             message (str): Required user message
-            files (list[Union[str, Path, BinaryIO, bytes]] | None): List of files
+            files (list[FileType] | None): List of files
                 (filepath, binary, file object, or bytes)
             parent_id (str | None): Parent message ID for threading
             source (str | None): Source identifier for the message

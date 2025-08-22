@@ -200,10 +200,10 @@ client = GLChat(
 
 **Parameters:**
 
-- `api_key`: Your GLChat API key for authentication 🔑 (or set GLCHAT_API_KEY env var)
+- `api_key`: Your GLChat API key for authentication (set GLCHAT_API_KEY env var) 🔑
 - `base_url`: Custom base URL for the GLChat API (optional, or set GLCHAT_BASE_URL env var) 🌐
-- `timeout`: Request timeout in seconds (default: 60.0) ⏱️
-- `tenant_id`: Tenant identifier for multi-tenant setups (optional, or set GLCHAT_TENANT_ID env var) 🏢
+- `timeout`: Request timeout in seconds (optional, default: 60.0) ⏱️
+- `tenant_id`: Custom tenant identifier for multi-tenant setups (optional, or set GLCHAT_TENANT_ID env var) 🏢
 
 #### Methods
 

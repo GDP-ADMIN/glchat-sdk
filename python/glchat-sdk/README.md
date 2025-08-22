@@ -34,6 +34,7 @@ GLChat Python Client is a Python library that simplifies interaction with the GL
 - **🚀 Simple API**: Send messages and receive responses with minimal code
 - **⚡ Streaming Support**: Process responses in real-time as they arrive
 - **📎 File Integration**: Easily attach and send files with your messages
+- **💬 Conversation Management**: Create and manage conversations with chatbots
 - **🎯 Type Safety**: Comprehensive type hints for better development experience
 - **🔄 Flexible Response Handling**: Choose between streaming or complete text responses
 - **💾 Memory Efficient**: Optimized file handling for large files
@@ -68,6 +69,15 @@ for chunk in client.message.create(
     message="Hello!"
 ):
     print(chunk.decode("utf-8"), end="")
+
+# Create a new conversation
+conversation = client.conversation.create(
+    user_id="your-user-id",
+    chatbot_id="your-chatbot-id",
+    title="My First Conversation",
+    model_name="gpt-4"
+)
+print(f"Created conversation: {conversation['conversation_id']}")
 ```
 
 Note: Make sure you have the correct chatbot ID and API key before running example.
@@ -185,7 +195,7 @@ The main client class for interacting with the GLChat API.
 client = GLChat(
     api_key: str | None = None,
     base_url: str | None = None,
-    timeout: float = 60.0
+    timeout: float = 60.0,
 )
 ```
 
@@ -194,6 +204,7 @@ client = GLChat(
 - `api_key`: Your GLChat API key for authentication 🔑 (or set GLCHAT_API_KEY env var)
 - `base_url`: Custom base URL for the GLChat API (optional, or set GLCHAT_BASE_URL env var) 🌐
 - `timeout`: Request timeout in seconds (default: 60.0) ⏱️
+- `tenant_id`: Tenant identifier for multi-tenant setups (optional, or set GLCHAT_TENANT_ID env var) 🏢
 
 #### Methods
 
@@ -248,6 +259,30 @@ response_stream = client.message.create(
 **Returns:**
 
 - `Iterator[bytes]`: Streaming response chunks 📡
+
+##### 💬 conversation.create
+
+Creates a new conversation with the GLChat API.
+
+```python
+conversation = client.conversation.create(
+    user_id: str,
+    chatbot_id: str,
+    title: str | None = None,
+    model_name: str | None = None
+) -> dict[str, Any]
+```
+
+**Parameters:**
+
+- `user_id`: Required user identifier 👤
+- `chatbot_id`: Required chatbot identifier 🤖
+- `title`: Optional conversation title 📝
+- `model_name`: Optional model name to use 🧠
+
+**Returns:**
+
+- `dict[str, Any]`: Conversation response data including conversation_id 💬
 
 ## 📁 File Support
 

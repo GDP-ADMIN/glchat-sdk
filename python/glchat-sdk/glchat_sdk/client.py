@@ -22,6 +22,7 @@ References:
 
 import os
 
+from glchat_sdk.conversation import ConversationAPI
 from glchat_sdk.message import MessageAPI
 
 # Ensure the URL ends with a slash; without the trailing slash, the base path will be incorrect.
@@ -36,6 +37,7 @@ class GLChat:
         base_url: Base URL for the GLChat API
         timeout: Request timeout in seconds
         message: MessageAPI instance for message operations
+        conversation: ConversationAPI instance for conversation operations
     """
 
     def __init__(
@@ -58,9 +60,11 @@ class GLChat:
         self.api_key = api_key or os.getenv("GLCHAT_API_KEY")
         if not self.api_key:
             raise ValueError(
-                "API key is required. Provide it via 'api_key' parameter or 'GLCHAT_API_KEY' environment variable."
+                "API key is required. Provide it via 'api_key' parameter or "
+                "'GLCHAT_API_KEY' environment variable."
             )
 
         self.base_url = base_url or os.getenv("GLCHAT_BASE_URL") or DEFAULT_BASE_URL
         self.timeout = timeout
         self.message = MessageAPI(self)
+        self.conversation = ConversationAPI(self)

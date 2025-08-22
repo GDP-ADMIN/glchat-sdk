@@ -33,11 +33,12 @@ class GLChat:
     """GLChat Backend API Client.
 
     Attributes:
-        api_key: API key for authentication
-        base_url: Base URL for the GLChat API
-        timeout: Request timeout in seconds
-        message: MessageAPI instance for message operations
-        conversation: ConversationAPI instance for conversation operations
+        api_key (str): API key for authentication
+        base_url (str): Base URL for the GLChat API
+        timeout (float): Request timeout in seconds
+        tenant_id (str | None): Tenant ID for multi-tenancy
+        message (MessageAPI): MessageAPI instance for message operations
+        conversation (ConversationAPI): ConversationAPI instance for conversation operations
     """
 
     def __init__(

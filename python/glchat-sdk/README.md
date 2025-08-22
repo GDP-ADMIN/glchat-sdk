@@ -74,8 +74,7 @@ for chunk in client.message.create(
 conversation = client.conversation.create(
     user_id="your-user-id",
     chatbot_id="your-chatbot-id",
-    title="My First Conversation",
-    model_name="gpt-4"
+    title="My First Conversation"
 )
 print(f"Created conversation: {conversation['conversation_id']}")
 ```

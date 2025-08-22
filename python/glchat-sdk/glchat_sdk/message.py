@@ -126,7 +126,7 @@ class MessageAPI:
 
     def _process_file_item(
         self, file_item: str | Path | BinaryIO | bytes
-    ) -> tuple[str, str | BinaryIO | bytes, str]:
+    ) -> tuple[str, tuple[str, str | BinaryIO | bytes, str]]:
         """Process a single file item and return the file tuple for httpx.
 
         Args:
@@ -161,7 +161,7 @@ class MessageAPI:
         """Prepare files for upload.
 
         Args:
-            files (List[Union[str, Path, BinaryIO, bytes]] | None): List of files to process
+            files (list[Union[str, Path, BinaryIO, bytes]] | None): List of files to process
 
         Returns:
             List of file tuples for httpx or None if no files
@@ -195,10 +195,10 @@ class MessageAPI:
 
         Args:
             url (str): API endpoint URL
-            data (Dict[str, Any]): Request data
-            files (List[Tuple[str, Tuple[str, Union[str, BinaryIO, bytes], str]]]
+            data (dict[str, Any]): Request data
+            files (list[Tuple[str, Tuple[str, Union[str, BinaryIO, bytes], str]]]
                 | None, Optional): Prepared files data
-            headers (Dict[str, str]): Request headers
+            headers (dict[str, str]): Request headers
 
         Yields:
             bytes: Streaming response chunks
@@ -247,7 +247,7 @@ class MessageAPI:
         Args:
             chatbot_id (str): Required chatbot identifier
             message (str): Required user message
-            files (List[Union[str, Path, BinaryIO, bytes]] | None): List of files
+            files (list[Union[str, Path, BinaryIO, bytes]] | None): List of files
                 (filepath, binary, file object, or bytes)
             parent_id (str | None): Parent message ID for threading
             source (str | None): Source identifier for the message
@@ -264,7 +264,7 @@ class MessageAPI:
             anonymize_lm (bool | None): Whether to anonymize language model
             use_cache (bool | None): Whether to use cached responses
             search_type (str | None): Type of search to perform
-            headers (Dict[str, str] | None): Custom headers to include in the request
+            headers (dict[str, str] | None): Custom headers to include in the request
 
         Yields:
             bytes: Streaming response chunks

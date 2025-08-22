@@ -1,3 +1,4 @@
+import { APIError, NetworkError } from '@/error';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { GLChatConfiguration } from '../config';
 import { createGLChatFetchClient } from './fetch';
@@ -59,6 +60,12 @@ describe('createGLChatFetchClient with MSW', () => {
   it('should throw error when the request fails', async () => {
     const client = createGLChatFetchClient(mockConfig);
 
-    await expect(client('/fetch/fail')).rejects.toThrowError('Failed to fetch');
+    await expect(client('/fetch/fail/network')).rejects.toThrowError(NetworkError);
+  });
+
+  it('should throw error when the request returned non-200', async () => {
+    const client = createGLChatFetchClient(mockConfig);
+
+    await expect(client('/fetch/fail/not-ok')).rejects.toThrowError(APIError);
   });
 });

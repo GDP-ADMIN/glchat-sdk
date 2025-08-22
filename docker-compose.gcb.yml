@@ -1,21 +1,4 @@
 services:
-  builder-libs:
-    image: asia.gcr.io/gdp-labs/gl-base/poetry:1.8.2-py${VERSION}.0
-    working_dir: /workspace/libs
-    environment:
-      - GH_TOKEN=${GH_TOKEN:-notdefined}
-      - MODULE=${MODULE:-notdefined}
-      - POETRY_PYPI_TOKEN_PYPI=${PYPI_TOKEN:-notdefined}
-      - TAG_NAME=${TAG_NAME}
-    entrypoint: /bin/bash
-    command:
-      - '-c'
-      - './build.ci.sh ${MODULE} $(echo "${TAG_NAME}" | sed -E "s/^.*-v//")'
-    env_file:
-      - 'libs/build.ci.env'
-    volumes:
-      - '.:/workspace'
-
   builder-python:
     image: ghcr.io/astral-sh/uv:python${VERSION}-bookworm
     working_dir: /workspace/python
@@ -23,6 +6,7 @@ services:
       - MODULE=${MODULE:-notdefined}
       - UV_PUBLISH_TOKEN=${PYPI_TOKEN:-notdefined}
       - TAG_NAME=${TAG_NAME}
+      - VERSION=${VERSION}
     entrypoint: /bin/bash
     command:
       - '-c'

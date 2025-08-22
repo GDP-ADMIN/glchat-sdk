@@ -11,6 +11,8 @@
  * Copyright (c) GDP LABS. All rights reserved.
  */
 
+import { ValidationError } from '@/error';
+import { ZodError } from 'zod/v4';
 import { processGLChatChunk } from '../lib';
 import { CreateMessagePayloadSchema, type CreateMessagePayload, type GLChatMessageChunk } from './types';
 
@@ -35,64 +37,73 @@ export class MessageAPI {
    * @param {CreateMessagePayload} payload Message payload
    * @returns {Promise<AsyncIterable<GLChatMessageChunk>>} A promise that resolves
    * into a generator that produces message chunks.
-   * @throws `ZodError` if the payload is invalid.
+   * @throws `ValidationError` if the payload is invalid.
    */
   public async create(
     payload: CreateMessagePayload,
   ): Promise<AsyncIterable<GLChatMessageChunk>> {
-    CreateMessagePayloadSchema.parse(payload);
+    try {
+      CreateMessagePayloadSchema.parse(payload);
 
-    const form = new FormData();
-    const {
-      files = [],
-      additional_data = {},
-      ...rest
-    } = payload;
+      const form = new FormData();
+      const {
+        files = [],
+        additional_data = {},
+        ...rest
+      } = payload;
 
-    // Populate form with additional data and other payload fields
-    const combinedEntries = [
-      ...Object.entries(additional_data),
-      ...Object.entries(rest),
-    ];
-    for (const [key, value] of combinedEntries) {
-      form.set(key, value);
-    }
+      // Populate form with additional data and other payload fields
+      const combinedEntries = [
+        ...Object.entries(additional_data),
+        ...Object.entries(rest),
+      ];
+      for (const [key, value] of combinedEntries) {
+        form.set(key, value);
+      }
 
-    for (const [index, file] of files.entries()) {
-      form.append(
-        'files',
-        file,
-        file.name ?? `file_message_${(index + 1).toString()}.bin`,
-      );
-    }
+      for (const [index, file] of files.entries()) {
+        form.append(
+          'files',
+          file,
+          file.name ?? `file_message_${(index + 1).toString()}.bin`,
+        );
+      }
 
-    const response = await this.client('message', {
-      method: 'POST',
-      headers: {
-        Accept: 'text/event-stream',
-      },
-      body: form,
-    });
+      const response = await this.client('message', {
+        method: 'POST',
+        headers: {
+          Accept: 'text/event-stream',
+        },
+        body: form,
+      });
 
-    const reader = response.body?.getReader();
-    const decoder = new TextDecoder();
+      const reader = response.body?.getReader();
+      const decoder = new TextDecoder();
 
-    return {
-      async* [Symbol.asyncIterator]() {
-        if (!reader) throw new Error('No response body');
+      return {
+        async* [Symbol.asyncIterator]() {
+          if (!reader) throw new Error('No response body');
 
-        try {
-          while (true) {
-            const { done, value } = await reader.read();
-            if (done) break;
+          try {
+            while (true) {
+              const { done, value } = await reader.read();
+              if (done) break;
 
-            const rawChunk = decoder.decode(value as ArrayBuffer, { stream: true });
-            yield processGLChatChunk(rawChunk);
+              const rawChunk = decoder.decode(value as ArrayBuffer, { stream: true });
+              yield processGLChatChunk(rawChunk);
+            }
+          } finally {
+            reader.releaseLock();
           }
-        } finally {
-          reader.releaseLock();
-        }
-      },
-    };
+        },
+      };
+    } catch (err) {
+      if (err instanceof ZodError) {
+        throw new ValidationError('payload', err);
+      }
+
+      // re-throw, handled in other part of the code.
+      throw err;
+    }
   }
 }

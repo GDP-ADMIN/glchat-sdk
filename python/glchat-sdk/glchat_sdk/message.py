@@ -120,6 +120,8 @@ class MessageAPI:
         headers = {}
         if self._client.api_key:
             headers["Authorization"] = f"Bearer {self._client.api_key}"
+        if self._client.tenant_id:
+            headers["X-Tenant-ID"] = self._client.tenant_id
         return headers
 
     def _process_file_item(

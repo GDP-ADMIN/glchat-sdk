@@ -11,13 +11,16 @@ import io
 from unittest.mock import Mock, patch
 
 import pytest
+
 from glchat_sdk.client import GLChat
 
 
 @pytest.fixture
 def client():
     """Create a GLChat instance for testing."""
-    return GLChat(api_key="test_api_key", base_url="https://test-api.example.com")
+    return GLChat(
+        api_key="test_api_key", base_url="https://test-api.example.com", tenant_id="test_tenant"
+    )
 
 
 @pytest.fixture
@@ -68,9 +71,7 @@ def test_send_message_with_bytes(client, mock_response):
     with patch("httpx.Client.stream") as mock_stream:
         mock_stream.return_value.__enter__.return_value = mock_response
 
-        response = client.message.create(
-            chatbot_id="test-bot", message="Hello", files=[test_bytes]
-        )
+        response = client.message.create(chatbot_id="test-bot", message="Hello", files=[test_bytes])
 
         chunks = list(response)
         assert chunks == [b"Hello", b" ", b"World"]
@@ -85,9 +86,7 @@ def test_send_message_with_file_object(client, mock_response):
     with patch("httpx.Client.stream") as mock_stream:
         mock_stream.return_value.__enter__.return_value = mock_response
 
-        response = client.message.create(
-            chatbot_id="test-bot", message="Hello", files=[file_obj]
-        )
+        response = client.message.create(chatbot_id="test-bot", message="Hello", files=[file_obj])
 
         chunks = list(response)
         assert chunks == [b"Hello", b" ", b"World"]
@@ -99,7 +98,9 @@ def test_send_message_with_invalid_file_type(client):
     with pytest.raises(ValueError, match="Unsupported file type"):
         list(
             client.message.create(
-                chatbot_id="test-bot", message="Hello", files=[123]  # Invalid file type
+                chatbot_id="test-bot",
+                message="Hello",
+                files=[123],  # Invalid file type
             )
         )
 
@@ -120,6 +121,24 @@ def test_send_message_with_additional_params(client, mock_response):
         chunks = list(response)
         assert chunks == [b"Hello", b" ", b"World"]
         mock_stream.assert_called_once()
+
+
+def test_send_message_includes_tenant_id_header(client, mock_response):
+    """Test that tenant_id header is included in message requests."""
+    with patch("httpx.Client.stream") as mock_stream:
+        mock_stream.return_value.__enter__.return_value = mock_response
+
+        response = client.message.create(chatbot_id="test-bot", message="Hello")
+
+        # Convert iterator to list to consume the response
+        list(response)
+
+        # Check that the tenant_id header was included
+        mock_stream.assert_called_once()
+        call_args = mock_stream.call_args
+        headers = call_args[1].get("headers", {})
+        assert "X-Tenant-ID" in headers
+        assert headers["X-Tenant-ID"] == "test_tenant"
 
 
 def test_client_with_environment_variables():
@@ -158,3 +177,29 @@ def test_client_default_base_url():
     with patch.dict("os.environ", {}, clear=True):
         client = GLChat(api_key="test_api_key")
         assert client.base_url == "https://chat.gdplabs.id/api/proxy/"
+
+
+def test_client_tenant_id_environment_variable():
+    """Test client initialization with tenant_id from environment variable."""
+    with patch.dict(
+        "os.environ",
+        {
+            "GLCHAT_API_KEY": "test-api-key",
+            "GLCHAT_TENANT_ID": "env-tenant-id",
+        },
+    ):
+        client = GLChat()
+        assert client.tenant_id == "env-tenant-id"
+
+
+def test_client_tenant_id_parameter_priority():
+    """Test that explicit tenant_id parameter takes priority over environment variable."""
+    with patch.dict(
+        "os.environ",
+        {
+            "GLCHAT_API_KEY": "test-api-key",
+            "GLCHAT_TENANT_ID": "env-tenant-id",
+        },
+    ):
+        client = GLChat(tenant_id="explicit-tenant-id")
+        assert client.tenant_id == "explicit-tenant-id"

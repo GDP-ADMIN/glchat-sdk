@@ -76,7 +76,7 @@ export const GLChatConfigurationSchema = z.object({
     .default(() => process.env.GLCHAT_BASE_URL ?? 'https://chat.gdplabs.id/api/proxy/'),
   timeout: z
     .int()
-    .nonnegative({ error: 'Timeout value must be a non-negative number' })
+    .nonnegative({ error: 'Timeout must be a non-negative number' })
     .default(() => Number(process.env.GLCHAT_TIMEOUT ?? 60_000)),
   __version: z
     .enum(

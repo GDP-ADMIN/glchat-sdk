@@ -11,11 +11,13 @@ References:
 """
 
 import logging
+from collections.abc import Iterator
 from pathlib import Path
-from typing import Any, BinaryIO, Dict, Iterator, List, Tuple, Union
+from typing import Any, BinaryIO
 from urllib.parse import urljoin
 
 import httpx
+
 from glchat_sdk.models import MessageRequest
 
 logger = logging.getLogger(__name__)
@@ -63,7 +65,7 @@ class MessageAPI:
         anonymize_lm: bool | None = None,
         use_cache: bool | None = None,
         search_type: str | None = None,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Prepare request data for the API call.
 
         Args:
@@ -109,7 +111,7 @@ class MessageAPI:
         )
         return request.model_dump(exclude_none=True)
 
-    def _prepare_headers(self) -> Dict[str, str]:
+    def _prepare_headers(self) -> dict[str, str]:
         """Prepare headers for the API request.
 
         Returns:
@@ -121,12 +123,12 @@ class MessageAPI:
         return headers
 
     def _process_file_item(
-        self, file_item: Union[str, Path, BinaryIO, bytes]
-    ) -> Tuple[str, Union[str, BinaryIO, bytes], str]:
+        self, file_item: str | Path | BinaryIO | bytes
+    ) -> tuple[str, str | BinaryIO | bytes, str]:
         """Process a single file item and return the file tuple for httpx.
 
         Args:
-            file_item (Union[str, Path, BinaryIO, bytes]): File item to process (path, bytes, or file-like object)
+            file_item (Union[str, Path, BinaryIO, bytes]): Item to process
 
         Returns:
             Tuple of (field_name, (filename, file_content, content_type))
@@ -134,7 +136,7 @@ class MessageAPI:
         Raises:
             ValueError: If file type is not supported
         """
-        if isinstance(file_item, (str, Path)):
+        if isinstance(file_item, str | Path):
             # File path
             file_path = Path(file_item)
             if not file_path.exists():
@@ -152,8 +154,8 @@ class MessageAPI:
             raise ValueError(f"Unsupported file type: {type(file_item)}")
 
     def _prepare_files(
-        self, files: List[Union[str, Path, BinaryIO, bytes]] | None
-    ) -> List[Tuple[str, Tuple[str, Union[str, BinaryIO, bytes], str]]] | None:
+        self, files: list[str | Path | BinaryIO | bytes] | None
+    ) -> list[tuple[str, tuple[str, str | BinaryIO | bytes, str]]] | None:
         """Prepare files for upload.
 
         Args:
@@ -183,16 +185,17 @@ class MessageAPI:
     def _make_streaming_request(
         self,
         url: str,
-        data: Dict[str, Any],
-        files: List[Tuple[str, Tuple[str, Union[str, BinaryIO, bytes], str]]] | None,
-        headers: Dict[str, str],
+        data: dict[str, Any],
+        files: list[tuple[str, tuple[str, str | BinaryIO | bytes, str]]] | None,
+        headers: dict[str, str],
     ) -> Iterator[bytes]:
         """Make the streaming HTTP request.
 
         Args:
             url (str): API endpoint URL
             data (Dict[str, Any]): Request data
-            files (List[Tuple[str, Tuple[str, Union[str, BinaryIO, bytes], str]]] | None): Prepared files data
+            files (List[Tuple[str, Tuple[str, Union[str, BinaryIO, bytes], str]]]
+                | None, Optional): Prepared files data
             headers (Dict[str, str]): Request headers
 
         Yields:
@@ -212,14 +215,13 @@ class MessageAPI:
                 headers=headers,
             ) as response:
                 response.raise_for_status()
-                for chunk in response.iter_bytes():
-                    yield chunk
+                yield from response.iter_bytes()
 
     def create(
         self,
         chatbot_id: str,
         message: str,
-        files: List[Union[str, Path, BinaryIO, bytes]] | None = None,
+        files: list[str | Path | BinaryIO | bytes] | None = None,
         parent_id: str | None = None,
         source: str | None = None,
         quote: str | None = None,
@@ -235,6 +237,7 @@ class MessageAPI:
         anonymize_lm: bool | None = None,
         use_cache: bool | None = None,
         search_type: str | None = None,
+        headers: dict[str, str] | None = None,
     ) -> Iterator[bytes]:
         """
         Create a streaming response from the GLChat API.
@@ -259,6 +262,7 @@ class MessageAPI:
             anonymize_lm (bool | None): Whether to anonymize language model
             use_cache (bool | None): Whether to use cached responses
             search_type (str | None): Type of search to perform
+            headers (Dict[str, str] | None): Custom headers to include in the request
 
         Yields:
             bytes: Streaming response chunks
@@ -294,8 +298,10 @@ class MessageAPI:
             use_cache=use_cache,
             search_type=search_type,
         )
-        headers = self._prepare_headers()
+        base_headers = self._prepare_headers()
+        if headers:
+            base_headers.update(headers)
         files_data = self._prepare_files(files)
 
         # Make the streaming request
-        yield from self._make_streaming_request(url, data, files_data, headers)
+        yield from self._make_streaming_request(url, data, files_data, base_headers)

@@ -44,3 +44,15 @@ class MessageRequest(BaseModel):
     anonymize_lm: bool | None = None
     use_cache: bool | None = None
     search_type: str | None = None
+
+
+class ConversationRequest(BaseModel):
+    """Request model for creating conversations with the GLChat API."""
+
+    # Disable pydantic's protected namespace "model_"
+    model_config = ConfigDict(protected_namespaces=())
+
+    user_id: str
+    chatbot_id: str
+    title: str | None = None
+    model_name: str | None = None

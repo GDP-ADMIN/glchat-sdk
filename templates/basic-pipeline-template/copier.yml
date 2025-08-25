@@ -1,0 +1,60 @@
+# Template metadata
+_templates_suffix: .jinja
+_envops:
+  block_start_string: "{%"
+  block_end_string: "%}"
+  variable_start_string: "{{"
+  variable_end_string: "}}"
+
+# Questions and configuration
+pipeline_id:
+  type: str
+  help: Pipeline ID
+  placeholder: "basic-pipeline"
+  default: "basic-pipeline"
+  validator: "{% if not pipeline_id | regex_search('^[a-z]+(-[a-z]+)*$') %}Pipeline ID must be lowercase letters and hyphens only (kebab-case){% endif %}"
+
+pipeline_slug:
+  type: str
+  default: "{{ pipeline_id.replace('-', '_') }}"
+  when: false
+
+pipeline_display_name:
+  type: str
+  default: "{{ pipeline_id.replace('-', ' ').title() }}"
+  when: false
+
+pipeline_name:
+  type: str
+  default: "{{ pipeline_display_name.replace(' ', '') }}"
+  when: false
+
+application_id:
+  type: str
+  help: Application ID to access the pipeline
+  placeholder: "{{ pipeline_id }}-app"
+  default: "{{ pipeline_id }}-app"
+  validator: "{% if not application_id | regex_search('^[a-z]+(-[a-z]+)*$') %}Application ID must be lowercase letters and hyphens only (kebab-case){% endif %}"
+
+application_display_name:
+  type: str
+  default: "{{ application_id.replace('-', ' ').title() }}"
+  when: false
+
+user_id:
+  type: str
+  help: User ID to access the application
+  placeholder: "username"
+  default: "username"
+
+author_name:
+  type: str
+  help: Author name
+  default: "Your Name"
+  placeholder: "Your Name"
+
+author_email:
+  type: str
+  help: Author email
+  default: "your.email@example.com"
+  placeholder: "your.email@example.com"

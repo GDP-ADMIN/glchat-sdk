@@ -1,0 +1,358 @@
+"""{{pipeline_display_name}} Builder.
+
+Authors:
+    {{author_name}} ({{author_email}})
+
+References:
+    None
+"""
+
+from typing import Any
+from pydantic import BaseModel, field_validator
+import json
+
+from glchat_plugin.pipeline.pipeline_plugin import PipelineBuilderPlugin
+from glchat_plugin.utils import get_catalog, get_lm_invoker
+from gllm_generation.response_synthesizer import StuffResponseSynthesizer
+from gllm_misc.chat_history_manager import ChatHistoryManager
+from gllm_misc.chat_history_manager.schema import OperationType, Parameter
+from gllm_pipeline.pipeline.pipeline import Pipeline
+from gllm_pipeline.steps import step, transform
+
+from {{pipeline_slug}}.preset_config import {{pipeline_name}}PresetConfig
+from {{pipeline_slug}}.state import {{pipeline_name}}State, {{pipeline_name}}StateKeys
+
+
+class ReferenceMetadata(BaseModel):
+    """A class to represent metadata for a reference.
+
+    Attributes:
+        source_type (str): The type of the source.
+        source (str): The source of the reference.
+        file_id (str): The id of the file associated with the reference.
+        conversation_id (str): The id of the conversation associated with the reference.
+        content (str): The content of the reference.
+        title (str): The title of the reference.
+        source_url (str | None): The optional source url of the reference.
+        link (str | None): The optional link of the reference.
+        gdrive_link (str | None): The optional gdrive_link of the reference.
+        transcripts (str | list[dict[str, Any]] | None): A list of transcript objects or JSON string,
+            each containing various fields, including `start_time` as a float.
+        position (str | list[dict[str, Any]] | None): A list of position objects or JSON string,
+            each containing various fields, including `coordinates` as a float array.
+    """
+
+    source_type: str = ""
+    source: str = ""
+    file_id: str = ""
+    conversation_id: str = ""
+    content: str = ""
+    title: str = ""
+    source_url: str | None = None
+    link: str | None = None
+    gdrive_link: str | None = None
+    transcripts: str | list[dict[str, Any]] | None = None
+    position: str | list[dict[str, Any]] | None = None
+    heading_1: str | None = None
+    heading_2: str | None = None
+
+    @field_validator("transcripts", "position", mode="after")
+    @classmethod
+    def cast_string_to_object(cls, value: Any) -> Any:
+        """Cast string to object for ChromaDB data.
+
+        Args:
+            value (Any): The input value.
+
+        Returns:
+            Any: The processed value.
+        """
+        if isinstance(value, str):
+            try:
+                return json.loads(value)
+            except json.JSONDecodeError:
+                return value
+        return value
+
+
+class {{pipeline_name}}Builder(PipelineBuilderPlugin[{{pipeline_name}}State, {{pipeline_name}}PresetConfig]):
+    """{{pipeline_display_name}} builder.
+
+    This pipeline will simply pass the user query to the response synthesizer.
+    There are no prompt templates used in this pipeline.
+
+    Inherits attributes from `PipelineBuilderPlugin`.
+    """
+
+    name = "{{pipeline_id}}"
+    preset_config_class = {{pipeline_name}}PresetConfig
+
+    # this will be injected by GL Chat to reuse the same data store with GL Chat
+    chat_history_manager: ChatHistoryManager
+
+    def __init__(self):
+        """Initialize the {{pipeline_display_name}} builder."""
+        super().__init__()
+
+    async def build(self, pipeline_config: dict[str, Any]) -> Pipeline:
+        """Build the pipeline.
+
+        Args:
+            pipeline_config (dict[str, Any]): The pipeline configuration.
+
+        Returns:
+            Pipeline: The simple pipeline.
+        """
+        model_name = pipeline_config.get("model_name")
+        model_kwargs = pipeline_config.get("model_kwargs", {})
+        model_env_kwargs = pipeline_config.get("model_env_kwargs", {})
+
+        chat_history_pair_limit = pipeline_config.get("chat_history_pair_limit", 0)
+
+        retrieve_history_step = step(
+            component=self.chat_history_manager,
+            input_state_map={
+                Parameter.USER_MESSAGE: {{pipeline_name}}StateKeys.QUERY,
+            },
+            output_state={{pipeline_name}}StateKeys.HISTORY,
+            runtime_config_map={
+                Parameter.CONVERSATION_ID: Parameter.CONVERSATION_ID,
+                Parameter.LAST_MESSAGE_ID: Parameter.LAST_MESSAGE_ID
+            },
+            fixed_args={
+                Parameter.OPERATION: OperationType.RETRIEVE,
+                Parameter.PAIR_LIMIT: chat_history_pair_limit,
+            },
+        )
+
+        response_synthesizer_step = step(
+            component=self.build_response_synthesizer(model_name, model_kwargs, model_env_kwargs),
+            input_state_map={
+                "query": {{pipeline_name}}StateKeys.QUERY,
+                "history": {{pipeline_name}}StateKeys.HISTORY,
+                "event_emitter": {{pipeline_name}}StateKeys.EVENT_EMITTER,
+            },
+            output_state={{pipeline_name}}StateKeys.RESPONSE,
+            runtime_config_map={
+                "user_multimodal_contents": "binaries",
+                "hyperparameters": "hyperparameters",
+            },
+        )
+
+        build_original_message_step = self.build_original_message_step()
+        build_user_metadata_history_step = self.build_user_metadata_history_step()
+        build_assistant_metadata_history_step = self.build_assistant_metadata_history_step()
+
+        save_history_step = step(
+            component=self.chat_history_manager,
+            input_state_map={
+                Parameter.USER_MESSAGE: {{pipeline_name}}StateKeys.QUERY,
+                Parameter.ASSISTANT_MESSAGE: {{pipeline_name}}StateKeys.RESPONSE,
+                Parameter.USER_METADATA: {{pipeline_name}}StateKeys.USER_METADATA,
+                Parameter.ASSISTANT_METADATA: {{pipeline_name}}StateKeys.ASSISTANT_METADATA,
+            },
+            output_state={{pipeline_name}}StateKeys.HISTORY,
+            runtime_config_map={
+                Parameter.CONVERSATION_ID: Parameter.CONVERSATION_ID,
+                Parameter.USER_MESSAGE_ID: Parameter.USER_MESSAGE_ID,
+                Parameter.ASSISTANT_MESSAGE_ID: Parameter.ASSISTANT_MESSAGE_ID,
+                Parameter.PARENT_ID: Parameter.PARENT_ID,
+                Parameter.SOURCE: Parameter.SOURCE,
+            },
+            fixed_args={
+                Parameter.OPERATION: OperationType.STORE,
+                Parameter.IS_ACTIVE: True,
+                Parameter.FEEDBACK: None,
+            },
+        )
+
+        pipeline = Pipeline(
+            steps=[
+                retrieve_history_step,
+                response_synthesizer_step,
+                build_original_message_step,
+                build_user_metadata_history_step,
+                build_assistant_metadata_history_step,
+                save_history_step,
+            ],
+            state_type={{pipeline_name}}State,
+        )
+
+        return pipeline
+
+    def build_initial_state(
+        self, request: dict[str, Any], pipeline_config: dict[str, Any], **kwargs: Any
+    ) -> {{pipeline_name}}State:
+        """Build the initial state for pipeline invoke.
+
+        Args:
+            request (dict[str, Any]): The given request from the user.
+            pipeline_config (dict[str, Any]): The pipeline configuration.
+            **kwargs (Any): A dictionary of arguments required for building the initial state.
+
+        Returns:
+            {{pipeline_name}}State: The initial state.
+        """
+        return {{pipeline_name}}State(
+            query=request.get("message"),
+            response=None,
+            references=[],
+            history=[],
+            user_metadata={},
+            assistant_metadata={},
+            event_emitter=kwargs.get("event_emitter")
+        )
+
+    def build_response_synthesizer(
+        self, model_name: str, model_kwargs: dict[str, Any], model_env_kwargs: dict[str, Any]
+    ) -> StuffResponseSynthesizer:
+        """Build the response synthesizer component.
+
+        Args:
+            model_name (str): The model to use for inference.
+            model_kwargs (dict[str, Any]): The model kwargs.
+            model_env_kwargs (dict[str, Any]): The model env kwargs.
+
+        Returns:
+            StuffResponseSynthesizer: The response synthesizer component.
+        """
+        lm_invoker = get_lm_invoker(model_name, model_kwargs, model_env_kwargs)
+        prompt_builder = get_catalog(self.prompt_builder_catalogs, "generate_response", model_name)
+        response_synthesizer = StuffResponseSynthesizer.from_lm_components(prompt_builder, lm_invoker)
+        return response_synthesizer
+
+    def build_original_message_step(self):
+        """Build the original message step.
+
+        Returns:
+            Transform: The original message step.
+        """
+        def map_original_message(inputs: dict[str, Any]) -> str:
+            """Map the original message.
+
+            Args:
+                inputs (dict[str, Any]): The input dictionary.
+
+            Returns:
+                str: The original message.
+            """
+            if inputs.get("original_message"):
+                return inputs.get("original_message")
+            return inputs.get({{pipeline_name}}StateKeys.QUERY)
+
+        return transform(
+            operation=map_original_message,
+            input_states=[{{pipeline_name}}StateKeys.QUERY],
+            runtime_config_map={
+                "original_message": "original_message",
+            },
+            output_state={{pipeline_name}}StateKeys.QUERY,
+        )
+
+    def build_user_metadata_history_step(self):
+        """Build the user metadata history step.
+
+        Returns:
+            Transform: The user metadata history step.
+        """
+        def map_user_metadata(inputs: dict[str, Any]) -> dict[str, Any]:
+            """Map the user metadata.
+
+            Args:
+                inputs (dict[str, Any]): The input dictionary.
+
+            Returns:
+                dict[str, Any]: The user metadata.
+            """
+            user_metadata: dict[str, Any] = {}
+
+            attachments = inputs.get("attachments")
+            if attachments:
+                user_metadata.update(attachments)
+
+            quote = inputs.get("quote")
+            if quote:
+                user_metadata["quote"] = quote
+
+            anonymize_metadata_keys = ["anonymize_em", "anonymize_lm"]
+            anonymize_metadata_metadata = {
+                key: value for key in anonymize_metadata_keys if (value := inputs.get(key)) is not None
+            }
+            user_metadata.update(anonymize_metadata_metadata)
+
+            user_metadata_keys = [
+                "search_type",
+                "is_edited",
+            ]
+            user_metadata.update({key: value for key in user_metadata_keys if (value := inputs.get(key))})
+
+            return user_metadata
+
+        return transform(
+            operation=map_user_metadata,
+            input_states=[],
+            runtime_config_map={
+                "attachments": "attachments",
+                "quote": "quote",
+                "anonymize_em": "anonymize_em",
+                "anonymize_lm": "anonymize_lm",
+                "search_type": "search_type",
+                "is_edited": "is_edited",
+            },
+            output_state={{pipeline_name}}StateKeys.USER_METADATA,
+        )
+
+    def build_assistant_metadata_history_step(self):
+        """Build the assistant metadata history step.
+
+        Returns:
+            Transform: The assistant metadata history step.
+        """
+        def map_assistant_metadata(inputs: dict[str, Any]) -> dict[str, Any]:
+            """Map the assistant metadata.
+
+            Args:
+                inputs (dict[str, Any]): The input dictionary.
+
+            Returns:
+                dict[str, Any]: The user metadata.
+            """
+            assistant_metadata: dict[str, Any] = {}
+
+            anonymize_metadata_keys = ["anonymize_em", "anonymize_lm"]
+            anonymize_metadata_metadata = {
+                key: value for key in anonymize_metadata_keys if (value := inputs.get(key)) is not None
+            }
+            assistant_metadata.update(anonymize_metadata_metadata)
+
+            assistant_metadata_keys = [
+                "search_type",
+                "is_regenerated",
+            ]
+            assistant_metadata.update({key: value for key in assistant_metadata_keys if (value := inputs.get(key))})
+
+            references = inputs.get("references")
+            if references:
+                reference_metadata: list[dict[str, Any]] = []
+
+                for reference in references:
+                    metadata = getattr(reference, "metadata", {})
+                    metadata["content"] = getattr(reference, "content", "")
+                    filtered_metadata = ReferenceMetadata(**metadata)
+                    reference_metadata.append(filtered_metadata.model_dump(exclude_none=True))
+
+                assistant_metadata.update({"references": reference_metadata})
+
+            return assistant_metadata
+
+        return transform(
+            operation=map_assistant_metadata,
+            input_states=[{{pipeline_name}}StateKeys.REFERENCES],
+            runtime_config_map={
+                "anonymize_em": "anonymize_em",
+                "anonymize_lm": "anonymize_lm",
+                "search_type": "search_type",
+                "is_regenerated": "is_regenerated",
+            },
+            output_state={{pipeline_name}}StateKeys.ASSISTANT_METADATA,
+        )

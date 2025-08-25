@@ -4,6 +4,8 @@
     "baseUrl": ".", // usually the root of your project
     "paths": {
       "@/*": ["./../../src/*"]
-    }
+    },
+    "strict": true,
+    "strictNullChecks": true
   }
 }

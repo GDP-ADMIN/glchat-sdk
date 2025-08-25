@@ -1,4 +1,4 @@
-import { GLChat } from './../../src/client';
+import { GLChat } from '@/client.ts';
 
 const client = new GLChat();
 

@@ -126,7 +126,7 @@ const client = new GLChat();
 > If your `baseUrl` contains a path, ensure that it ends with a trailing slash! Otherwise, the path will be dropped
 > during request and may cause unexpected errors.
 
-### Methods
+#### Methods
 
 #### `.setBaseUrl(url: string): void`
 
@@ -158,18 +158,9 @@ Sets the global API timeout to be used for future requests.
 
 ### Message API
 
-#### `message.create(payload: CreateMessagePayload): Promise<AsyncIterable<GLChatMessageChunk>>`
+#### `message.create(payload: CreateMessagePayload)`
 
 Creates a streaming response from the GLChat API for a chatbot message.
-
-```ts
-const stream = await client.message.create({
-  chatbot_id: "bot-123",
-  message: "Hello!",
-  conversation_id: "conv-456",
-  files: [new File(["hello"], "greeting.txt")],
-});
-```
 
 #### Payload Parameters
 
@@ -198,19 +189,19 @@ const stream = await client.message.create({
 
 | Name  | Type     | Description                                          |
 | ----- | -------- | ---------------------------------------------------- |
-| quote | `string` | Quoted section of an assistant message (for context) |
+| `quote` | `string` | Quoted section of an assistant message (for context) |
 
 #### `GLChatMessageChunk` Fields
 
 | Name  | Type     | Description                                          |
 | ----- | -------- | ---------------------------------------------------- |
-| quote | `string` | Quoted section of an assistant message (for context) |
+| `quote` | `string` | Quoted section of an assistant message (for context) |
 
 #### Returns
 
-- `Promise<AsyncIterable<GLChatMessageChunk>>`: An asynchronous iterable yielding streamed message chunks.
+`Promise<AsyncIterable<GLChatMessageChunk>>`, an asynchronous iterable yielding [streamed message chunks](#message-chunks).
 
-### Example Usage
+#### Example Usage
 
 ```ts
 for await (const chunk of await client.message.create({
@@ -219,6 +210,60 @@ for await (const chunk of await client.message.create({
 })) {
   console.log(chunk);
 }
+```
+
+### Pipeline API
+
+#### `pipeline.register(pipeline: UploadedFile)`
+
+Register a new pipeline to GLChat pipeline registry.
+
+#### Payload Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| `pipeline` | `UploadedFile` | Pipeline plugin file. Only accepts a `.zip` file. |
+
+#### Returns
+
+`Promise<PipelineRegistrationResponse>`, a Promise that resolves into `PipelineRegistrationResponse` with the following properties:
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| `status` | `string` | Status of the response. The value for the property is always `success` |
+| `registered_plugins` | `string[]` | List of plugin IDs that have been successfully registered. Will be used later for [unregistration API](#pipelineunregisterpluginids-string) |
+
+#### Example Usage
+
+```ts
+const file = new File([<ZIP_FILE_CHUNK>], 'pipeline.zip', { type: 'application/zip' });
+
+const result = await client.pipeline.register(file);
+```
+
+#### `pipeline.unregister(pluginIds: string[])`
+
+Removes a pipeline plugin from GLChat pipeline registry.
+
+#### Payload Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| `pluginIds` | `string[]` | List of plugin IDs that should be removed from GLChat pipeline registry. The ID is returned from plugin registration. |
+
+#### Returns
+
+`Promise<PipelineUnregistrationResponse>`, a Promise that resolves into `PipelineUnregistrationResponse` with the following properties:
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| `status` | `string` | Status of the response. The value for the property is always `success` |
+| `unregistered_plugins` | `string[]` | List of plugin IDs that have been successfully unregistered. |
+
+#### Example Usage
+
+```ts
+const result = await client.pipeline.unregister(['glchat-sample-pipeline']);
 ```
 
 ## Message Chunks

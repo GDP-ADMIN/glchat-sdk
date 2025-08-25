@@ -1,16 +1,15 @@
-import { GLChat } from './../../src/client';
+import { GLChat } from '@/client';
 
 const client = new GLChat();
 
 void (async () => {
-  // Deno uses custom filesystem API inside the Deno namespace
-  const rawFile = await Deno.readFile('examples/fixtures/sample.txt');
-  const file = new Blob([rawFile], { type: 'text/plain' });
+  // Bun supports faster filesystem using the Bun namespace
+  const sampleText = Bun.file('examples/bun/sample.txt');
 
   const result = await client.message.create({
     chatbot_id: 'general-purpose',
     message: 'Tell me the filename from the .txt file that I have attached and its contents!',
-    files: [file],
+    files: [sampleText],
     search_type: 'normal',
     anonymize_lm: false,
   });

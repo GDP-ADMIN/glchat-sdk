@@ -51,5 +51,8 @@
         "Copyright (c) GDP LABS. All rights reserved."
       ]
     }
-  ]
+  ],
+
+  // deno config
+  "deno.enablePaths": ["examples/deno"]
 }

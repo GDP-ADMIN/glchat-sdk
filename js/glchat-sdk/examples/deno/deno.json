@@ -1,0 +1,10 @@
+{
+  "imports": {
+    "@/": "./../../src/",
+    "zod/v4": "npm:zod@^3.25.67/v4"
+  },
+  "compilerOptions": {
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true
+  }
+}

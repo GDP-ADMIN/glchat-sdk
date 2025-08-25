@@ -17,6 +17,7 @@
 import { ZodError } from 'zod/v4';
 import { createGLChatFetchClient } from './api/fetch';
 import { MessageAPI } from './api/message/handler';
+import { PipelineAPI } from './api/pipeline/handler';
 
 import type { APIVersion, GLChatConfiguration } from './config';
 import { GLChatConfigurationSchema } from './config';
@@ -38,6 +39,12 @@ export class GLChat {
   public readonly message: MessageAPI;
 
   /**
+   * Collection of interfaces to interact with pipeline registry
+   * of GLChat.
+   */
+  public readonly pipeline: PipelineAPI;
+
+  /**
    * API client that serves as an interface to interact with GLChat.
    *
    * @param {Partial<GLChatConfiguration>} config GLChat configuration object
@@ -50,6 +57,7 @@ export class GLChat {
       const fetchClient = createGLChatFetchClient(this.configuration);
 
       this.message = new MessageAPI(fetchClient);
+      this.pipeline = new PipelineAPI(fetchClient);
     } catch (err) {
       if (err instanceof ZodError) {
         throw new ValidationError('configuration', err);

@@ -13,7 +13,7 @@ describe('MessageAPI', () => {
   });
 
   describe('create', () => {
-    it('should throw a ZodError if the payload is invalid', async () => {
+    it('should throw ValidationError if the payload is invalid', async () => {
       const payload = {
         chatbot_id: 123,
         message: 'AAAAAAAAA',

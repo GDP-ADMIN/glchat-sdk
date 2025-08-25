@@ -22,6 +22,7 @@ References:
 
 import os
 
+from glchat_sdk.conversation import ConversationAPI
 from glchat_sdk.message import MessageAPI
 
 # Ensure the URL ends with a slash; without the trailing slash, the base path will be incorrect.
@@ -32,10 +33,12 @@ class GLChat:
     """GLChat Backend API Client.
 
     Attributes:
-        api_key: API key for authentication
-        base_url: Base URL for the GLChat API
-        timeout: Request timeout in seconds
-        message: MessageAPI instance for message operations
+        api_key (str): API key for authentication
+        base_url (str): Base URL for the GLChat API
+        timeout (float): Request timeout in seconds
+        tenant_id (str | None): Tenant ID for multi-tenancy
+        message (MessageAPI): MessageAPI instance for message operations
+        conversation (ConversationAPI): ConversationAPI instance for conversation operations
     """
 
     def __init__(
@@ -43,6 +46,7 @@ class GLChat:
         api_key: str | None = None,
         base_url: str | None = None,
         timeout: float = 60.0,
+        tenant_id: str | None = None,
     ):
         """
         Initialize GLChat client
@@ -54,13 +58,18 @@ class GLChat:
                 will try to get from GLCHAT_BASE_URL environment variable,
                 otherwise uses default
             timeout (float): Request timeout in seconds
+            tenant_id (str | None): Tenant ID for multi-tenancy. If not provided,
+                will try to get from GLCHAT_TENANT_ID environment variable
         """
         self.api_key = api_key or os.getenv("GLCHAT_API_KEY")
         if not self.api_key:
             raise ValueError(
-                "API key is required. Provide it via 'api_key' parameter or 'GLCHAT_API_KEY' environment variable."
+                "API key is required. Provide it via 'api_key' parameter or "
+                "'GLCHAT_API_KEY' environment variable."
             )
 
         self.base_url = base_url or os.getenv("GLCHAT_BASE_URL") or DEFAULT_BASE_URL
         self.timeout = timeout
+        self.tenant_id = tenant_id or os.getenv("GLCHAT_TENANT_ID")
         self.message = MessageAPI(self)
+        self.conversation = ConversationAPI(self)

@@ -14,7 +14,7 @@
 import { z } from 'zod/v4';
 import { UploadedFileSchema } from '../types';
 
-export const PipelineFileSchema = UploadedFileSchema.refine(file =>
+export const RegisterPluginSchema = UploadedFileSchema.refine(file =>
   file.type === 'application/zip',
 );
 
@@ -27,4 +27,13 @@ export const UnregisterPluginSchema = z.array(z.string()).min(1);
 export interface PipelineRegistrationResponse {
   status: 'success';
   registered_pipelines: string[];
+}
+
+/**
+ * Pipeline unregistration result. Stores the identifier
+ * of each pipelines in an array.
+ */
+export interface PipelineUnregistrationResponse {
+  status: 'success';
+  unregistered_pipelines: string[];
 }

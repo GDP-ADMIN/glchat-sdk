@@ -12,8 +12,9 @@
  * Copyright (c) GDP LABS. All rights reserved.
  */
 
-import { ChunkError } from '@/error';
+import { ChunkError, ValidationError } from '@/error';
 
+import { ZodError, type ZodType } from 'zod/v4';
 import type { GLChatMessageChunk, GLChatMessageStatus } from './message/types';
 
 /**
@@ -50,4 +51,40 @@ export function processGLChatChunk(
     ...rawChunk,
     message: parsedMessage,
   } as GLChatMessageChunk;
+}
+
+/**
+ * Decorates a class-method to use Zod validation flow and automatically
+ * convert it to `ValidationError` whenever the payload doesn't fulfill
+ * the schema.
+ *
+ * @param {ZodType} schema Zod schema that will be used for validation.
+ * @returns A function that decorates the target with validation flow.
+ */
+export function withValidation(schema: ZodType) {
+  return function (
+    _target: unknown,
+    _key: string,
+    descriptor: PropertyDescriptor,
+  ) {
+    const originalMethod = descriptor.value;
+
+    descriptor.value = async function (...args: unknown[]) {
+      try {
+        schema.parse(args[0]);
+
+        return await originalMethod.apply(this, args);
+      } catch (err) {
+        if (err instanceof ZodError) {
+          throw new ValidationError('payload', err);
+        }
+
+        // re-propagate, either it's already handled in other parts of the code.
+        // or something unexpected.
+        throw err;
+      }
+    };
+
+    return descriptor;
+  };
 }

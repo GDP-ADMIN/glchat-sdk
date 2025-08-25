@@ -1,6 +1,7 @@
-import { ChunkError } from '@/error';
-import { describe, expect, it } from 'vitest';
-import { processGLChatChunk } from './lib';
+import { ChunkError, ValidationError } from '@/error';
+import { beforeEach, describe, expect, it } from 'vitest';
+import { z } from 'zod/v4';
+import { processGLChatChunk, withValidation } from './lib';
 
 describe('processGLChatChunk', () => {
   it('should throw error when the chunk has incorrect type', () => {
@@ -54,5 +55,37 @@ describe('processGLChatChunk', () => {
     const parsedChunk = processGLChatChunk(chunk);
 
     expect(parsedChunk).toEqual(expected);
+  });
+});
+
+class TestService {
+  @withValidation(z.string())
+  async echo(input: string): Promise<string> {
+    return `echo: ${input}`;
+  }
+
+  @withValidation(z.string())
+  async throws(_input: string): Promise<string> {
+    throw new Error('Something else failed');
+  }
+}
+
+describe('withValidation decorator', () => {
+  let service: TestService;
+
+  beforeEach(() => {
+    service = new TestService();
+  });
+
+  it('should run the method when input is valid', async () => {
+    await expect(service.echo('hello')).resolves.toBe('echo: hello');
+  });
+
+  it('should throw ValidationError when input is invalid', async () => {
+    await expect(service.echo(123 as unknown as string)).rejects.toBeInstanceOf(ValidationError);
+  });
+
+  it('should propagate non-validation errors', async () => {
+    await expect(service.throws('hello')).rejects.toThrow('Something else failed');
   });
 });

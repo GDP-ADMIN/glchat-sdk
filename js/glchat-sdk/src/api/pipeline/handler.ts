@@ -12,8 +12,13 @@
  * Copyright (c) GDP LABS. All rights reserved.
  */
 
-import type { UploadedFile } from '../types';
-import { PipelineFileSchema, UnregisterPluginSchema, type PipelineRegistrationResponse } from './types';
+import { withValidation } from '@/api/lib';
+import type { UploadedFile } from '@/api/types';
+import {
+  RegisterPluginSchema,
+  UnregisterPluginSchema,
+  type PipelineRegistrationResponse, type PipelineUnregistrationResponse,
+} from './types';
 
 /**
  * An API that serves as an interface to GLChat pipeline registry.
@@ -38,13 +43,13 @@ export class PipelineAPI {
    * @param {UploadedFile} pipeline Schema of the pipeline packaged
    * as a zip file.
    * @returns {Promise<PipelineRegistrationResponse>} Pipeline registration
-   * response.
+   * response. Stores the list of successfully registered pipeline plugins.
+   * @throws `ValidationError` if the payload is invalid.
    */
+  @withValidation(RegisterPluginSchema)
   public async register(
     pipeline: UploadedFile,
   ): Promise<PipelineRegistrationResponse> {
-    PipelineFileSchema.parse(pipeline);
-
     const form = new FormData();
 
     form.append(
@@ -72,21 +77,24 @@ export class PipelineAPI {
    * @param {string[]} pluginIds List of plugin identifiers to be removed from
    * GLChat pipeline registry. The plugin identifier should be returned during the
    * registration process.
-   * @returns
+   * @returns {Promise<PipelineUnregistrationResponse>} Pipeline unregistration response.
+   * Stores the list of deleted pipeline plugins.
+   * @throws `ValidationError` if the payload is invalid.
    */
-  public async unregister(pluginIds: string[]) {
-    UnregisterPluginSchema.parse(pluginIds);
-
+  @withValidation(UnregisterPluginSchema)
+  public async unregister(pluginIds: string[]): Promise<PipelineUnregistrationResponse> {
     const response = await this.client('unregister-pipeline-plugin', {
       method: 'POST',
       headers: {
-        Accept: 'application/json',
+        'Accept': 'application/json',
+        // needed to avoid bad request errors.
+        'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        plugin_ids: pluginIds,
-      }),
+      body: JSON.stringify(pluginIds),
     });
 
-    return response.json();
+    const body = await response.json();
+
+    return body as PipelineUnregistrationResponse;
   };
 }

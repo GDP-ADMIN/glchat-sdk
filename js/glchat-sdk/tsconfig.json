@@ -21,6 +21,9 @@
 
     "declaration": true,
 
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+
     "lib": ["ES2022"],
     "baseUrl": ".", // usually the root of your project
     "paths": {

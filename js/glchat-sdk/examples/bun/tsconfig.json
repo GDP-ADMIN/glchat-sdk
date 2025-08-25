@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "types": ["bun-types"],
+    "baseUrl": ".", // usually the root of your project
+    "paths": {
+      "@/*": ["./../../src/*"]
+    }
+  }
+}
